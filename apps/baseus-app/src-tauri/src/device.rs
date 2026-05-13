@@ -9,6 +9,10 @@ use tracing::{error, info, warn};
 
 const EVENT_CHANNEL_CAP: usize = 64;
 
+// Baseus frames are small (empirically < 64 bytes); 1 KiB is a safe upper bound.
+// If decode returns framing errors after a large recv, increase this value.
+const RECV_BUF_LEN: usize = 1024;
+
 pub struct Device<T: BluetoothTransport> {
     transport: T,
     model:     BaseusModel,
@@ -23,7 +27,7 @@ impl<T: BluetoothTransport> Device<T> {
 
     pub async fn run(mut self) {
         info!("device event loop started");
-        let mut buf = vec![0u8; 1024];
+        let mut buf = vec![0u8; RECV_BUF_LEN];
         loop {
             match self.transport.recv(&mut buf).await {
                 Ok(n) => {
@@ -80,7 +84,17 @@ mod tests {
 
         let event = tokio::time::timeout(
             std::time::Duration::from_secs(1),
-            async { loop { if let Ok(e) = rx.recv().await { return e; } } }
+            async {
+                loop {
+                    match rx.recv().await {
+                        Ok(e) => return e,
+                        Err(tokio::sync::broadcast::error::RecvError::Lagged(_)) => continue,
+                        Err(tokio::sync::broadcast::error::RecvError::Closed) => {
+                            panic!("channel closed before event arrived")
+                        }
+                    }
+                }
+            }
         ).await.expect("event within 1s");
 
         assert!(matches!(
@@ -97,7 +111,17 @@ mod tests {
 
         let event = tokio::time::timeout(
             std::time::Duration::from_secs(1),
-            async { loop { if let Ok(e) = rx.recv().await { return e; } } }
+            async {
+                loop {
+                    match rx.recv().await {
+                        Ok(e) => return e,
+                        Err(tokio::sync::broadcast::error::RecvError::Lagged(_)) => continue,
+                        Err(tokio::sync::broadcast::error::RecvError::Closed) => {
+                            panic!("channel closed before event arrived")
+                        }
+                    }
+                }
+            }
         ).await.expect("disconnect event within 1s");
 
         assert!(matches!(event, DeviceEvent::Disconnected));
