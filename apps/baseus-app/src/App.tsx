@@ -1,51 +1,54 @@
-import { createSignal } from "solid-js";
-import logo from "./assets/logo.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { createSignal, onCleanup, onMount } from 'solid-js';
+import BatteryCard from './components/BatteryCard';
+import ConnectionCard from './components/ConnectionCard';
+import { BatteryState, connectDevice, onDeviceEvent } from './lib/tauri';
 
-function App() {
-  const [greetMsg, setGreetMsg] = createSignal("");
-  const [name, setName] = createSignal("");
+// The Bluetooth address of the BP1 Pro ANC.
+// Set VITE_BT_ADDR in apps/baseus-app/.env.local (hex, no colons).
+// e.g. VITE_BT_ADDR=AABBCCDDEEFF
+const DEVICE_ADDR = BigInt('0x' + (import.meta.env.VITE_BT_ADDR ?? '000000000000'));
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name: name() }));
-  }
+type ConnStatus = 'connected' | 'connecting' | 'disconnected';
+
+export default function App() {
+  const [status, setStatus] = createSignal<ConnStatus>('connecting');
+  const [battery, setBattery] = createSignal<BatteryState | null>(null);
+  const [lastUpd, setLastUpd] = createSignal<string | null>(null);
+
+  onMount(async () => {
+    const unlisten = await onDeviceEvent((e) => {
+      if (e.type === 'battery_update') {
+        setBattery(e);
+        setStatus('connected');
+        setLastUpd(new Date().toLocaleTimeString());
+      } else if (e.type === 'connected') {
+        setStatus('connected');
+      } else if (e.type === 'disconnected') {
+        setStatus('disconnected');
+      }
+    });
+    onCleanup(unlisten);
+
+    try {
+      await connectDevice(DEVICE_ADDR);
+    } catch (err) {
+      console.error('connect failed:', err);
+      setStatus('disconnected');
+    }
+  });
 
   return (
-    <main class="container">
-      <h1>Welcome to Tauri + Solid</h1>
-
-      <div class="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://solidjs.com" target="_blank">
-          <img src={logo} class="logo solid" alt="Solid logo" />
-        </a>
+    <div class="min-h-screen bg-neutral-950 flex flex-col items-center justify-center gap-6 p-6">
+      <h1 class="text-lg font-semibold text-neutral-200 tracking-tight">Baseus Desktop</h1>
+      <ConnectionCard status={status()} lastUpdated={lastUpd()} />
+      <div class="flex gap-4 flex-wrap justify-center">
+        <BatteryCard label="Left" pct={battery()?.left_pct ?? 0} charging={battery()?.left_charging ?? false} />
+        <BatteryCard label="Right" pct={battery()?.right_pct ?? 0} charging={battery()?.right_charging ?? false} />
+        <BatteryCard label="Case" pct={battery()?.case_pct ?? 0} charging={battery()?.case_charging ?? false} />
       </div>
-      <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
-
-      <form
-        class="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg()}</p>
-    </main>
+      <p class="text-xs text-neutral-600">
+        {status() === 'disconnected' ? 'Open the case to reconnect.' : 'Showing live battery readings.'}
+      </p>
+    </div>
   );
 }
-
-export default App;
