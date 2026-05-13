@@ -1,0 +1,2121 @@
+DEX files: ['classes.dex', 'classes2.dex', 'classes3.dex', 'classes4.dex', 'classes5.dex', 'classes6.dex', 'classes7.dex']
+
+=== classes.dex ===
+Size: 8,650,228 bytes
+Strings found: 75,369
+
+--- Raw 0xAA sequences (first 30 unique) ---
+  aa2a5500de2a5500122b55003e2b5500
+  aa4455002445550098455500e9455500
+  aa550018ab5500b3ab550087ac5500c0
+  aa2a5600fe2b5600212d5600af2f5600
+  aae35600a9e556002ce85600fee95600
+  aa315700b2315700bc315700c1315700
+  aa525800d95258000d5358003c535800
+  aa6d5800e06d5800116e5800476e5800
+  aa58008eaa5800daaa580025ab580086
+  aa5800daaa580025ab580086ab5800a8
+  aa580025ab580086ab5800a8ab5800cd
+  aab35800eeb3580021b458006db45800
+  aaf55800baf55800cff55800e5f55800
+  aa035900ba035900c5035900d4035900
+  aa075900b2075900bc075900c4075900
+  aa175900ff175900131859002c185900
+  aa665900d46659000d6759004a675900
+  aaa35900b6a35900bca35900dea35900
+  aa590021aa59004aaa590058aa59008c
+  aa59004aaa590058aa59008caa5900ae
+  aa590058aa59008caa5900aeaa5900b6
+  aa59008caa5900aeaa5900b6aa5900d8
+  aa5900aeaa5900b6aa5900d8aa5900de
+  aa5900b6aa5900d8aa5900deaa5900ed
+  aa5900d8aa5900deaa5900edaa5900fa
+  aa5900deaa5900edaa5900faaa59003d
+  aa5900edaa5900faaa59003dab590042
+  aa5900faaa59003dab590042ab59004d
+  aa59003dab590042ab59004dab590051
+  aad15900c1d15900d5d15900e1d15900
+
+=== classes2.dex ===
+Size: 6,554,576 bytes
+Strings found: 52,972
+
+--- UUIDs (5) ---
+  $00001101-0000-1000-8000-00805F9B34FB
+  $02F00000-0000-0000-0000-00000000FE00
+  $02F00000-0000-0000-0000-00000000FF01
+  $02F00000-0000-0000-0000-00000000FF02
+  $02F00000-0000-0000-0000-00000000FF05
+
+--- Raw 0xAA sequences (first 30 unique) ---
+  aadb3700f2db370022dc370059dc3700
+  aa38008bab3800a0ac380014ad380061
+  aa5a39006d5b3900e85c39009b5e3900
+  aa390079ab390065ac3900a9ad390072
+  aac43900f7c53900b6c73900b0c83900
+  aa3b00d5ad3b00e7af3b00b9b33b0073
+  aa3c0041ad3c0086b13c00d4b53c00e6
+  aa193d00571d3d0014223d00b8253d00
+  aa593e00d7613e00da613e00de613e00
+  aa3e000daa3e0016aa3e001aaa3e0020
+  aa3e0016aa3e001aaa3e0020aa3e002d
+  aa3e001aaa3e0020aa3e002daa3e0034
+  aa3e0020aa3e002daa3e0034aa3e003f
+  aa3e002daa3e0034aa3e003faa3e004e
+  aa3e0034aa3e003faa3e004eaa3e005d
+  aa3e003faa3e004eaa3e005daa3e006b
+  aa3e004eaa3e005daa3e006baa3e007e
+  aa3e005daa3e006baa3e007eaa3e008f
+  aa3e006baa3e007eaa3e008faa3e009c
+  aa3e007eaa3e008faa3e009caa3e00b6
+  aa3e008faa3e009caa3e00b6aa3e00c3
+  aa3e009caa3e00b6aa3e00c3aa3e00d0
+  aa3e00b6aa3e00c3aa3e00d0aa3e00e6
+  aa3e00c3aa3e00d0aa3e00e6aa3e00fe
+  aa3e00d0aa3e00e6aa3e00feaa3e0011
+  aa3e00e6aa3e00feaa3e0011ab3e0022
+  aa3e00feaa3e0011ab3e0022ab3e002d
+  aa3e0011ab3e0022ab3e002dab3e004e
+  aa1c3f000b1d3f00591d3f00941d3f00
+  aa7c3f00007d3f007c7d3f00d37d3f00
+
+=== classes3.dex ===
+Size: 3,588,120 bytes
+Strings found: 38,423
+
+--- Raw 0xAA sequences (first 30 unique) ---
+  aa211b0090221b0096231b009c241b00
+  aa1b001cab1b00e5ab1b00a4ac1b0069
+  aacb1b000ccf1b0004d11b00cbd21b00
+  aaf01d00b8f01d00cff01d00e8f01d00
+  aaf41d00b5f41d00c0f41d00cbf41d00
+  aa091e00d7091e000e0a1e00450a1e00
+  aa381e0008391e005f391e00b8391e00
+  aadb1e00b2db1e00bddb1e00cadb1e00
+  aae11e00b9e11e00cde11e00dbe11e00
+  aaff1e00bcff1e00bfff1e00c3ff1e00
+  aa071f00bf071f00db071f00fd071f00
+  aa121f00bb121f00cd121f00e6121f00
+  aa251f00cf251f00fa251f002c261f00
+  aa4b1f00d04b1f00fe4b1f00224c1f00
+  aa7c1f00d27c1f00ee7c1f000d7d1f00
+  aaa21f00c6a21f00d9a21f00f2a21f00
+  aa1f001eaa1f0033aa1f0048aa1f0059
+  aa1f0033aa1f0048aa1f0059aa1f006a
+  aa1f0048aa1f0059aa1f006aaa1f0081
+  aa1f0059aa1f006aaa1f0081aa1f00aa
+  aa1f006aaa1f0081aa1f00aaaa1f00d4
+  aa1f0081aa1f00aaaa1f00d4aa1f0003
+  aa1f00aaaa1f00d4aa1f0003ab1f002a
+  aaaa1f00d4aa1f0003ab1f002aab1f00
+  aa1f00d4aa1f0003ab1f002aab1f0054
+  aa1f0003ab1f002aab1f0054ab1f007e
+  aae51f00cce51f00f0e51f0011e61f00
+  aa4c2000c44c2000de4c2000094d2000
+  aa682000c0682000c8682000cc682000
+  aa8b2000d18b2000f98b2000228c2000
+
+=== classes4.dex ===
+Size: 5,521,748 bytes
+Strings found: 60,121
+
+--- UUIDs (23) ---
+  $00001101-0000-1000-8000-00805F9B34FB
+  $00001801-0000-1000-8000-00805f9b34fb
+  $00002902-0000-1000-8000-00805f9b34fb
+  $0000fae0-0000-1000-8000-00805f9b34fb
+  $0000fae1-0000-1000-8000-00805f9b34fb
+  $0000fae2-0000-1000-8000-00805f9b34fb
+  $0000fae3-0000-1000-8000-00805f9b34fb
+  $0000fd00-0000-1000-8000-00805f9b34fb
+  $0000fd01-0000-1000-8000-00805f9b34fb
+  $0000fd02-0000-1000-8000-00805f9b34fb
+  $01000100-0000-1000-8000-009078563412
+  $02000200-0000-1000-8000-009178563412
+  $03000300-0000-1000-8000-009278563412
+  $05000500-0000-1000-8000-009478563412
+  $06000600-0000-1000-8000-009578563412
+  $07000700-0000-1000-8000-009678563412
+  $65786365-6c70-6f69-6e74-2e636f820000
+  $65786365-6c70-6f69-6e74-2e636f820001
+  $65786365-6c70-6f69-6e74-2e636f820002
+  $66666666-6666-6666-6666-666666666666
+  $77777777-7777-7777-7777-777777777777
+  $86868686-8686-8686-8686-868686868686
+  $97979797-9797-9797-9797-979797979797
+
+--- Raw 0xAA sequences (first 30 unique) ---
+  aaff0000985b0400207a0000e8580c00
+  aa3100b4aa310008ab31005cab3100b0
+  aa310008ab31005cab3100b0ab3100fe
+  aaac310013ad310081ad3100edad3100
+  aab9310041ba310096ba3100efba3100
+  aa3200d8ac32001cb0320025b232006d
+  aa0a3400c90a3400020b3400470b3400
+  aa123400b2123400be123400da123400
+  aa563400f05634001757340042573400
+  aa743400e07434001675340042753400
+  aa8e3400f08e34003a8f34007b8f3400
+  aa34005faa3400e2aa340024ab3400b8
+  aa3400e2aa340024ab3400b8ab34000b
+  aa340024ab3400b8ab34000bac340078
+  aac93400d7c9340007ca340010ca3400
+  aacd3400b1cd3400b6cd3400bccd3400
+  aada3400b7da3400c4da3400d3da3400
+  aae23400b6e23400c0e23400cce23400
+  aae43400b6e43400c0e43400cbe43400
+  aaf33400bef33400d5f33400e9f33400
+  aa0b3500b90b3500c80b3500d70b3500
+  aa0e3500d00e3500d60e3500e00e3500
+  aa133500b3133500bc133500c5133500
+  aa4a3500cb4a3500f34a3500174b3500
+  aa723500cf723500f072350012733500
+  aa35003eaa35006aaa350089aa3500b1
+  aa35006aaa350089aa3500b1aa3500d0
+  aa350089aa3500b1aa3500d0aa3500fa
+  aa3500b1aa3500d0aa3500faaa35001a
+  aa3500d0aa3500faaa35001aab350046
+
+=== classes5.dex ===
+Size: 8,989,108 bytes
+Strings found: 70,901
+
+--- UUIDs (6) ---
+  $00000000-0000-0000-0000-000000000000
+  $bb392ec0-8d4d-11e0-a896-0002a5d5c51b
+  $c06c8400-8e06-11e0-9cb6-0002a5d5c51b
+  -urn:uuid:9a04f079-9840-4286-ab92-e65be0885f95
+  -urn:uuid:e2719d58-a985-b3c9-781a-b030af78d30e
+  -urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed
+
+--- Raw 0xAA sequences (first 30 unique) ---
+  aa945c00e5945c0013955c0042955c00
+  aa5c00c0ab5c0015ac5c00aaac5c0003
+  aaac5c0003ad5c006fad5c00eead5c00
+  aa5d0063ac5d0054af5d0043b35d00f4
+  aa235e00ee255e004a295e001b2d5e00
+  aa315f00c5315f00e4315f00f1315f00
+  aa3d5f00b13d5f00bb3d5f00c63d5f00
+  aa425f0016435f0039435f005a435f00
+  aa445f00c2445f00cd445f00e7445f00
+  aa5f003baa5f0069aa5f00b7aa5f0013
+  aa5f0069aa5f00b7aa5f0013ab5f0045
+  aa5f00b7aa5f0013ab5f0045ab5f0078
+  aa5f0013ab5f0045ab5f0078ab5f00ac
+  aac35f0020c45f006bc45f00c3c45f00
+  aa0e6000b00e6000b70e6000bf0e6000
+  aa116000c2116000341260005e126000
+  aa126000b3126000b7126000e1126000
+  aa1e6000b31e6000bf1e6000cd1e6000
+  aa2c6000b12c6000be2c6000cb2c6000
+  aa2f6000b42f6000c12f6000ce2f6000
+  aa376000b9376000c5376000d3376000
+  aa3c6000bd3c6000c53c6000d23c6000
+  aa436000b5436000c0436000d1436000
+  aa816000d6816000f48160000f826000
+  aa8f6000c88f6000fa8f60003a906000
+  aa936000df9360000e94600042946000
+  aab66000adb66000b1b66000cfb66000
+  aac86000b4c86000bcc86000c4c86000
+  aace6000b3ce6000eece600011cf6000
+  aae76000c1e76000d1e76000ebe76000
+
+=== classes6.dex ===
+Size: 6,595,148 bytes
+Strings found: 63,999
+
+--- UUIDs (10) ---
+  $00001101-0000-1000-8000-00805F9B34FB
+  $00001101-0000-1000-8000-00805f9b34fb
+  $0000110b-0000-1000-8000-00805F9B34FB
+  $0000110b-0000-1000-8000-00805f9b34fb
+  $0000111e-0000-1000-8000-00805F9B34FB
+  $00002902-0000-1000-8000-00805F9B34FB
+  $0000ae00-0000-1000-8000-00805F9B34FB
+  $0000ae01-0000-1000-8000-00805F9B34FB
+  $0000ae02-0000-1000-8000-00805F9B34FB
+  $fe010000-1234-5678-abcd-00805f9b34fb
+
+--- Raw 0xAA sequences (first 30 unique) ---
+  aa7c3e00cc7c3e00f87c3e001e7d3e00
+  aa3e00c2ac3e005cae3e0061af3e006e
+  aa643f00b4643f00c4643f00d7643f00
+  aa663f00e9663f00fd663f001c673f00
+  aa693f00c0693f00d6693f00e8693f00
+  aa883f00ce883f0000893f0036893f00
+  aa3f00dbaa3f001cab3f00b9ab3f0033
+  aa3f001cab3f00b9ab3f0033ac3f0071
+  aac93f00f5c93f0096ca3f00d0ca3f00
+  aaff3f00b4ff3f00c0ff3f00c8ff3f00
+  aa114000b8114000ca114000e1114000
+  aa194000b9194000c7194000d0194000
+  aa234000d3234000002440002a244000
+  aa404000ae404000b3404000ba404000
+  aa414000b2414000b6414000be414000
+  aa464000af464000c4464000ca464000
+  aa494000c5494000d0494000e1494000
+  aa574000b5574000c4574000d3574000
+  aa5a4000bf5a4000ca5a4000db5a4000
+  aa614000c7614000e3614000fb614000
+  aa6c4000d06c4000f36c4000146d4000
+  aa9a4000ce9a4000f39a4000169b4000
+  aa9b4000d29b4000f19b40000e9c4000
+  aaa94000dfa9400014aa400047aa4000
+  aa400047aa40007eaa4000b4aa4000ea
+  aa40007eaa4000b4aa4000eaaa400017
+  aa4000b4aa4000eaaa400017ab400052
+  aa4000eaaa400017ab400052ab400078
+  aa400017ab400052ab400078ab4000a6
+  aaee4000bdee4000d8ee4000eaee4000
+
+=== classes7.dex ===
+Size: 9,322,880 bytes
+Strings found: 71,174
+
+--- UUIDs (2) ---
+  $258EAFA5-E914-47DA-95CA-C5AB0DC85B11
+  {"device":{"type":"100", "name":"M2004J7AC", "said":"f8cce1b65b4046fd9fcf58eab8d459b5", "os":"2", "country":"CN", "zone":"GMT+08:00", "lang":"zh", "lmt":"0", "contype":"1", "carrier":"UNKNOW", "osv":"10", "idfa":"null", "oaid":"", "gaid":"", "model":"null", "w":"393", "h":"800", "make":"M2004J7AC", "brand":"Redmi", "bootMark":"5514e651-ce54-4b06-840d-7ba69f02dbee", "cidfa":"null", "coaid":"", "cgaid":"", "updateMark":"1262305837.140000000", "fileMark":"1609769817000", "sysUpdateMark":"", "harddiskSize":"50676314112", "physicalMemory":"5652197376", "hwModel":"null", "ext":"null"}, "app":{"appId":123, "name":"null", "bundleid":"com.example.adscopesdk", "version":"1.0", "install":"1682663507999", "update":"1683167868801", "ext":"null"}, "user":{"id":"null", "customData":"", "ext":"null"}, "ext":"null", "time":null, "sdk":{"version":"5.0.0.0", "sdkArray":null, "ext":"null"}}
+
+--- Raw 0xAA sequences (first 30 unique) ---
+  aa735300e07353002074530049745300
+  aa8c5300f78c5300448d5300ad8d5300
+  aa53003daa530073aa5300a9aa5300e2
+  aa530073aa5300a9aa5300e2aa53001b
+  aa5300a9aa5300e2aa53001bab530061
+  aa5300e2aa53001bab530061ab530096
+  aa53001bab530061ab530096ab5300d7
+  aa4a5400fa4a5400614b5400ca4b5400
+  aa7354005b745400c07454003f755400
+  aa540006ab54006cab540000ac54006d
+  aae9540052ea54001ceb54009eeb5400
+  aa5500beaa55000dac5500b2ad550096
+  aa55000dac5500b2ad550096ae550035
+  aae4550065e5550087e7550034e85500
+  aa8f56004f9056003c9156001c925600
+  aa570048ab57005bac570061ad5700c4
+  aa6f5900af7159006b735900e5765900
+  aa590047ac590005ae5900a0b05900a5
+  aa605b00b5605b00c1605b00e1605b00
+  aa6b5b00c96b5b00d06b5b00dd6b5b00
+  aa8c5b00b88c5b00c58c5b00d28c5b00
+  aa5b000eaa5b0019aa5b0021aa5b0031
+  aa5b0019aa5b0021aa5b0031aa5b0035
+  aa5b0021aa5b0031aa5b0035aa5b0040
+  aa5b0031aa5b0035aa5b0040aa5b0048
+  aa5b0035aa5b0040aa5b0048aa5b005c
+  aa5b0040aa5b0048aa5b005caa5b0064
+  aa5b0048aa5b005caa5b0064aa5b0071
+  aa5b005caa5b0064aa5b0071aa5b008d
+  aa5b0064aa5b0071aa5b008daa5b0095
+
+
+=== PROTOCOL KEYWORD HITS (all DEX) ===
+Total keyword hits: 19075
+  '\t BALANCED'
+  '\t instance'
+  '\t$onCancel'
+  '\t(?:alley|annex|arcade|ave[.]?|avenue|alameda|bayou|beach|bend|bluffs?|bottom|boulevard|branch|bridge|brooks?|burgs?|bypass|broadway|camino|camp|canyon|cape|causeway|centers?|circles?|cliffs?|club|common|corners?|course|courts?|coves?|creek|crescent|crest|crossing|crossroad|curve|circulo|dale|dam|divide|drives?|estates?|expressway|extensions?|falls?|ferry|fields?|flats?|fords?|forest|forges?|forks?|fort|freeway|gardens?|gateway|glens?|greens?|groves?|harbors?|haven|heights|highway|hills?|hollow|inlet|islands?|isle|junctions?|keys?|knolls?|lakes?|land|landing|lane|lights?|loaf|locks?|lodge|loop|mall|manors?|meadows?|mews|mills?|mission|motorway|mount|mountains?|neck|orchard|oval|overpass|parks?|parkways?|pass|passage|path|pike|pines?|plains?|plaza|points?|ports?|prairie|privada|radial|ramp|ranch|rapids?|rd[.]?|rest|ridges?|river|roads?|route|row|rue|run|shoals?|shores?|skyway|springs?|spurs?|squares?|station|stravenue|stream|st[.]?|streets?|summit|speedway|terrace|throughway|trace|track|trafficway|trail|tunnel|turnpike|underpass|unions?|valleys?|viaduct|views?|villages?|ville|vista|walks?|wall|ways?|wells?|xing|xrd)(?=[,*'
+  '\t, gatt : '
+  '\t, opCode='
+  '\t, serial='
+  '\t, uuid : '
+  '\t, uuid = '
+  '\tAnchorDTO'
+  '\tBLUETOOTH'
+  '\tBP1 Ultra'
+  '\tBaseus E9'
+  '\tBaseus EX'
+  '\tBaseus P1'
+  '\tBaseus T1'
+  '\tBaseus T2'
+  '\tBaseus T3'
+  '\tBaseus X3'
+  '\tBaseus X5'
+  '\tBesOtaCMD'
+  '\tBluetooth'
+  '\tCANCELLED'
+  '\tCONNECTED'
+  '\tCRC_ERROR'
+  '\tCancelled'
+  '\tCommandId'
+  '\tConnectBG'
+  '\tConnected'
+  '\tEurodance'
+  '\tFRAME_POS'
+  '\tFUN_NOISE'
+  '\tFrameType'
+  '\tHeaderMap'
+  '\tINSTANCES'
+  '\tId3Header'
+  '\tKeyFrames'
+  '\tKeyframe '
+  '\tNo uuids.'
+  '\tON_CANCEL'
+  '\tPsytrance'
+  '\tTYPE_UUID'
+  '\tUtterance'
+  '\t_instance'
+  '\taddCancel'
+  '\taddFrames'
+  '\taddHeader'
+  '\tancestors'
+  '\tanchorMap'
+  '\tbFrameNum'
+  '\tbaseus_x3'
+  '\tbleHeader'
+  '\tbluetooth'
+  '\tbtnCancel'
+  '\tcancelAll'
+  '\tcancelJob'
+  '\tcanceled '
+  '\tcancelled'
+  '\tchecksum:'
+  '\tcloseGatt'
+  '\tcmdOption'
+  '\tcommandID'
+  '\tcommandId'
+  '\tconPacket'
+  '\tconnect: '
+  '\tconnected'
+  '\tdenoiser_'
+  '\tdistances'
+  '\tdoBalance'
+  '\tdoConnect'
+  '\tdrawFrame'
+  '\teqDataAnc'
+  '\terrHeader'
+  '\tframeLock'
+  '\tframeRate'
+  '\tframeSize'
+  '\tframeType'
+  '\tframedrop'
+  '\tframerate'
+  '\tgetAnchor'
+  '\tgetHeader'
+  '\tgetOpcode'
+  '\tgetSerial'
+  '\tgetZipCrc'
+  '\thandshake'
+  '\thasHeader'
+  '\theader_mc'
+  '\tinstances'
+  '\tisConnect'
+  '\tisMagicUI'
+  '\tiv_cancel'
+  '\tiv_header'
+  '\tkeyframes'
+  '\tlogHeader'
+  '\tluminance'
+  '\tmAnchorId'
+  '\tmCanceled'
+  '\tmChecksum'
+  '\tmDistance'
+  '\tmInstance'
+  '\tmSerialNo'
+  '\tmTVCancel'
+  '\tmTvCancel'
+  '\tmagic_tag'
+  '\tnewHeader'
+  '\tonCommand'
+  '\tonConnect'
+  '\tpacketLen'
+  '\tprotocols'
+  '\trawSocket'
+  '\treConnect'
+  '\trebalance'
+  '\treconnect'
+  '\tsInstance'
+  '\tsSerialNo'
+  '\tscanCount'
+  '\tserial_no'
+  '\tserialize'
+  '\tsetAnchor'
+  '\tsetBFrame'
+  '\tsetCancel'
+  '\tsetHeader'
+  '\tsetSerial'
+  '\tsourceCrc'
+  '\tspanCount'
+  '\tsslSocket'
+  '\ttagSocket'
+  '\ttv_cancel'
+  '\tunconnect'
+  '\tval$frame'
+  '\tvariance_'
+  '\twebSocket'
+  '\twebsocket'
+  '\twriteUuid'
+  '\tyearFrame'
+  '        \tiframe.src = "alipayjsbridge://callNativeFunc?" + paramStr;'
+  '        \tiframe.style.display = "none";'
+  '        \tiframe.style.height = "1px";'
+  '        \tiframe.style.width = "1px";'
+  '        \tparent.appendChild(iframe);'
+  '        \tvar iframe = document.createElement("iframe");'
+  '            \tparent.removeChild(iframe)'
+  '                iframeCall(paramStr)'
+  '            document.body.removeChild(iframe)'
+  '        "selectedIcon": "\\t\\nhttps://cdn.baseus.cn/admin/other/tHD0phztbfxWKJX928f8KMUHick71Hv2.png",'
+  '        "unSelectedIcon": "https://cdn.baseus.cn/admin/other/ljoWjtFk8UbxzkvqU3GmREHszazMjcOR.png",'
+  '        document.body.appendChild(iframe);'
+  '        iframe.src = url;'
+  '        iframe.style.display = "none";'
+  '        iframe.style.height = "1px";'
+  '        iframe.style.width = "1px";'
+  '        iframeCall(paramStr)'
+  '        var iframe = document.createElement("iframe");'
+  '      }.socketFactory'
+  '    function iframeCall(paramStr) {'
+  '    }.socketFactory'
+  '  connect:'
+  '  deleteChargingRecords cmdStr = '
+  '  mConnectStatusLiveData state = '
+  '  mServiceConnection='
+  '  startRecord sco connect timeout'
+  ' (Lcom/baseus/model/Descriptor;)V'
+  ' (Ljava/net/Socket;)Lokio/Source;'
+  ' , queryBattery battery = '
+  ' , showHeadphoneConnectivityStep='
+  ' - crc: '
+  ' ----> Connected'
+  ' -writeDataToSppDevice- device = '
+  ' / currentConnected: '
+  ' : Connect Options'
+  ' : writing to save instance state'
+  ' ; expected Class<JsonSerializer>'
+  ' === onDeviceConnect sn = '
+  ' === onDevicesDisconnect sn = '
+  ' AUDIO_FRAME_CALLBACK_REMOTE_USER'
+  ' Anchor keylines cannot be focal.'
+  ' BalanceSeekBarView_bl_pointColor'
+  ' BesOtaService Protocol: --------'
+  ' BezierRadarHeader_srlAccentColor'
+  ' BotShortcutCommandToolInfo(name='
+  ' BsChartWebSocket Closing: '
+  ' BsChartWebSocket Error: '
+  ' BsChartWebSocket onOpen'
+  ' COMMON_UPGRADE_LOW_BATTERY_LIMIT'
+  ' Cannot configure while connected'
+  ' Cannot serialize abstract class '
+  ' ClassicsHeader_srlEnableLastTime'
+  ' ClassicsHeader_srlFinishDuration'
+  ' ClassicsHeader_srlTextRefreshing'
+  ' Config frame generated. Offset: '
+  ' ConnectedSppDevice = '
+  ' ConnectedThread-->'
+  ' ConnectedThread:cancel-->'
+  ' ConnectionPool'
+  ' DEVICE_EXCEPTION_BATTERY_OFFLINE'
+  ' DISCONNECTED_BUFFER_SIZE_DEFAULT'
+  ' DeserializedClassTypeConstructor'
+  ' DownloadService onStartCommand()'
+  ' FRAMEWORK_BUTTON_DRAWABLE_RES_ID'
+  ' Failed to connect or obtain data'
+  ' Failed to obtain HTTP connection'
+  ' HTTP_HEADER_SEC_WEBSOCKET_ACCEPT'
+  ' INDOOR_LOCATION_SOURCE_BLUETOOTH'
+  ' Invalid WWW-Authenticate header '
+  ' JavaTypeEnhancementState(jsr305='
+  ' KTV_ERROR_CODE_DOWNLOAD_CANCELED'
+  ' LENS_INFO_MINIMUM_FOCUS_DISTANCE'
+  ' Lcom/base/baseus/R$interpolator;'
+  ' Lcom/base/baseus/api/ControlApi;'
+  ' Lcom/base/baseus/api/MessageApi;'
+  ' Lcom/base/baseus/api/NetWorkApi;'
+  ' Lcom/base/baseus/api/StatSDKApi;'
+  ' Lcom/base/baseus/base/BaseModel;'
+  ' Lcom/base/baseus/map/MapContext;'
+  ' Lcom/base/baseus/utils/AppState;'
+  ' Lcom/base/baseus/utils/DateUtil;'
+  ' Lcom/base/baseus/utils/DesUtils;'
+  ' Lcom/base/baseus/utils/GlideApp;'
+  ' Lcom/base/baseus/utils/KtToolKt;'
+  ' Lcom/base/baseus/utils/RSAUtils;'
+  ' Lcom/baseus/carrecordsdk/R$attr;'
+  ' Lcom/baseus/carrecordsdk/base/a;'
+  ' Lcom/baseus/carrecordsdk/base/b;'
+  ' Lcom/baseus/carrecordsdk/base/c;'
+  ' Lcom/baseus/carrecordsdk/base/d;'
+  ' Lcom/baseus/carrecordsdk/base/e;'
+  ' Lcom/baseus/carrecordsdk/base/f;'
+  ' Lcom/baseus/carrecordsdk/base/g;'
+  ' Lcom/baseus/carrecordsdk/base/h;'
+  ' Lcom/baseus/intelligent/R$array;'
+  ' Lcom/baseus/intelligent/R$color;'
+  ' Lcom/baseus/intelligent/R$dimen;'
+  ' Lcom/baseus/intelligent/R$style;'
+  ' Lcom/baseus/mall/R$interpolator;'
+  ' Lcom/baseus/mall/adapter/home/a;'
+  ' Lcom/baseus/mall/adapter/home/b;'
+  ' Lcom/baseus/mall/adapter/home/c;'
+  ' Lcom/baseus/mall/adapter/home/d;'
+  ' Lcom/baseus/mall/adapter/home/e;'
+  ' Lcom/baseus/mall/adapter/home/f;'
+  ' Lcom/baseus/mall/adapter/home/g;'
+  ' Lcom/baseus/mall/adapter/home/h;'
+  ' Lcom/baseus/mall/adapter/home/i;'
+  ' Lcom/baseus/mall/adapter/home/j;'
+  ' Lcom/baseus/mall/adapter/home/k;'
+  ' Lcom/baseus/mall/adapter/home/l;'
+  ' Lcom/baseus/mall/adapter/home/m;'
+  ' Lcom/baseus/mall/adapter/home/n;'
+  ' Lcom/baseus/mall/adapter/home/o;'
+  ' Lcom/baseus/mall/utils/SkuUtils;'
+  ' Lcom/baseus/mimi/R$interpolator;'
+  ' Lcom/baseus/model/control/Skill;'
+  ' Lcom/baseus/model/mall/JsonData;'
+  ' Lcom/baseus/model/mall/MallArea;'
+  ' Lcom/baseus/model/mall/MallBags;'
+  ' Lcom/baseus/model/mall/MallCity;'
+  ' Lcom/baseus/model/my/AvatarBean;'
+  ' Lcom/baseus/model/page/PageData;'
+  ' Lcom/baseus/model/page/PageData<'
+  ' Lcom/baseus/model/pay/PayResult;'
+  ' Lcom/baseus/my/view/activity/a0;'
+  ' Lcom/baseus/my/view/activity/a1;'
+  ' Lcom/baseus/my/view/activity/a2;'
+  ' Lcom/baseus/my/view/activity/a3;'
+  ' Lcom/baseus/my/view/activity/a4;'
+  ' Lcom/baseus/my/view/activity/b0;'
+  ' Lcom/baseus/my/view/activity/b1;'
+  ' Lcom/baseus/my/view/activity/b2;'
+  ' Lcom/baseus/my/view/activity/b3;'
+  ' Lcom/baseus/my/view/activity/b4;'
+  ' Lcom/baseus/my/view/activity/c0;'
+  ' Lcom/baseus/my/view/activity/c1;'
+  ' Lcom/baseus/my/view/activity/c2;'
+  ' Lcom/baseus/my/view/activity/c3;'
+  ' Lcom/baseus/my/view/activity/c4;'
+  ' Lcom/baseus/my/view/activity/d0;'
+  ' Lcom/baseus/my/view/activity/d1;'
+  ' Lcom/baseus/my/view/activity/d2;'
+  ' Lcom/baseus/my/view/activity/d3;'
+  ' Lcom/baseus/my/view/activity/d4;'
+  ' Lcom/baseus/my/view/activity/e0;'
+  ' Lcom/baseus/my/view/activity/e1;'
+  ' Lcom/baseus/my/view/activity/e2;'
+  ' Lcom/baseus/my/view/activity/e3;'
+  ' Lcom/baseus/my/view/activity/e4;'
+  ' Lcom/baseus/my/view/activity/f0;'
+  ' Lcom/baseus/my/view/activity/f1;'
+  ' Lcom/baseus/my/view/activity/f2;'
+  ' Lcom/baseus/my/view/activity/f3;'
+  ' Lcom/baseus/my/view/activity/f4;'
+  ' Lcom/baseus/my/view/activity/g0;'
+  ' Lcom/baseus/my/view/activity/g1;'
+  ' Lcom/baseus/my/view/activity/g2;'
+  ' Lcom/baseus/my/view/activity/g3;'
+  ' Lcom/baseus/my/view/activity/g4;'
+  ' Lcom/baseus/my/view/activity/h0;'
+  ' Lcom/baseus/my/view/activity/h1;'
+  ' Lcom/baseus/my/view/activity/h2;'
+  ' Lcom/baseus/my/view/activity/h3;'
+  ' Lcom/baseus/my/view/activity/i0;'
+  ' Lcom/baseus/my/view/activity/i1;'
+  ' Lcom/baseus/my/view/activity/i2;'
+  ' Lcom/baseus/my/view/activity/i3;'
+  ' Lcom/baseus/my/view/activity/j0;'
+  ' Lcom/baseus/my/view/activity/j1;'
+  ' Lcom/baseus/my/view/activity/j2;'
+  ' Lcom/baseus/my/view/activity/j3;'
+  ' Lcom/baseus/my/view/activity/k0;'
+  ' Lcom/baseus/my/view/activity/k1;'
+  ' Lcom/baseus/my/view/activity/k2;'
+  ' Lcom/baseus/my/view/activity/k3;'
+  ' Lcom/baseus/my/view/activity/l0;'
+  ' Lcom/baseus/my/view/activity/l1;'
+  ' Lcom/baseus/my/view/activity/l2;'
+  ' Lcom/baseus/my/view/activity/l3;'
+  ' Lcom/baseus/my/view/activity/m0;'
+  ' Lcom/baseus/my/view/activity/m1;'
+  ' Lcom/baseus/my/view/activity/m2;'
+  ' Lcom/baseus/my/view/activity/m3;'
+  ' Lcom/baseus/my/view/activity/n0;'
+  ' Lcom/baseus/my/view/activity/n1;'
+  ' Lcom/baseus/my/view/activity/n2;'
+  ' Lcom/baseus/my/view/activity/n3;'
+  ' Lcom/baseus/my/view/activity/o0;'
+  ' Lcom/baseus/my/view/activity/o1;'
+  ' Lcom/baseus/my/view/activity/o2;'
+  ' Lcom/baseus/my/view/activity/o3;'
+  ' Lcom/baseus/my/view/activity/p0;'
+  ' Lcom/baseus/my/view/activity/p1;'
+  ' Lcom/baseus/my/view/activity/p2;'
+  ' Lcom/baseus/my/view/activity/p3;'
+  ' Lcom/baseus/my/view/activity/q0;'
+  ' Lcom/baseus/my/view/activity/q1;'
+  ' Lcom/baseus/my/view/activity/q2;'
+  ' Lcom/baseus/my/view/activity/q3;'
+  ' Lcom/baseus/my/view/activity/r0;'
+  ' Lcom/baseus/my/view/activity/r1;'
+  ' Lcom/baseus/my/view/activity/r2;'
+  ' Lcom/baseus/my/view/activity/r3;'
+  ' Lcom/baseus/my/view/activity/s0;'
+  ' Lcom/baseus/my/view/activity/s1;'
+  ' Lcom/baseus/my/view/activity/s2;'
+  ' Lcom/baseus/my/view/activity/s3;'
+  ' Lcom/baseus/my/view/activity/t0;'
+  ' Lcom/baseus/my/view/activity/t1;'
+  ' Lcom/baseus/my/view/activity/t2;'
+  ' Lcom/baseus/my/view/activity/t3;'
+  ' Lcom/baseus/my/view/activity/u0;'
+  ' Lcom/baseus/my/view/activity/u1;'
+  ' Lcom/baseus/my/view/activity/u2;'
+  ' Lcom/baseus/my/view/activity/u3;'
+  ' Lcom/baseus/my/view/activity/v0;'
+  ' Lcom/baseus/my/view/activity/v1;'
+  ' Lcom/baseus/my/view/activity/v2;'
+  ' Lcom/baseus/my/view/activity/v3;'
+  ' Lcom/baseus/my/view/activity/w0;'
+  ' Lcom/baseus/my/view/activity/w1;'
+  ' Lcom/baseus/my/view/activity/w2;'
+  ' Lcom/baseus/my/view/activity/w3;'
+  ' Lcom/baseus/my/view/activity/x0;'
+  ' Lcom/baseus/my/view/activity/x1;'
+  ' Lcom/baseus/my/view/activity/x2;'
+  ' Lcom/baseus/my/view/activity/x3;'
+  ' Lcom/baseus/my/view/activity/y0;'
+  ' Lcom/baseus/my/view/activity/y1;'
+  ' Lcom/baseus/my/view/activity/y2;'
+  ' Lcom/baseus/my/view/activity/y3;'
+  ' Lcom/baseus/my/view/activity/z0;'
+  ' Lcom/baseus/my/view/activity/z1;'
+  ' Lcom/baseus/my/view/activity/z2;'
+  ' Lcom/baseus/my/view/activity/z3;'
+  ' Lcom/baseus/networklib/Business;'
+  ' Lcom/bytedance/bpea/basics/Cert;'
+  ' Lcom/bytedance/realx/base/Utils;'
+  ' Leightbitlab/com/blurview/Noise;'
+  ' Ljava/security/cert/TrustAnchor;'
+  ' Ljavax/net/ssl/SSLSocketFactory;'
+  ' Lokhttp3/ConnectionSpec$Builder;'
+  ' MaterialCardView_shapeAppearance'
+  ' MaterialHeader_srlShowBezierWave'
+  ' NavigationView_subheaderInsetEnd'
+  ' OTA BLE connect timeout'
+  ' PRIORITY_BALANCED_POWER_ACCURACY'
+  ' Prepending config frame of size '
+  " Problem deserializing property '"
+  ' REASON_CODE_CLIENT_DISCONNECTING'
+  ' REASON_CODE_CLIENT_NOT_CONNECTED'
+  ' REASON_CODE_SERVER_CONNECT_ERROR'
+  " ReconnectParam{originalAddress='"
+  ' RoundFrameLayout_rv_cornerRadius'
+  ' SWITCH_LOW_FREQUENCY_ENHANCEMENT'
+  ' SearchBar_android_textAppearance'
+  ' ShimmerFrameLayout_shimmer_shape'
+  ' SocketManager[onDeviceResponse:]'
+  ' StateCallback::onDisconnected...'
+  ' TRAFFIC_ERROR_NON_OPEN_BLUETOOTH'
+  ' Test Setup Familiarity Noise Set'
+  ' TextAppearance_AppCompat_Caption'
+  ' TextAppearance_AppCompat_Inverse'
+  ' TextAppearance_AppCompat_Subhead'
+  ' TextAppearance_AppCompat_Tooltip'
+  ' TextAppearance_Design_HelperText'
+  ' TextAppearance_Mimi_Body_Compact'
+  ' TextAppearance_android_textColor'
+  ' TextAppearance_android_textStyle'
+  ' The operation has been canceled.'
+  ' TwoLevelHeader_srlEnableTwoLevel'
+  ' UI_TIP_NET_NETWORK_CONNECT_ERROR'
+  ' VIDEO_ENCODER_PREFERENCE_BALANCE'
+  ' WebSocket '
+  ' WifiConnectingActivity'
+  ' [Lokhttp3/internal/http2/Header;'
+  ' _createAndCacheUntypedSerializer'
+  ' _createAndCacheValueDeserializer'
+  ' _deserializeContainerNoRecursion'
+  ' _findCustomReferenceDeserializer'
+  ' _findUnsupportedTypeDeserializer'
+  ' _reusableCancellableContinuation'
+  ' a2dp_connected:'
+  ' access$getICarConnectCallBack$cp'
+  ' access$setICarConnectCallBack$cp'
+  ' addVersionHeader$libcore_release'
+  ' api/wap/baseusCoupon/sku/{skuId}'
+  ' asInvalidProtocolBufferException'
+  ' badgeShapeAppearanceOverlayResId'
+  ' bluetoothHeadsetConnectedChecker'
+  ' callBackTotaConnectState: ------'
+  ' callbackCmd : param is null. '
+  ' canApplyTextAppearanceLineHeight'
+  ' cancel'
+  ' chat connect ws error'
+  ' chat reconnect fail'
+  ' clNoiseReductionSelector  2  '
+  ' closeWebSocket ----'
+  ' cmd Message insert failed:msgid:'
+  ' com.baseus.process_communication'
+  ' com.yalantis.ucrop.ShowCropFrame'
+  ' connect ----url :'
+  ' connect state: '
+  ' connected device '
+  ' connection is null when findEtag'
+  ' connectivity receiver onReceiver'
+  ' constructBeanDeserializerBuilder'
+  ' convert2VideoFrame frame is null'
+  ' crc total Count '
+  ' crc32='
+  ' createCollectionLikeDeserializer'
+  ' decviceType: ---TWS_CONNECT_LEFT'
+  ' deserializationComponentsForJava'
+  ' deserializeTestResultJsonUseCase'
+  ' design_navigation_item_subheader'
+  ' device : %s, ReconnectParam = %s'
+  ' device disconnected'
+  ' deviceBluetoothVersionWrap = '
+  ' disconnect timeout'
+  ' distanceInfluenceForSnapDuration'
+  ' doConnect '
+  ' doConnect curBotID : '
+  ' drop table if exists cmdMessages'
+  ' droppedToKeyframeEvents=%s'
+  ' dynamic framerate without select'
+  ' feature = ? AND instance_uid = ?'
+  ' frame type '
+  ' getContainingTypeDefaultInstance'
+  ' getInstance("TLSv1.3", provider)'
+  ' getMimiConnectedHeadphoneUseCase'
+  ' getPngAttributes starting with: '
+  ' has been canceled.'
+  ' has been cancelled.'
+  ' header '
+  ' headset plug not changed, ignore'
+  ' inputConnection must be non-null'
+  ' is cancelling'
+  ' is not a valid ancestor'
+  ' is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.'
+  ' isConnect '
+  ' isNoiseSuppressorEffectAvailable'
+  ' kotlin.jvm.internal.SerializedIr'
+  ' kotlin.jvm.serialization.use8to7'
+  ' mClassicConnectTimeOut deviceModel='
+  ' mClassicConnectTimeOut deviceModel=$deviceModel  '
+  ' mConnectStatusLiveData '
+  ' mConnectStatusLiveData : '
+  ' mConnectStatusLiveData = '
+  ' mDeviceMqttConnectStatusLiveData'
+  ' mPortProtocol value '
+  ' mRemoteEncodedVideoFrameObserver'
+  ' mServiceConnection='
+  ' minFrameCache:'
+  ' modifyIdCard cmdStr = '
+  ' ms. Frames received: '
+  ' mtrl_btn_textappearance_all_caps'
+  ' mtrl_calendar_day_selector_frame'
+  ' mtrl_calendar_header_orientation'
+  ' mtrl_picker_date_header_selected'
+  ' nativeNotifyChoreographerDoFrame'
+  ' nativeRegisterAudioFrameObserver'
+  ' nativeRegisterVideoFrameObserver'
+  ' nativeRequestRemoteVideoKeyFrame'
+  ' nativeStartHeatMapFrameAnimation'
+  ' noiseParameterBean?.type '
+  ' notification_media_cancel_action'
+  ' onConnectred ...'
+  ' onDisconnected ...'
+  ' onFirstLocalVideoFrame...width: '
+  ' onGetAntiWindNoiseSettingData = '
+  ' onHeadsetConnectivityChanged(Z)V'
+  ' onMapRenderValidFrame isValid = '
+  ' onPostMessageServiceDisconnected'
+  ' onReceivingBluetoothData '
+  ' onReceivingBluetoothData = '
+  ' onReconnectFail----'
+  ' onRetainNonConfigurationInstance'
+  ' onVecChatCmdMessageNotify'
+  ' packets received in '
+  ' packets send; '
+  ' plUUID:'
+  ' popwindow_balance_sound_channels'
+  ' protocol='
+  ' pushAudioFrame isMicClose : '
+  ' pushAudioFrame size :'
+  ' reConnect--- '
+  ' reConnect---isConnect '
+  ' reConnect---websocket '
+  ' readDeviceStatus cmd = '
+  ' reconnect sco'
+  ' recorded CRC value: '
+  ' registerConnectionFailedListener'
+  ' request headers: %s '
+  ' response headers: %s'
+  ' retainInstance'
+  ' retry delivering frame take ms: '
+  ' sSerialExecutorForLocalesStorage'
+  ' sco audio connected'
+  ' sco audio disconnected'
+  ' sco disconnected'
+  ' sco not disconnected'
+  ' seconds, cancel Chat'
+  ' send data timeout  --> opCode : '
+  ' sendCmd from = '
+  ' sendCmd vecImServiceNumber = '
+  ' sentChatCancel  jsonEventData '
+  ' sentChatCancel e: '
+  ' setAppearanceLightNavigationBars'
+  ' setCounterOverflowTextAppearance'
+  ' setFristVideoFrameRenderListener'
+  ' setLightModel cmd value = '
+  ' setMimiConnectedHeadphoneUseCase'
+  ' setTotaV2PacketData: -----------'
+  ' shape_home_card_disconnection_bg'
+  ' showAntiWindNoise isChecked '
+  ' socket is disconnected'
+  ' socket reConnect success = '
+  ' start socket success '
+  ' stopWebSocket'
+  ' str_balance_sound_channels_title'
+  ' str_can_not_open_resistance_tip1'
+  ' str_can_not_open_resistance_tip2'
+  ' str_disconnected_update_location'
+  ' str_go_bluetooth_list_to_connect'
+  ' str_incapable_of_connection_hint'
+  ' str_setting_failed_disconnect_bt'
+  ' str_synchronize_during_bluetooth'
+  ' to anchor view '
+  ' tooltip_precise_anchor_threshold'
+  ' totalVideoFrameProcessingOffsetUs=%s'
+  ' ucrop_UCropView_ucrop_show_frame'
+  ' unregisterOnLoadCanceledListener'
+  ' usb device connect error'
+  ' usb device connect success'
+  ' uuid = '
+  ' videoFrameProcessingOffsetCount=%s'
+  ' was cancelled'
+  ' was cancelled normally'
+  ' websocket connect success'
+  ' wifi_connecting_animation_middle'
+  ' with mServiceConnection='
+  '! does not implement Serializable.'
+  '!()Lcom/base/baseus/base/BaseView;'
+  '!()Lcom/base/baseus/map/base/IMap;'
+  '!()Lcom/baseus/model/control/User;'
+  '!(Lcom/baseus/model/my/DictBean;)V'
+  '!--->>> u-app packet overload !!! '
+  '!-checkHaveResponseList- opCode : '
+  '!-startConnectSppThread- device = '
+  '!/app/deviceshare/cancelShare/{id}'
+  '!; expected Class<KeyDeserializer>'
+  '!AMPS_CONFIG_URL_TRANSFER_PROTOCOL'
+  '!AUDIO_FRAME_PROCESSOR_EAR_MONITOR'
+  '!AUDIO_FRAME_PROCESSOR_REMOTE_USER'
+  '!AUDIO_PLAYBACK_DEVICE_HEADSET_USB'
+  '!AddDeviceScanActivity -->sn_uuid='
+  '!Badge_badgeShapeAppearanceOverlay'
+  '!BalanceSeekBarView_bl_circleWidth'
+  '!BalanceSeekBarView_bl_maxProgress'
+  '!BalanceSeekBarView_bl_pointHeight'
+  '!BatteryProgressBar_bpb_show_alarm'
+  '!BezierRadarHeader_srlPrimaryColor'
+  '!Bluetooth device is disconnected.'
+  '!BluetoothDataWriteManager '
+  '!BotShortcutCommandComponent(name='
+  '!BotShortcutCommandToolInfoBuilder'
+  '!BsRealtimeTranslationWebSocket.kt'
+  '!CLOSE_ENHANCED_BATTERY_AND_SET_EQ'
+  '!Cannot pass null KeyDeserializers'
+  '!Cannot serialize anonymous class '
+  '!Class %s is not an instance of %s'
+  '!CompletedWithCancellation(result='
+  '!ConnectedThread-->'
+  '!ConnectionProgressReportCallbacks'
+  '!DEFAULT_OUTPUT_FRAME_WAIT_TIME_MS'
+  '!Deserialize Map must be Generics!'
+  '!DoubleLineChartView_left_distance'
+  '!EarphoneFunctionShowFragmentNewUI'
+  '!FORWARD_STREAM_EVENT_DISCONNECTED'
+  '!Fail to connect to camera service'
+  '!Fail to create an MMKV instance ['
+  '!Failed to close timed out socket '
+  '!Failed to parse WebSocket message'
+  '!Failed to send SET_BA5D command: '
+  '!KotlinSerializedIrArgumentVisitor'
+  '!Landroid/bluetooth/BluetoothA2dp;'
+  '!Landroid/bluetooth/BluetoothGatt;'
+  '!Landroid/bluetooth/le/ScanFilter;'
+  '!Landroid/bluetooth/le/ScanRecord;'
+  '!Landroid/bluetooth/le/ScanResult;'
+  '!Landroid/net/ConnectivityManager;'
+  '!Lcom/base/baseus/api/FeedBackApi;'
+  '!Lcom/base/baseus/base/AppManager;'
+  '!Lcom/base/baseus/map/base/IFence;'
+  '!Lcom/base/baseus/model/EmptyBean;'
+  '!Lcom/base/baseus/model/LoginMode;'
+  '!Lcom/base/baseus/utils/FileUtils;'
+  '!Lcom/base/baseus/utils/GlideUtil;'
+  '!Lcom/base/baseus/utils/GsonUtils;'
+  '!Lcom/base/baseus/utils/MediaUtil;'
+  '!Lcom/base/baseus/utils/TimeCount;'
+  '!Lcom/base/baseus/utils/TimeUtils;'
+  '!Lcom/base/baseus/utils/ViewUtils;'
+  '!Lcom/baseus/carrecordsdk/R$array;'
+  '!Lcom/baseus/carrecordsdk/R$color;'
+  '!Lcom/baseus/carrecordsdk/R$dimen;'
+  '!Lcom/baseus/carrecordsdk/R$style;'
+  '!Lcom/baseus/carrecordsdk/utils/a;'
+  '!Lcom/baseus/carrecordsdk/utils/b;'
+  '!Lcom/baseus/carrecordsdk/utils/c;'
+  '!Lcom/baseus/intelligent/R$layout;'
+  '!Lcom/baseus/intelligent/R$mipmap;'
+  '!Lcom/baseus/intelligent/R$string;'
+  '!Lcom/baseus/mall/utils/SkuHelper;'
+  '!Lcom/baseus/model/control/AdData;'
+  '!Lcom/baseus/model/event/NfcState;'
+  '!Lcom/baseus/model/home/ToastBean;'
+  '!Lcom/baseus/model/my/PictureInfo;'
+  '!Lcom/baseus/networklib/TcpClient;'
+  '!Lcom/bytedance/realx/BuildConfig;'
+  '!LifecycleOnBackPressedCancellable'
+  '!Lio/mimi/proto/v1/DenoiserKt$Dsl;'
+  '!Ljava/net/SocketTimeoutException;'
+  '!Lorg/apache/http/ProtocolVersion;'
+  '!MaterialTextAppearance_lineHeight'
+  '!MenuView_android_headerBackground'
+  '!NavigationView_itemTextAppearance'
+  '!RTCLocalEncodedVideoFrameObserver'
+  '!Reconnect to server, client size='
+  '!SUBJECT_DISTANCE_RANGE_CLOSE_VIEW'
+  '!SearchView_android_textAppearance'
+  '!Sent SET_BA5D command to device: '
+  '!ShapeAppearance_Material3_Tooltip'
+  '!ShapeAppearance_cornerSizeTopLeft'
+  '!SocketManager[onChange:isConnect]'
+  '!SocketManager[querySelfCleaning:]'
+  '!SwitchCompat_switchTextAppearance'
+  '!TextAppearance_AppCompat_Display1'
+  '!TextAppearance_AppCompat_Display2'
+  '!TextAppearance_AppCompat_Display3'
+  '!TextAppearance_AppCompat_Display4'
+  '!TextAppearance_AppCompat_Headline'
+  '!TextAppearance_Design_Placeholder'
+  '!TextAppearance_android_fontFamily'
+  '!Unexpected header: Content-Length'
+  '![method:refreshEarDisconnect]--->'
+  '!_deserializeTypedUsingDefaultImpl'
+  '!_findCustomCollectionDeserializer'
+  '!abc_popup_menu_header_item_layout'
+  '!addSerializationExclusionStrategy'
+  '!android.permission.BLUETOOTH_SCAN'
+  '!app instance id encryption failed'
+  '!applyLineHeightFromViewAppearance'
+  '!badgeWithTextShapeAppearanceResId'
+  '!bluetooth_connect_permission_lost'
+  '!buildBatteryNotification model = '
+  '!checkClassicBluetoothConnectState'
+  '!choose or cancel cur file type = '
+  '!com.yalantis.ucrop.CropFrameColor'
+  '!connect fail '
+  '!createConnectionKeepAliveStrategy'
+  '!createDummyDeserializationContext'
+  '!createRfcommSocketToServiceRecord'
+  '!decviceType: ---TWS_CONNECT_RIGHT'
+  '!deserializeEnumUsingPropertyBased'
+  '!earphoneFunctionShowFragmentNewUI'
+  '!findConvertingContentDeserializer'
+  '!findKeyDeserializerFromAnnotation'
+  '!findPropertyContentTypeSerializer'
+  '!findSerializationContentConverter'
+  '!gesture_set_with_earphone_connect'
+  '!getClosestSupportedFramerateRange'
+  '!getJpegAttributes starting with: '
+  '!getLowLatencyInputFramesPerBuffer'
+  '!getMCDistanceByOneLatLngAndRadius'
+  '!getTOO_LATE_TO_CANCEL$annotations'
+  '!getTransitionShapeAppearanceResId'
+  '!headsetPlugActionIsFromUsbHeadset'
+  '!isAcousticEchoCancelerBlacklisted'
+  '!isAnchorViewLayoutListenerEnabled'
+  '!isAnchorViewWrappedInCompatParent'
+  '!layout_stylus_device_disconnected'
+  '!material_timepicker_cancel_button'
+  '!mimiTextAppearanceBodyHighlighted'
+  '!mimi_content_setup_headsets_check'
+  '!mimi_flow_complete_failure_header'
+  '!mimi_flow_complete_success_header'
+  '!mockSerializableClass.defaultType'
+  '!mtrl_calendar_header_text_padding'
+  '!mtrl_calendar_year_selector_frame'
+  '!mtrl_picker_header_selection_text'
+  '!mtrl_picker_range_header_selected'
+  '!noise_mode_transparent_unselected'
+  '!notifyChildrenChangedForFramework'
+  '!onCloudProxyConnected, interval: '
+  '!onConnectionStateChanged, state: '
+  '!onGetSmartConnectedSettingData = '
+  '!onSoundChannelBalanceQueryData = '
+  '!open_search_view_header_container'
+  '!proxy.getConnectedDevices is null'
+  '!replaceCharMemoizedSerializedSize'
+  '!setCameraAdaptiveMinimumFrameRate'
+  '!setSupportProtocolAndCipherSuites'
+  '!setWhileBalance : Camera is null!'
+  '!setWhileBalance : camera is null.'
+  '!shouldAddLinksFallbackToFramework'
+  '!shouldHeaderOverlapScrollingChild'
+  '!srlEnableHeaderTranslationContent'
+  '!startConnectDevice-->'
+  '!str_low_frequency_enhancement_tip'
+  '!supertypeIdMemoizedSerializedSize'
+  '!switch camera, create instance...'
+  '!ucrop_UCropView_ucrop_frame_color'
+  '!xsc mimi device connect status = '
+  '" BsChartWebSocket Received bytes: '
+  '" createRTCRoom-------isConnected :'
+  '" synchronizeAccountToDevice cmd = '
+  '"$earphoneFunctionShowFragmentNewUI'
+  '"()Lcom/base/baseus/map/MapContext;'
+  '"()Lcom/baseus/model/control/Skill;'
+  '"()Lcom/baseus/model/mall/JsonData;'
+  '"()Lcom/baseus/model/mall/MallArea;'
+  '"()Lcom/baseus/model/mall/MallCity;'
+  '"()Ljavax/net/ssl/SSLSocketFactory;'
+  '"()[Lokhttp3/internal/http2/Header;'
+  '"(@JsonValue serializer for method '
+  '"(Lcom/base/baseus/map/base/IMap;)V'
+  '"(Lokhttp3/Headers;)Ljava/util/Set;'
+  '"(Lokhttp3/internal/http2/Header;)V'
+  '"(Z)Lcom/base/baseus/map/base/IMap;'
+  '"------networkInfo is discconnected'
+  '"-ConnectionSppThread- exception : '
+  '"/sdk/carRecord/ConnectWifiActivity'
+  '"/sdk/carrecord/connectwifiactivity'
+  '"; expected Class<JsonDeserializer>'
+  '"AUDIO_FRAME_CALLBACK_CAPTURE_MIXED'
+  '"AspectRatioFrameLayout_resize_mode'
+  '"Badge_badgeWithTextShapeAppearance'
+  '"Base_TextAppearance_AppCompat_Menu'
+  '"BatteryProgressBar_bpb_alarm_value'
+  '"BluetoothAbsoluteVolumeUnknownHost'
+  '"BotShortcutCommandComponentBuilder'
+  '"BsChartHelper isAiCommand command '
+  '"COMMAND_ARGUMENT_MEDIA_DESCRIPTION'
+  '"COMMAND_OPEN_CUSTOMER_SERVICE_CHAT'
+  '"COMMAND_SUBSCRIBE_MINI_PROGRAM_MSG'
+  '"CONTENT_CHANGE_TYPE_DRAG_CANCELLED'
+  '"Cannot reconnect to remote server.'
+  '"Classic Bluetooth is disconnected.'
+  '"ClassicsHeader_srlDrawableProgress'
+  '"Client-sent frames must be masked.'
+  '"ConnectThread-->'
+  '"ConnectThread-->mSocket != null'
+  '"ConnectedThread:run-->'
+  '"ConversationChatCancelEvent(super='
+  '"ConversationChatCancelEventBuilder'
+  '"Expected a SETTINGS frame but was '
+  '"FFP_PROP_INT64_IMMEDIATE_RECONNECT'
+  '"Failed to launch custom protocol: '
+  '"Failed to retrieve setFrame method'
+  '"Framebuffer not complete, status: '
+  '"FunGameHitBlockHeader_fghBallSpeed'
+  '"HTTP_HEADER_SEC_WEBSOCKET_PROTOCOL'
+  '"HeaderPositionsAdapterDataObserver'
+  '"IFrameListener.onNewSurfaceTexture'
+  '"Install Referrer Service connected'
+  '"Is_not_yet_connected_to_the_server'
+  '"Landroid/bluetooth/BluetoothClass;'
+  '"Lcom/airbnb/lottie/value/Keyframe;'
+  '"Lcom/airbnb/lottie/value/Keyframe<'
+  '"Lcom/base/baseus/map/MapInitUtils;'
+  '"Lcom/base/baseus/model/ILoginMode;'
+  '"Lcom/base/baseus/utils/ImageUtils;'
+  '"Lcom/base/baseus/utils/ScreenUtil;'
+  '"Lcom/base/baseus/utils/SetImgUtil;'
+  '"Lcom/base/baseus/utils/ThemeUtils;'
+  '"Lcom/base/baseus/widget/seekbar/a;'
+  '"Lcom/baseus/ble/bean/RequestParam;'
+  '"Lcom/baseus/carrecordsdk/R$layout;'
+  '"Lcom/baseus/carrecordsdk/R$mipmap;'
+  '"Lcom/baseus/carrecordsdk/R$string;'
+  '"Lcom/baseus/intelligent/R$integer;'
+  '"Lcom/baseus/intelligent/R$plurals;'
+  '"Lcom/baseus/mall/utils/OrderUtils;'
+  '"Lcom/baseus/mall/view/ImageHolder;'
+  '"Lcom/baseus/mall/view/TabListView;'
+  '"Lcom/baseus/model/control/EF8Data;'
+  '"Lcom/baseus/model/event/BaseEvent;'
+  '"Lcom/baseus/model/home/UnBindBean;'
+  '"Lcom/baseus/model/mall/LabelsBean;'
+  '"Lcom/baseus/model/mall/PreAddBean;'
+  '"Lcom/baseus/model/mall/WeChatBean;'
+  '"Lcom/baseus/model/my/FeedBackBean;'
+  '"Lcom/baseus/model/my/RegisterBean;'
+  '"Lcom/bytedance/realx/base/GPUUtil;'
+  '"Lcom/bytedance/realx/video/GlUtil;'
+  '"Lcom/google/zxing/LuminanceSource;'
+  '"Ljava/io/NotSerializableException;'
+  '"Ljavax/net/ssl/HttpsURLConnection;'
+  '"Lkotlinx/coroutines/CancelHandler;'
+  '"Lokhttp3/ConnectionSpec$Companion;'
+  '"MSG_GET_CRC_CHECK_PACKAGE_TIME_OUT'
+  '"NavigationRailView_shapeAppearance'
+  '"NavigationView_itemShapeAppearance'
+  '"NavigationView_subheaderInsetStart'
+  '"NetworkConnectionInfo{networkType='
+  '"No support for Bluetooth function.'
+  '"Null containingTypeDefaultInstance'
+  '"RTCRemoteEncodedVideoFrameObserver'
+  '"RequestManagerConnectivityListener'
+  '"RoundFrameLayout_rv_isRippleEnable'
+  '"Service connected with null binder'
+  '"ServiceConnection must not be null'
+  '"ShapeAppearance_MaterialComponents'
+  '"ShapeAppearance_cornerSizeTopRight'
+  '"ShapeableImageView_shapeAppearance'
+  '"ShimmerFrameLayout_shimmer_colored'
+  '"ShimmerFrameLayout_shimmer_dropoff'
+  '"SmartRefreshLayout_srlHeaderHeight'
+  '"SocketManager[deviceConnectState:]'
+  '"Starting WebSocket connection to: '
+  '"Subtype of BeanSerializerFactory ('
+  '"TRAFFIC_ERROR_NONSUPPORT_BLUETOOTH'
+  '"TextAppearance_Compat_Notification'
+  '"TextAppearance_Material3_BodyLarge'
+  '"TextAppearance_Material3_BodySmall'
+  '"TextAppearance_Material3_SearchBar'
+  '"TextAppearance_Mimi_Action_Compact'
+  '"TextAppearance_android_shadowColor'
+  '"TextInputLayout_hintTextAppearance'
+  '"ToneNoiseAdjustmentInteractionMode'
+  '"WebsocketsChatCreateReqBuilderImpl'
+  '"[Lcom/baseus/model/my/PictureInfo;'
+  '"_deserializeFromEmptyStringDefault'
+  '"abc_text_size_menu_header_material'
+  '"addOnFrameMetricsAvailableListener'
+  '"allow_access_bluetooth_in_settings'
+  '"android.intent.action.HEADSET_PLUG'
+  '"applyFrameworkTintUsingColorFilter'
+  '"bind socket to network exception: '
+  '"binder is dead. start connection? '
+  '"calculateBottomMarginForAnchorView'
+  '"com.hyphenate.notification.cancel.'
+  '"com.quick.qt.commonsdk.framework.a'
+  '"constructDelegatingKeyDeserializer'
+  '"convertByteTexFrame2WebrtcTexFrame'
+  '"convertTexture2DToWebRTCVideoFrame'
+  '"dynamic framerate for front camera'
+  '"filterNonofifyCmdMessage action = '
+  '"findContextualConvertingSerializer'
+  '"findNonContextualValueDeserializer'
+  '"getItemIndexer$base_baseus_release'
+  '"getLowLatencyOutputFramesPerBuffer'
+  '"getRemoteEncodedVideoFrameObserver'
+  '"headphoneDisconnectionInterruption'
+  '"itemActiveIndicatorShapeAppearance'
+  '"javax.sql.rowset.serial.SerialBlob'
+  '"kVideoDenoiseModeChangedReasonNull'
+  '"lastCustomNonConfigurationInstance'
+  '"mRtcLocalEncodedVideoFrameObserver'
+  '"materialCalendarHeaderCancelButton'
+  '"materialCalendarHeaderToggleButton'
+  '"mimi_content_header_title_subtitle'
+  '"mimi_flow_setup_environment_header'
+  '"mimi_signup_complete_action_cancel'
+  '"mtrl_picker_date_header_unselected'
+  '"nativeEnableVocalInstrumentBalance'
+  '"nativePushExternalWebrtcVideoFrame'
+  '"ods_cancel_wait_pay_refund_success'
+  '"onBleConnection : removeParam >>> '
+  '"onCancel called in for APIListener'
+  '"onDisconnected: OpenCameraCallBack'
+  '"onReceiveRegisterResult. cmdArg1: '
+  '"onScreenVideoFramePlayStateChanged'
+  '"onScreenVideoFrameSendStateChanged'
+  '"popwindow_bass_enhancement_setting'
+  '"restartBluetoothScoAsynTask enter.'
+  '"rx3.scheduler.drift-tolerance-unit'
+  '"setAnchorViewLayoutListenerEnabled'
+  '"setBadgeWithoutTextShapeAppearance'
+  '"setManualFocusDistance exception: '
+  '"setTextAppearanceActiveBoldEnabled'
+  '"setWebRtcBasedAcousticEchoCanceler'
+  '"srlEnableClipHeaderWhenFixedBehind'
+  '"textAppearanceSearchResultSubtitle'
+  '"type":"cmd",'
+  '"unregisterConnectionFailedListener'
+  '"upperBoundIdMemoizedSerializedSize'
+  '"useWebRtcBasedAcousticEchoCanceler'
+  '"xsc setGestureChildFunction cmd = '
+  '# is not Serializable or Parcelable.'
+  '# isConnected to hyphenate server : '
+  '#()Landroid/bluetooth/BluetoothGatt;'
+  '#()Landroid/bluetooth/le/ScanResult;'
+  '#()Lcom/base/baseus/map/base/IFence;'
+  '#()Lcom/base/baseus/utils/MediaUtil;'
+  '#(ILokhttp3/internal/http2/Header;)V'
+  '#(Lcom/baseus/model/mall/MallArea;)V'
+  '#(Lcom/baseus/model/mall/MallCity;)V'
+  '#(Lcom/baseus/model/my/AvatarBean;)V'
+  '#(Lcom/baseus/model/page/PageData;)V'
+  '#(Lcom/baseus/model/pay/PayResult;)V'
+  '#(Lcom/bytedance/bpea/basics/Cert;)V'
+  '#(Ljava/util/List;)Lokhttp3/Headers;'
+  '#(Ljavax/net/ssl/SSLSocketFactory;)V'
+  '#(Lokhttp3/Headers;)Ljava/util/List;'
+  '#(Z)Lokhttp3/ConnectionSpec$Builder;'
+  '#(ZZ)Lcom/base/baseus/map/base/IMap;'
+  '#-startConnectTimeoutTask- device = '
+  '#ACTION_HEADSET_PLUG info, address: '
+  '#Already awaiting connection attempt'
+  '#AudioTrack: buffer size in frames: '
+  '#BalanceSeekBarView_bl_progressColor'
+  '#Base_TextAppearance_AppCompat_Body1'
+  '#Base_TextAppearance_AppCompat_Body2'
+  '#Base_TextAppearance_AppCompat_Large'
+  '#Base_TextAppearance_AppCompat_Small'
+  '#Base_TextAppearance_AppCompat_Title'
+  '#BesOtaService Protocol: --ddd------'
+  '#BtHelper setAIBleCommand command : '
+  '#COMMAND_ADD_CARD_TO_EX_CARD_PACKAGE'
+  '#Cannot advance the iterator beyond '
+  '#Cannot construct instance of %s: %s'
+  '#Cannot upgrade from an instance of '
+  '#ClassicsHeader_srlDrawableArrowSize'
+  '#ClassicsHeader_srlTextTimeMarginTop'
+  '#ConnectThread-->mSocket != null'
+  '#ConnectThread:run-->mSocket == null'
+  '#DISCONNECTED_BUFFER_ENABLED_DEFAULT'
+  '#Default instance must be immutable.'
+  '#EXT-X-I-FRAME-STREAM-INF'
+  '#EXT-X-I-FRAMES-ONLY'
+  '#ExoPlayer:FrameReleaseChoreographer'
+  '#Expected ViewPager2 instance. Got: '
+  '#Expected continuation opcode. Got: '
+  '#FFP_PROP_INT64_AUDIO_CACHED_PACKETS'
+  '#FFP_PROP_INT64_VIDEO_CACHED_PACKETS'
+  '#FUN_ID_SCH_POI_OPTION_RECOMMANDLINK'
+  '#Failed to call Surface.setFrameRate'
+  '#Failed to find image header parser.'
+  '#Failed to get default instance for '
+  '#FileDownloadServiceSharedConnection'
+  '#HEADER_VALUE_APPLICATION_URLENCODED'
+  '#HFP#ACTION_CONNECTION_STATE_CHANGED'
+  '#Headers parameter must not be null.'
+  '#Invalid aspect frame values. frame='
+  '#KEY_HISI_EXT_CODEC_NON_REF_P_FRAMES'
+  '#Landroid/bluetooth/BluetoothDevice;'
+  '#Landroid/bluetooth/BluetoothSocket;'
+  '#Landroid/bluetooth/le/ScanCallback;'
+  '#Landroid/bluetooth/le/ScanSettings;'
+  '#Landroid/content/ServiceConnection;'
+  '#Lcom/base/baseus/arch/LiveDataWrap;'
+  '#Lcom/base/baseus/arch/LiveDataWrap<'
+  '#Lcom/base/baseus/base/BaseActivity;'
+  '#Lcom/base/baseus/base/BaseActivity<'
+  '#Lcom/base/baseus/base/BaseFragment;'
+  '#Lcom/base/baseus/base/BaseFragment<'
+  '#Lcom/base/baseus/map/base/IMapView;'
+  '#Lcom/base/baseus/net/interceptor/a;'
+  '#Lcom/base/baseus/net/transformer/a;'
+  '#Lcom/base/baseus/net/transformer/b;'
+  '#Lcom/base/baseus/utils/Base64Utils;'
+  '#Lcom/base/baseus/utils/ContextUtil;'
+
+
+=== HEX CONSTANTS (all DEX) ===
+Total: 354
+  '  0x000000:unknown'
+  ' > 0x7FFFFFFFFFFFFFFF'
+  '*Padding string not terminated by 0x01 byte'
+  ',) to output; max is 0x10FFFF as per RFC 4627'
+  '0\t0X8FX'
+  '00000000'
+  '0000000000'
+  '000000000000'
+  '000000000000000'
+  '0000000000000000'
+  '000000000000000000000000'
+  '0000000000000000000000000000'
+  '00000001'
+  '00000002'
+  '000000ffff'
+  '00001111'
+  '0000ffff'
+  '00010400'
+  '00020000'
+  '00030400'
+  '00050600'
+  '010000000000000000'
+  '01110000'
+  '0123456789ABCDEF'
+  '0123456789abcdef'
+  '020000000000'
+  '03ff03ff'
+  '090000000000000000'
+  '0X8F@FX'
+  '0X8FX'
+  '0d000062340'
+  '0j0X8FX'
+  '0x64 '
+  '0x8FX'
+  '0xC2 : isOTA = '
+  '0xD1 : command is error.'
+  '0xE5 : command is error.'
+  '0xE8 : '
+  '0xE8 : command is error.'
+  '0xE8 : length = '
+  '0}0X8FX'
+  '1111111111'
+  '11111342'
+  '1200000000'
+  '1200000001'
+  '1200000002'
+  '1200000004'
+  '1200000005'
+  '1200000006'
+  '12345678'
+  '123456789'
+  '1234567890'
+  '1234567890987654321'
+  '1800000000'
+  '19AA4152'
+  '19AA474C'
+  '19AA5243'
+  '19AA5243000000001AC320'
+  '19AA5543'
+  '19AA554300000000ADC220'
+  '19AA5544'
+  '19AA5553'
+  '19AA5553000000006E0320'
+  '20000125'
+  '2014052600006128'
+  '202604291828'
+  '2147483647'
+  '2273782735'
+  '308202eb30820254a00302010202044d36f7a4300d06092a864886f70d01010505003081b9310b300906035504061302383631123010060355040813094775616e67646f6e673111300f060355040713085368656e7a68656e31353033060355040a132c54656e63656e7420546563686e6f6c6f6779285368656e7a68656e2920436f6d70616e79204c696d69746564313a3038060355040b133154656e63656e74204775616e677a686f7520526573656172636820616e6420446576656c6f706d656e742043656e7465723110300e0603550403130754656e63656e74301e170d3131303131393134333933325a170d3431303131313134333933325a3081b9310b300906035504061302383631123010060355040813094775616e67646f6e673111300f060355040713085368656e7a68656e31353033060355040a132c54656e63656e7420546563686e6f6c6f6779285368656e7a68656e2920436f6d70616e79204c696d69746564313a3038060355040b133154656e63656e74204775616e677a686f7520526573656172636820616e6420446576656c6f706d656e742043656e7465723110300e0603550403130754656e63656e7430819f300d06092a864886f70d010101050003818d0030818902818100c05f34b231b083fb1323670bfbe7bdab40c0c0a6efc87ef2072a1ff0d60cc67c8edb0d0847f210bea6cbfaa241be70c86daf56be08b723c859e52428a064555d80db448cdcacc1aea2501eba06f8bad12a4fa49d85cacd7abeb68945a5cb5e061629b52e3254c373550ee4e40cb7c8ae6f7a8151ccd8df582d446f39ae0c5e930203010001300d06092a864886f70d0101050500038181009c8d9d7f2f908c42081b4c764c377109a8b2c70582422125ce545842d5f520aea69550b6bd8bfd94e987b75a3077eb04ad341f481aac266e89d3864456e69fba13df018acdc168b9a19dfd7ad9d9cc6f6ace57c746515f71234df3a053e33ba93ece5cd0fc15f3e389a3f365588a9fcb439e069d3629cd7732a13fff7b891499'
+  '33333333'
+  '3758096383'
+  '38c76d8cc1'
+  '456D7074792044617461'
+  '4HZ+dci+KoJjiGyon9R2HJ7C93n17+blODqSJt9AyeQi3Ka/hLkkqCjiAB2ENCWPnNPydyPYJknjRoRj8bKzQzKFSIqdxDTzLfYKX/GeDPVwnkq0mlcXBHz7yQggkAwWu0+tJIFysuJltmKoJmn0MwnDkA4QajD8QLMyzsLPL4xkE5mClwbq8SXwVK37/56xR2vUpwNgicPNpXFN6Fx+FcqR+4s6TObzB8AREDm00Snb8njlpZF2a0YDwlHXeiL63wlS9ilvj6Nb6YIJnOE+DuGQSj/H1UeV0mgw8u8WBCqyAAdBUThGxnhu28ySksHQgs5dHZk9qyp41boiGI8xAS74pyWJZt/VdtI98DJcDUcVd6nQlwwYfH3EKiin/NOau5WT94I7jy4TE0p5a/HGSl2TO90NT1G8AH1iA7FpE1neKdk/mZdt5MOw3w9QpsTcTvA8pk2qLXtJG9e3xobyTkdKS1C/zHJ1A1e/dcU31Ro4uM2pY5bVUJjFF/d+1bVuV+DUfP85k1NVWHW4wMdBgzAlVdcFzEVx9odkIZfKuVE2/btb2NQV7eVejeHQYiJbzsulCih+iD6jYqy5HeCbOLLJPwrjVKSC4YE2hCpFHx8RAGCVduEFE2xfD3shWzleX8ZoMEj+pr7W8KYAAk4KnPBcyrYQZI70KwH1afLPGR2p96Eglt8clEnEGFaroetLG4gLfZei317n4+fzEvX0jI80zgph5kKJVdAGTtITL3uOool4v/JLeyNEPMYzaYStfb82fDlIQ9+UAUCf0Uup7KR8wj81/H6PaAlfEi71J5fcEFfov5BNLWwWu+VPgpqOd3etHcqFktnRwx0MdlQyK/mFZXKYwHjQ7qibPb3YKnPNa5OzRLVZuXa+0fEyoUDaYA+4DpesezSSr8/cPU61asbY2XM3q+wiglVc9vB4hdMvUyINnGYdZZbMmflyBAYCb5pnQ9zD0cRXDyzNxIdn9EPTTtq5FGixRX2j9bNtwD/7Xa/Epwz5rYZxK6sUnesrkYi1tPx+g1hPeg1BGrkcFKM9cWla5xXegFmVYwd4UAcz2MUzAi8G2Fq/YvsXwr7O4En2L8BBIGZWOgjtvc6lDQzPF4OkzZ45j30nPNbfXX3CUEy9O7SgQjHh0RdctmLVbjFn5V2+Ou1EUQyymjsuSBSCCd9iiIoYVCoiDaP6NvCXbJbg/L6YQktWNtXlESQJ77w5gebxu70SX/FxoT9M2d7qFed53Y2YuPs2VIJgyqZ69Qdg4qBjG58zu+LRCtn7CQDLUiwbAKsy+e7HBZTc43pWam7Hy4hvyVFbS8oDquc/F8y1qwHoKHw825GS/MmXuKx0+n0TogI07npnrgZTdwJNoP+ZgflLhJetbGpamnK4qVYUqv6pb/MRftXSO13TADOPZPp89Js1598KQzapL9FZ1+xC3wTtgJCvJLcwy2g1Kg6dxVPSJOqmyiYJO+SNfQk24QQ4fLzaFsSHcuM9bMF/eGNFfEe73nQ0petdeJ/EEAtacXlpx/nWPq4ZBTBzD1vanE/VkkuHwrnxWJTAPWkihEO+xZT50vfhimCKhv3xrPvW9nvWn8Hy/hiJREGFkrDjAW4ZlyKarpsluj1IbfBGgq646qDUdxmrZJFmtKuGTMMMjtywE2H8c3rTIgX6MYEMjfVUgVI5tkpZ54XkM+7UaKMfODtGIp1Hj7kDbyQcL8pWR2hB5VX5mJeAx5YKVXBJQwGAlBL/Ejc9WqYo9rdJzM8GBzelvfvwb52rXKeQmuvwRpbTxi+vFSJnFWA0tP12Vyz9sF+c45KTbyImmaeh06iDNq9EGBpd1BnFuWj6WzsQT+3tlODFHk7gNQtdSxAhVjgwTKLkMoovPf3DNF3ieuB1Ji4uLidyjJ5hVMOBJz83dlQYQEtNgIPcSVtuilLwkxoDUNvp9qXGiKy0X37oIn/zyyI6HRpHPIbBlNxmz5Df3MBguSE7R6+CnOZBU210oNYKORbbBfhuf+vx5nAhHn4Wq4zhTY8zubeknKP21Q28mlvFHmBWylFy4F0GtUAW9qqa6IH3nTKj4fmYkzvoGJmzwFajGm8UDyzztmFo1Wrux2pvSoPC2PSQwv0EHlM4/sKm1Z6Zx5+buyCUICemzLd8KlPWZpUYb0AHwUM7TKTfmRwvp9tJ/T1g77IOLHCADYWG2Ca4/dPK4PSsCXNh8wxDlNdPyU8PmZNKuC5a7SQigOZnjWxGIef1NEYLCnNkoSbQh409qnye2REvyPGXnvcrJgoUbGiAYAwkAxWgL7Ara4ZsLjn8xOt731PiLyP8I5Dia3k6dXKwaGxE2pYsyAcOuVLg8RY8Ga1ex6pWxXqUq2vy0dcSDtvaMUr0YPhCYAJm3RJ7P3wrnK9pL3nv9EH/7TdvC8mvsZdnkYwfaLzJzHD9Q65qzawlUNGuwVcs+FoSgJGVS0XoxNpTavqfQpGy6S+GXeBt9CpL3rCKggEMUK0Ay89EEJUaVcv1S2J0R0Yg82GlFQ3UC9b9fHw7og5CiXtJfcie02ajfPWkex4CsoUIIvugvuXRoF0CbUMaoEcJQVYElcyfEWuUzv7PwiLcSsah1cCTp6QuoC24Vxy3ubEt078Jk5i6PhRXvnDUPP88v01UClBo1pKwvDcV4UYxU43/cz26V7SQe9Oy0AHpVnaGJpC9rUrVGDBCRie8rApbo1VCfu/hr2OTUW/ThGXRg0dij4DNFneOVBJywXFEllbxZARs6KAQBbYG6QT3AOGsjCDq3qcaDz3SzNijmIJqUs633VtCo8e6sggpp8t24Z3O15XiGebu0c5HZXcHY3tQVt07AeCHUbbYXcQ0bwIkrAY03zr7TQFG/SahUH6WTENCrYaSPxf5V2p6lcgGNg0Wqxhi1FV1+SGovfIWrgl7gGBa+yu30zo1hXVkao3nleDj29naTfcn8iY2xPpkZNrl+Na5ogE80YQjZfNvFErG+IYUrnv+psLDuTo4JtEkqXbXYmoZ4+ZJBAjmiCOelJnD0W13lP9RfyChKvJwBm497LE7pj+hl6FRVxfeAeJohJEpsp6ShKyW9ap5'
+  '5 following 0xEF; should get 0xBB as part of UTF-8 BOM'
+  '55AA0315'
+  '55AA0701031402'
+  '55AA070103140200'
+  '55AA070103140201'
+  '55AA09010502'
+  '55AA0F010B14'
+  '55AA10020000'
+  '55AA1003'
+  '55AA1004'
+  '55AA1004000100'
+  '55AA1004000102'
+  '55AA1005'
+  '55AA1006'
+  '55AA100600051200000000'
+  '55AA1007'
+  '55AA100700020112'
+  '55AA100C0008'
+  '55AA100D0008'
+  '55AA10100004'
+  '55AA10110001'
+  '55AA1012'
+  '55AA1013'
+  '55AA1014'
+  '55AA1015'
+  '55AA10180000'
+  '55AA10190001'
+  '55AA101B000100'
+  '55AA101B000101'
+  '55AA101C0000'
+  '55AA101D'
+  '55AA101E0000'
+  '55AA101F'
+  '55AA10200002012C'
+  '55AA1021'
+  '55AA10220000'
+  '55AA1023'
+  '55AA1024'
+  '55AA1025'
+  '55AA1026'
+  '55AA10280000'
+  '55AA1029'
+  '55AA102900020000'
+  '55AA102A'
+  '55AA102B'
+  '55AA30012C01'
+  '5value outside valid Character range (0x0000 - 0xFFFF)'
+  '6596764261'
+  '7077277177'
+  '7087287187'
+  '7297497397'
+  '7367567467'
+  '7426720361733144585'
+  '7426720361753886757'
+  '7461961004256624679'
+  '7486365242352926731'
+  '7570903491355967529'
+  '7577777677'
+  '7587787687'
+  '77577577'
+  '789B000A2C00000412FD'
+  '789B000A2C000005D23C'
+  '789B000A2C000006D37C'
+  '789B000A2C00000713BD'
+  '789B000A2C00000817FD'
+  '7A87C87B87'
+  '7B57D57C57'
+  '7B67D67C67'
+  '7a87c87b87'
+  '7aB78C77C'
+  '7bA7aA7cA7'
+  '7c57e57d57'
+  '7d67f67e67'
+  '7expected code book to start with [0x56, 0x43, 0x42] at '
+  '8e17f7422b35fbea'
+  '9A00050400010001'
+  '9A00050400010002'
+  '9A00050400010003'
+  '9A00050400010004'
+  '9A00050400010005'
+  '9A00050400010006'
+  '9A00050400010007'
+  '9A00050400010008'
+  '9A00050400010009'
+  '9A0005040001000A'
+  '9A0005040001000B'
+  '9A0005040001000C'
+  '9A0005040001000E'
+  '9A0005040001000F'
+  '9A00050400010010'
+  '9A00050400010012'
+  '9A00050400010013'
+  '9A00050400010014'
+  '9A00050400010015'
+  '9A00050400010016'
+  '9A00050400010017'
+  '9A00050400010018'
+  '9A00050400010019'
+  '9A0005040001001A'
+  '9A0005040001001B'
+  '9A0005040001001C'
+  '9A0005040001001D'
+  '9A0005040001001E'
+  '9A0005040001001F'
+  '9A00050400010020'
+  '9A00050400010021'
+  '9A00050400010022'
+  '9A00050400010023'
+  '9A00050400010024'
+  '9A00050400010025'
+  '9A00050400010026'
+  '9A00050400010027'
+  '9A00050400010028'
+  '9A00050400010029'
+  '9A0005040001002A'
+  '9A0005040001002B'
+  '9A0005040001002C'
+  '9A0005040001002E'
+  '9A0005040001002F'
+  '9A00050400010030'
+  '9A00050400010031'
+  '9A00050400010032'
+  '9A00050400010033'
+  '9A00050400010034'
+  '9A00050400010035'
+  '9A00050400010036'
+  '9A00050400010037'
+  '9A00050400010038'
+  '9A00050400010039'
+  '9A0005040001003A'
+  '9A0005040001003B'
+  '9A0005040001003C'
+  '9A0005040001003D'
+  '9A0005040001003E'
+  '9A00050400010042'
+  '9A00050400010043'
+  '9A00050400010046'
+  '9A0005040001004A'
+  '9A0005040001004B'
+  '9A0005040001004D'
+  '9A0005040001004F'
+  '9A0006070001003A'
+  '9A0006070001003B'
+  '9A0006070001003C'
+  '9A0006070001003D'
+  '9A0006070001003E'
+  '9A0006070001003F'
+  '9A00060700010043'
+  '9A00060700010044'
+  '9A00060700010046'
+  '9A00060700010049'
+  '9A0006070001004A'
+  '9A0006070001004C'
+  '9A0006070001004D'
+  '9A0006070001004E'
+  '9A0006070001004F'
+  '9A0006110003004500470048'
+  '9AAA030001'
+  '9AAA030002'
+  '9AAA030003'
+  '9AAA030004'
+  '9AAA030005'
+  '9AAA030006'
+  '9AAA030007'
+  '9AAA030008'
+  '9AAA030009'
+  '9AAA03000A'
+  '9AAA03000B'
+  '9AAA03000C'
+  '9AAA03000E'
+  '9AAA03000F'
+  '9AAA030010'
+  '9AAA030012'
+  '9AAA0300120001'
+  '9AAA030013'
+  '9AAA030014'
+  '9AAA030015'
+  '9AAA030016'
+  '9AAA030017'
+  '9AAA030018'
+  '9AAA030019'
+  '9AAA03001A'
+  '9AAA03001B'
+  '9AAA03001C'
+  '9AAA03001D'
+  '9AAA03001E'
+  '9AAA03001F'
+  '9AAA030020'
+  '9AAA030021'
+  '9AAA030022'
+  '9AAA030023'
+  '9AAA030024'
+  '9AAA030025'
+  '9AAA030026'
+  '9AAA030027'
+  '9AAA030028'
+  '9AAA030029'
+  '9AAA03002A'
+  '9AAA03002B'
+  '9AAA03002C'
+  '9AAA03002E'
+  '9AAA03002F'
+  '9AAA030030'
+  '9AAA030031'
+  '9AAA030032'
+  '9AAA030033'
+  '9AAA030034'
+  '9AAA030035'
+  '9AAA030036'
+  '9AAA030037'
+  '9AAA030038'
+  '9AAA030039'
+  '9AAA03003A'
+  '9AAA03003B'
+  '9AAA03003C'
+  '9AAA03003D'
+  '9AAA03003E'
+  '9AAA030042'
+  '9AAA030043'
+  '9AAA03004A'
+  '9AAA03004D'
+  '9AAA10003A'
+  '9AAA10003B'
+  '9AAA10003C'
+  '9AAA10003D'
+  '9AAA10003E'
+
+
+=== CLASS NAMES (baseus / protocol / bluetooth) ===
+Total: 988
+  	(?:alley|annex|arcade|ave[.]?|avenue|alameda|bayou|beach|bend|bluffs?|bottom|boulevard|branch|bridge|brooks?|burgs?|bypass|broadway|camino|camp|canyon|cape|causeway|centers?|circles?|cliffs?|club|common|corners?|course|courts?|coves?|creek|crescent|crest|crossing|crossroad|curve|circulo|dale|dam|divide|drives?|estates?|expressway|extensions?|falls?|ferry|fields?|flats?|fords?|forest|forges?|forks?|fort|freeway|gardens?|gateway|glens?|greens?|groves?|harbors?|haven|heights|highway|hills?|hollow|inlet|islands?|isle|junctions?|keys?|knolls?|lakes?|land|landing|lane|lights?|loaf|locks?|lodge|loop|mall|manors?|meadows?|mews|mills?|mission|motorway|mount|mountains?|neck|orchard|oval|overpass|parks?|parkways?|pass|passage|path|pike|pines?|plains?|plaza|points?|ports?|prairie|privada|radial|ramp|ranch|rapids?|rd[.]?|rest|ridges?|river|roads?|route|row|rue|run|shoals?|shores?|skyway|springs?|spurs?|squares?|station|stravenue|stream|st[.]?|streets?|summit|speedway|terrace|throughway|trace|track|trafficway|trail|tunnel|turnpike|underpass|unions?|valleys?|viaduct|views?|villages?|ville|vista|walks?|wall|ways?|wells?|xing|xrd)(?=[,*
+          	iframe.src = "alipayjsbridge://callNativeFunc?" + paramStr;
+          	iframe.style.display = "none";
+          	iframe.style.height = "1px";
+          	iframe.style.width = "1px";
+          	parent.appendChild(iframe);
+          	var iframe = document.createElement("iframe");
+              	parent.removeChild(iframe)
+              document.body.removeChild(iframe)
+          "selectedIcon": "\t\nhttps://cdn.baseus.cn/admin/other/tHD0phztbfxWKJX928f8KMUHick71Hv2.png",
+          "unSelectedIcon": "https://cdn.baseus.cn/admin/other/ljoWjtFk8UbxzkvqU3GmREHszazMjcOR.png",
+          document.body.appendChild(iframe);
+          iframe.src = url;
+          iframe.style.display = "none";
+          iframe.style.height = "1px";
+          iframe.style.width = "1px";
+          var iframe = document.createElement("iframe");
+   Anchor keylines cannot be focal.
+   Config frame generated. Offset: 
+   The operation has been canceled.
+   com.baseus.process_communication
+   com.yalantis.ucrop.ShowCropFrame
+   getInstance("TLSv1.3", provider)
+   has been canceled.
+   has been cancelled.
+   is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.
+   kotlin.jvm.internal.SerializedIr
+   kotlin.jvm.serialization.use8to7
+   ms. Frames received: 
+   onFirstLocalVideoFrame...width: 
+  ! does not implement Serializable.
+  !Bluetooth device is disconnected.
+  !android.permission.BLUETOOTH_SCAN
+  !com.yalantis.ucrop.CropFrameColor
+  !mockSerializableClass.defaultType
+  !setWhileBalance : camera is null.
+  !switch camera, create instance...
+  "Classic Bluetooth is disconnected.
+  "Client-sent frames must be masked.
+  "IFrameListener.onNewSurfaceTexture
+  "No support for Bluetooth function.
+  "android.intent.action.HEADSET_PLUG
+  "com.hyphenate.notification.cancel.
+  "com.quick.qt.commonsdk.framework.a
+  "javax.sql.rowset.serial.SerialBlob
+  "restartBluetoothScoAsynTask enter.
+  "rx3.scheduler.drift-tolerance-unit
+  # is not Serializable or Parcelable.
+  #Default instance must be immutable.
+  #Expected ViewPager2 instance. Got: 
+  #Expected continuation opcode. Got: 
+  #Failed to call Surface.setFrameRate
+  #Invalid aspect frame values. frame=
+  #Missing bluetooth scan permissions.
+  #Protocol message had invalid UTF-8.
+  #android.bluetooth.device.extra.RSSI
+  #android.bluetooth.device.extra.UUID
+  #android.settings.BLUETOOTH_SETTINGS
+  #bluetoothAdapter.bluetoothLeScanner
+  #com.bytedance.sdk.openadsdk.TTAdSdk
+  #com.quick.qt.analytics.CoreProtocol
+  $-connectSpp-  device is bad object. 
+  $BluetoothOTAManager can not be null.
+  $Failed to get app instance id. appId
+  $android.bluetooth.device.action.UUID
+  $android.hardware.vr.high_performance
+  $android.permission.BLUETOOTH_CONNECT
+  $com.quick.qt.commonsdk.framework.a$1
+  $com.quick.qt.commonsdk.framework.a$2
+  $com.quick.qt.commonsdk.framework.a$a
+  $gattDescriptor.ENABLE fail: --------
+  %BluetoothGattService is null. uuid = 
+  %Control frame must be less than 125B.
+  %android.bluetooth.adapter.extra.STATE
+  %android.bluetooth.device.action.FOUND
+  %android.bluetooth.device.extra.DEVICE
+  %android.bluetooth.profile.extra.STATE
+  %android.intent.action.BATTERY_CHANGED
+  %androidx.media.audio_attrs.FRAMEWORKS
+  %com.quick.qt.analytics.CoreProtocol$1
+  %com.quick.qt.analytics.CoreProtocol$a
+  %onFrameCaptured from another session.
+  %protocols must not contain http/1.0: 
+  &-writeDataToSppDevice- param is error.
+  &ChargingNebulaBluetoothVersionModel.kt
+  &Server-sent frames must not be masked.
+  &The device is not supported bluetooth.
+  &android.permission.BLUETOOTH_ADVERTISE
+  &com.baseus.blelib.internal.BLE_SERVICE
+  &kotlin.jvm.internal.EnhancedMutability
+  &onFirstLocalAudioFrame...streamIndex: 
+  &onFirstRemoteVideoFrameDecoded...uid: 
+  '-connectSpp- miss bluetooth permission.
+  'ChargingStationBluetoothVersionModel.kt
+  'Instantiation error. Response command: 
+  'Missing permission to search Bluetooth.
+  'android.media.SubtitleController$Anchor
+  'androidx.lifecycle.BlockRunner$cancel$1
+  'awaitClose { yourCallbackOrListener.cancel() }' should be used in the end of callbackFlow block.
+  'com.baseus.mall.viewmodels.PcaViewModel
+  'com.baseus.mimi.manager.MimiAuthManager
+  'com.bytedance.bpea.cert.token.TokenCert
+  'com.yalantis.ucrop.CropFrameStrokeWidth
+  'kotlin.jvm.internal.EnhancedNullability
+  'onFirstRemoteVideoFrameRendered...uid: 
+  (Attempted to serialize java.lang.Class: 
+  (Deserialize Map Key must be String.class
+  (Missing permission to connect Bluetooth.
+  (failed to draw, toTexture2DFrame failed.
+  (setManualFocusDistance : camera is null.
+  )-handlerQueue- findPacketData not found. 
+  )CancelChatReq.CancelChatReqBuilder(super=
+  )Rendering of frame failed. Frame number: 
+  )android.bluetooth.device.extra.BOND_STATE
+  )com.google.protobuf.NewInstanceSchemaFull
+  *-disconnectSpp- miss bluetooth permission.
+  *First frame does not start with sync code.
+  *com.baseus.intelligent.view.SplashActivity
+  *com.bytedance.ttgame.module.rtc.RtcService
+  *com.quick.qt.commonsdk.framework.UMFrUtils
+  *onFirstPublicStreamAudioFrame...streamid: 
+  *org.checkerframework.checker.nullness.qual
+  *restartBluetoothSco skip. sco is starting.
+  +--->>> Error, Should not go to this branch.
+  +-writeDataToSppDevice- spp socket is close.
+  +An instance of OnFlingListener already set.
+  +CancelChatResp.CancelChatRespBuilder(super=
+  +DeserializationComponentsForJava.ModuleData
+  +Protocol message tag had invalid wire type.
+  +Serializables don't support default values.
+  +com.baseus.mimi.VoiceSpecialSettingActivity
+  +com.location.apis.geofence_baseus.broadcast
+  +vendor.hisi.hisi-ext-codec-non-ref-p-frames
+  ,-stopDeviceScan- :: Bluetooth is not enable.
+  ,BluetoothGattCharacteristic is null. uuid = 
+  ,Data loss. Failed to serialize bundle. appId
+  ,android.bluetooth.device.extra.BATTERY_LEVEL
+  ,com.base.baseus.router.provider.BsAiServices
+  ,com.base.baseus.router.provider.MallServices
+  ,com.baseus.blelib.internal.google_channel_id
+  ,com.quick.qt.commonsdk.framework.UMFrUtils$1
+  ,com.quick.qt.commonsdk.framework.UMFrUtils$2
+  ,engine is invalid, processVideoFrame failed.
+  ,guava.concurrent.generate_cancellation_cause
+  ,restartBluetoothSco failed. Context is null.
+  - readFirstPushAudioFrame firstPushData?.size 
+  - was started more than once. Each instance of
+  -android.bluetooth.device.action.ACL_CONNECTED
+  -com.baseus.blelib.internal.battery_channel_id
+  -com.baseus.intelligent.view.SplashNewActivity
+  -com.baseus.mall.viewmodels.LogisticsViewModel
+  -com.yalantis.ucrop.UcropToolbarCancelDrawable
+  -failed to get a texture, ToVideoFrame failed.
+  -https://www.baseus.cn/#/product/detail?skuId=
+  . Reflective serialization of Kotlin classes without using kotlin-reflect has undefined and unexpected behavior. Please use KotlinJsonAdapter from the moshi-kotlin artifact or use code gen from the moshi-kotlin-codegen artifact.
+  .()Lcom/base/baseus/request/DeviceShareRequest;
+  .()Lcom/baseus/mall/adapter/InvoiceNameAdapter;
+  .()Lcom/baseus/mall/adapter/MallCommentAdapter;
+  .()Lcom/baseus/mall/viewmodels/MallMeViewModel;
+  .()Lcom/baseus/model/analysis/AiAnalyseMessage;
+  .()Lcom/baseus/model/control/OrderChargingData;
+  .()Ljava/util/concurrent/CancellationException;
+  .(I)Lcom/baseus/mall/fragment/MallCartFragment;
+  .(ILcom/baseus/model/control/BsGanDeviceBean;)V
+  .(ILcom/baseus/model/control/FenceStatusBean;)Z
+  .(Lcom/baseus/carrecordsdk/bean/DeviceSnData;)V
+  .(Lcom/baseus/mall/adapter/DetailSpecAdapter;)V
+  .(Lcom/baseus/model/QuickGuideSplashDataBean;)V
+  .(Lcom/baseus/model/ble_model/BleResolveBean;)V
+  .(Lcom/baseus/model/control/CMDeviceInfoBean;)V
+  .(Lcom/baseus/model/control/CMQuestParamBean;)V
+  .(Lcom/baseus/model/control/CommonResultBean;)V
+  .(Lcom/baseus/model/control/ConversationItem;)V
+  .(Lcom/baseus/model/control/CupScentParamDto;)V
+  .(Lcom/baseus/model/control/EqRegulationBean;)V
+  .(Lcom/baseus/model/control/FirmwareInfoBean;)V
+  .(Lcom/baseus/model/control/FirmwareInfoBean;)Z
+  .(Lcom/baseus/model/control/NebulaActionBean;)V
+  .(Lcom/baseus/model/control/NebulaActionBean;)Z
+  .(Lcom/baseus/model/control/NebulaScreenBean;)V
+  .(Lcom/baseus/model/control/ScentMachModeDTO;)V
+  .(Lcom/baseus/model/control/ShareDealRequest;)V
+  .(Lcom/baseus/model/control/mimi/MimiPayload;)V
+  .(Lcom/baseus/model/event/ErgStorageBleEvent;)V
+  .(Lcom/baseus/model/event/MallOrderListEvent;)V
+  .(Lcom/baseus/model/event/RecepTimeListEvent;)V
+  .(Lcom/baseus/model/mall/LogiticsDetailsBean;)V
+  .(Lcom/baseus/model/mall/MallAfterMarketBean;)V
+  .(Lcom/baseus/model/mall/MallDetailCartBean;I)V
+  .(Lcom/baseus/model/mall/MallInVoiceListBean;)V
+  .(Lokhttp3/Protocol;)Lokhttp3/Response$Builder;
+  .Another SimpleCache instance uses the folder: 
+  .AppCompatTheme_textAppearanceListItemSecondary
+  .AppCompatTheme_textAppearanceSearchResultTitle
+  .CANNOT_LOAD_DESERIALIZE_TYPE_PARAMETER_BY_NAME
+  .Cannot find a (Map) Key deserializer for type 
+  .DEVICE_EXCEPTION_BATTERY_OVERRIDE_ON_DISCHARGE
+  .DEVICE_EXCEPTION_BATTERY_TOO_HIGH_ON_CHARGEING
+  .EarPublicVersionActivity1 isLowBattery battery
+  .Exception in invokeOnCancellation handler for 
+  .FlatBuffers: struct must be serialized inline.
+  .Landroidx/appcompat/widget/ContentFrameLayout;
+  .Landroidx/navigation/NavType$SerializableType;
+  .Landroidx/navigation/NavType$SerializableType<
+  .Lcom/base/baseus/adapter/FragmentStateAdapter;
+  .Lcom/base/baseus/arch/ProtectedUnPeekLiveData;
+  .Lcom/base/baseus/arch/ProtectedUnPeekLiveData<
+  .Lcom/base/baseus/base/BaseWebViewV2Activity$1;
+  .Lcom/base/baseus/base/BaseWebViewV2Activity$2;
+  .Lcom/base/baseus/map/baidu/BaiduBaseusMapView;
+  .Lcom/base/baseus/map/google/GoogleBaseusFence;
+  .Lcom/base/baseus/model/PublicDeviceInfoModule;
+  .Lcom/base/baseus/net/callback/ErrorSubscriber;
+  .Lcom/base/baseus/net/callback/ErrorSubscriber<
+  .Lcom/base/baseus/request/MallRequest$refund$1;
+  .Lcom/base/baseus/router/provider/BsAiServices;
+  .Lcom/base/baseus/router/provider/MallServices;
+  .Lcom/base/baseus/utils/CheckServerStatesUtils;
+  .Lcom/base/baseus/utils/TimeFormatUtils$Time12;
+  .Lcom/base/baseus/widget/NonSwipeableViewPager;
+  .Lcom/base/baseus/widget/button/SwitchButton$1;
+  .Lcom/base/baseus/widget/button/SwitchButton$2;
+  .Lcom/base/baseus/widget/button/SwitchButton$3;
+  .Lcom/base/baseus/widget/videoview/MyVideoView;
+  .Lcom/base/baseus/widget/wheelview/ItemIndexer;
+  .Lcom/baseus/carrecordsdk/SdkManager$Companion;
+  .Lcom/baseus/carrecordsdk/bean/CaptureResponse;
+  .Lcom/baseus/carrecordsdk/exo/ExoPlayerFactory;
+  .Lcom/baseus/carrecordsdk/ijk/IJkMediaPlayer$2;
+  .Lcom/baseus/carrecordsdk/ijk/IjkPlayerFactory;
+  .Lcom/baseus/carrecordsdk/ui/BaseMediaActivity;
+  .Lcom/baseus/carrecordsdk/utils/SdkContextUtil;
+  .Lcom/baseus/carrecordsdk/utils/SdkDensityUtil;
+  .Lcom/baseus/carrecordsdk/utils/SdkGsonUtils$5;
+  .Lcom/baseus/intelligent/wxapi/WXEntryActivity;
+  .Lcom/baseus/mall/activity/MallCommentActivity;
+  .Lcom/baseus/mall/adapter/ActivitiesTabAdapter;
+  .Lcom/baseus/mall/adapter/CategoryImageAdapter;
+  .Lcom/baseus/mall/adapter/DelegateAdapter$Cell;
+  .Lcom/baseus/mall/adapter/MallMyAddressAdapter;
+  .Lcom/baseus/mall/adapter/MallMyCommentAdapter;
+  .Lcom/baseus/mall/adapter/MallOrderListAdapter;
+  .Lcom/baseus/mall/adapter/MallReturnSkuAdapter;
+  .Lcom/baseus/mall/adapter/OrderListLogoAdapter;
+  .Lcom/baseus/mall/adapter/SecKillDetailAdapter;
+  .Lcom/baseus/mall/adapter/home/MallHomeAdapter;
+  .Lcom/baseus/mall/adapter/provider/TitProvider;
+  .Lcom/baseus/mall/fragment/MallBillAllFragment;
+  .Lcom/baseus/mall/viewmodels/FavoriteViewModel;
+  .Lcom/baseus/model/analysis/DeviceConnectEvent;
+  .Lcom/baseus/model/analysis/DeviceSettingEvent;
+  .Lcom/baseus/model/constant/BaseusConstant$MP3;
+  .Lcom/baseus/model/control/ChargingRecordsBean;
+  .Lcom/baseus/model/control/DeviceBleConfigBean;
+  .Lcom/baseus/model/control/DeviceHeartInfoBean;
+  .Lcom/baseus/model/control/EarCleanContentBean;
+  .Lcom/baseus/model/control/ElectricityTodayDto;
+  .Lcom/baseus/model/control/EqUploadRequestBean;
+  .Lcom/baseus/model/control/ModifyDevicePinData;
+  .Lcom/baseus/model/control/ProductPropertyBean;
+  .Lcom/baseus/model/control/ResRequest$ListBean;
+  .Lcom/baseus/model/control/ScentMachModeAllDTO;
+  .Lcom/baseus/model/control/UserDevicesListBean;
+  .Lcom/baseus/model/control/VolumeValueResponse;
+  .Lcom/baseus/model/control/WaterVolumeResponse;
+  .Lcom/baseus/model/control/WorkingModeResponse;
+  .Lcom/baseus/model/control/mimi/MimiResetEvent;
+  .Lcom/baseus/model/event/DisconnectDeviceEvent;
+  .Lcom/baseus/model/event/ErgStorageFinishEvent;
+  .Lcom/baseus/model/home/DeviceLocationInfoBean;
+  .Lcom/baseus/model/home/HomeAllBean$BannersDTO;
+  .Lcom/baseus/model/home/HomeAllBean$DevicesDTO;
+  .Lcom/baseus/model/mall/MallActivitiesHomeBean;
+  .Lcom/baseus/model/mall/MallCategoryFilterBean;
+  .Lcom/baseus/model/mall/MallFavoriteListBeanKt;
+  .Lcom/baseus/model/my/DeviceAvailableShareBean;
+  .Lcom/baseus/my/view/activity/FeedBackActivity;
+  .Lcom/baseus/my/view/fragment/CusPhotoFragment;
+  .Lcom/baseus/my/view/weight/ExpandableTextView;
+  .Lcom/baseus/networklib/TTNetworkStateListener;
+  .Lcom/bytedance/bae/codec/MediaCodecAACDecoder;
+  .Lcom/bytedance/bae/codec/MediaCodecAACEncoder;
+  .Lcom/bytedance/realx/RXAppStateMonitorAndroid;
+  .Lcom/bytedance/realx/RXVideoSurfaceController;
+  .Lcom/bytedance/realx/base/RXDeviceInfoAndroid;
+  .Lcom/bytedance/realx/base/ThreadUtils$1Result;
+  .Lcom/bytedance/realx/video/RXVideoFrameHelper;
+  .Lcom/bytedance/realx/video/RXVideoScaleFilter;
+  .Lcom/bytedance/realx/video/SurfaceEglRenderer;
+  .Lcom/bytedance/realx/video/VideoFrameDrawer$1;
+  .Lcom/coze/openapi/client/chat/CancelChatReq$1;
+  .Lcom/google/android/exoplayer2/util/FrameInfo;
+  .Lcom/google/firebase/iid/InstanceIdResultImpl;
+  .Lcom/jieli/jl_bt_ota/impl/BluetoothOTAManager;
+  .Lcom/quick/qt/commonsdk/framework/UMFrUtils$1;
+  .Lcom/quick/qt/commonsdk/framework/UMFrUtils$2;
+  .Lcom/ss/android/ttvecamera/TEFrameRateRange$1;
+  .Lcom/ss/bytertc/base/media/VideoFrameDrawer$1;
+  .Lcom/ss/bytertc/engine/meeting/MeetingAdvance;
+  .Lkotlin/coroutines/CombinedContext$Serialized;
+  .Lkotlinx/coroutines/BeforeResumeCancelHandler;
+  .Lkotlinx/coroutines/CancellableContinuationKt;
+  .Lkotlinx/coroutines/CompletedWithCancellation;
+  .ShapeAppearanceOverlay_Material3_Corner_Bottom
+  .ShapeAppearanceOverlay_MaterialComponents_Chip
+  .ShapeAppearance_M3_Comp_SearchBar_Avatar_Shape
+  .ShapeAppearance_M3_Sys_Shape_Corner_ExtraLarge
+  .ShapeAppearance_M3_Sys_Shape_Corner_ExtraSmall
+  .TextAppearance_AppCompat_SearchResult_Subtitle
+  .TextAppearance_AppCompat_Widget_ActionBar_Menu
+  .TextAppearance_AppCompat_Widget_Button_Colored
+  .TextAppearance_AppCompat_Widget_Button_Inverse
+  .TextAppearance_Compat_Notification_Line2_Media
+  .TextAppearance_Compat_Notification_Title_Media
+  .TextAppearance_M3_Sys_Typescale_HeadlineMedium
+  .Unexpected exception while cancelling focusing
+  .[Lcom/base/baseus/widget/seekbar/SeekBarState;
+  .[Lcom/baseus/carrecordsdk/ui/constant/GmtEnum;
+  .[Lcom/baseus/model/control/ai/AiResponseEvent;
+  .[Lcom/baseus/model/home/ToastBean$ToastSource;
+  .[Lcom/baseus/networklib/utils/Constant$Exists;
+  .[Lcom/bytedance/realx/base/RXLogging$Severity;
+  .[Lcom/bytedance/realx/video/RXVideoMemoryType;
+  .[Lcom/ss/bytertc/engine/data/AudioFrameSource;
+  .[Lcom/ss/bytertc/engine/data/SEICountPerFrame;
+  .android.bluetooth.adapter.action.STATE_CHANGED
+  .android.bluetooth.adapter.extra.PREVIOUS_STATE
+  .android.bluetooth.profile.extra.PREVIOUS_STATE
+  .com/base/baseus/request/MallRequest$billList$2
+  .com/base/baseus/request/MallRequest$favorite$1
+  .com/base/baseus/request/MallRequest$invocing$1
+  .getClassNames$deserialization()Ljava/util/Set;
+  .instanceState
+  .notify_check_classical_bluetooth_connect_state
+  .onPerformanceAlarms callback catch exception.
+  .savePngAttributes starting with (inputStream: 
+  .serializeNulls()
+  / does not implement Parcelable or Serializable.
+  /-connectSpp- >>  device is connecting. device :
+  /AudioRouteDeviceManager: initUsbHeadset failed.
+  /ConnectThread:cancel-->mSocket.isConnected() = 
+  /Ignoring attempt to cancel non-cancelable load.
+  /RTP H264 packetization mode [%d] not supported.
+  /The device does not support Bluetooth function.
+  /android.media.property.OUTPUT_FRAMES_PER_BUFFER
+  /com.baidu.mapframework.open.aidl.IComOpenClient
+  /com.base.baseus.router.provider.AccountServices
+  /com.base.baseus.router.provider.ControlServices
+  /com.base.baseus.router.provider.MessageServices
+  /com.base.baseus.router.provider.StatSDKServices
+  /com.base.baseus.router.provider.UpgradeServices
+  /com.baseus.intelligent/
+  /com.quick.qt.commonsdk.framework.UMWorkDispatch
+  /io.netty.buffer.AdvancedLeakAwareByteBuf.touch(
+  /kotlinx.coroutines.flow.StartedLazily$command$1
+  /org.springframework.beans.factory.ObjectFactory
+  /texture helper is invalid, ToVideoFrame failed.
+  0Data loss. Failed to bundle and serialize. appId
+  0Unable to find acceptable protocols. isFallback=
+  0android.bluetooth.adapter.extra.CONNECTION_STATE
+  0android.bluetooth.device.action.ACL_DISCONNECTED
+  0com.baidu.mapframework.open.aidl.IMapOpenService
+  0com.base.baseus.map.model.CommonLatLng(latitude=
+  0com.baseus.blelib.internal.foreground_channel_id
+  0com.baseus.my.view.activity.ForgetPswNewActivity
+  0com.fasterxml.jackson.databind.ext.DOMSerializer
+  0com.quick.qt.commonsdk.framework.UMEnvelopeBuild
+  0org.checkerframework.checker.nullness.compatqual
+  0xD1 : command is error.
+  0xE5 : command is error.
+  0xE8 : command is error.
+  1 readFirstPushAudioFrame 002 firstPushData?.size 
+  1-isSppSocketConnected- miss bluetooth permission.
+  1-writeDataToSppDevice- device is error. device = 
+  1-writeDataToSppDevice- miss bluetooth permission.
+  1AudioRouteDeviceManager: initUsbHeadset finished.
+  1Cancelling end sequence job if it exists. - Job: 
+  1DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS
+  1Protocol message contained an invalid tag (zero).
+  1com.baseus.mall.viewmodels.RequestRefundViewModel
+  1com.quick.qt.commonsdk.framework.UMModuleRegister
+  1com.quick.qt.commonsdk.framework.UMWorkDispatch$1
+  1failed to get a texture, toTexture2DFrame failed.
+  1kotlinx.coroutines.flow.StartedLazily$command$1$1
+  1onFirstLocalAudioFrame callback catch exception.
+  1onFirstLocalVideoFrame callback catch exception.
+  1onFirstPublicStreamVideoFrameDecoded...streamid: 
+  1org.arrah.framework.rdbms.UpdatableJdbcRowsetImpl
+  1restartBluetoothSco failed. AudioManager is null.
+  2Command waiting for the device to reply timed out.
+  2Picture start Code (PSC) missing, dropping packet.
+  2android.bluetooth.adapter.action.DISCOVERY_STARTED
+  2android.bluetooth.device.action.BOND_STATE_CHANGED
+  2c.components.deserialize
+  2com.google.firebase.iid.FirebaseInstanceIdReceiver
+  2com.quick.qt.commonsdk.framework.UMLogDataProtocol
+  2enhancedClassifier?.typeConstructor ?: constructor
+  2newInstance().apply(Buil
+  2newInstance().apply(JvmP
+  2onFirstRemoteAudioFrame callback catch exception.
+  2org.checkerframework.checker.nullness.qual.NonNull
+  2restartBluetoothSco skip, no bluetooth device now.
+  2view.findViewById<FrameL
+  3 multiple times. Please create a fresh instance of 
+  3Cannot set framework drawable as progress drawable.
+  3Skipping frame rendering - fps reduction is active.
+  3android.bluetooth.adapter.action.DISCOVERY_FINISHED
+  3com.base.baseus.router.provider.DeviceShareServices
+  3com.baseus.mall.adapter.home.Type31Cell$convert$1$1
+  3com.baseus.mall.viewmodels.MallInvoiceEditViewModel
+  3com.baseus.my.view.activity.LoginStepOneNewActivity
+  3com.baseus.my.view.activity.VisitorGuideNewActivity
+  3com.bytedance.bpea.core.checker.CertCheckerProvider
+  3org.checkerframework.checker.nullness.qual.Nullable
+  3texture helper is invalid, toTexture2DFrame failed.
+  4Camera is opening, ignore cancelAutoFocus operation.
+  4Camera is opening, ignore setWhileBalance operation.
+  4Failed to call BluetoothAdapter.isLEAudioConnected()
+  4com.baidu.mapframework.open.aidl.IOpenClientCallback
+  4com.baseus.intelligent.view.GooglePushResultActivity
+  4com.baseus.mall.adapter.home.Type1Cell$convert$2$2$1
+  4com.baseus.mall.fragment.MallHomeFragment$exposure$1
+  4com.baseus.mall.viewmodels.MallSmartProductViewModel
+  4com.baseus.my.view.activity.LoginRegisterNewActivity
+  4com.baseus.my.view.activity.RegisterEmailNewActivity
+  4com.fasterxml.jackson.databind.ext.SqlBlobSerializer
+  4com.quick.qt.commonsdk.framework.UMSenderStateNotify
+  4initBluetooth() with no bluetooth-connect permision.
+  4measurement.integration.disable_firebase_instance_id
+  5-disconnectSpp- >> device is not connected. device = 
+  5Dropping frame - Not initialized or already released.
+  5FlatBuffers: object serialization must not be nested.
+  5The map cannot be serialized while it is being built.
+  5The set cannot be serialized while it is being built.
+  5android.bluetooth.device.action.BATTERY_LEVEL_CHANGED
+  5com.fasterxml.jackson.databind.ext.CoreXMLSerializers
+  5vendor.hisi.hisi-ext-codec-non-ref-p-frames-supported
+  6Derived class did not call super.onSaveInstanceState()
+  6The list cannot be serialized while it is being built.
+  6com.intellij.openapi.progress.ProcessCanceledException
+  6failed to draw to target texture, ToVideoFrame failed.
+  6native engine is invalid, PushScreenAudioFrame failed.
+  6onExternalScreenFrameUpdate callback catch exception.
+  6restartBluetoothSco failed. Not in communication mode.
+  6setRenderer has already been called for this instance.
+  7Bluetooth SCO is not available off call on this device.
+  7Cannot deserialize a Map.Entry out of empty JSON Object
+  7Mutated drawable is not the same instance as the input.
+  7Texture frame captured but camera is no longer running.
+  7android.support.v4.media.session.command.ADD_QUEUE_ITEM
+  7android.support.v4.media.session.command.ARGUMENT_INDEX
+  7com.baseus.mall.adapter.home.Type21Cell$convert$2$1$1$1
+  7com.baseus.mall.adapter.home.Type23Cell$convert$2$1$1$1
+  7com.baseus.mall.fragment.MallHomeFragment$setHomeData$1
+  7com.baseus.mall.viewmodels.PcaViewModel$initProvinces$2
+  7com.fasterxml.jackson.databind.ext.CoreXMLDeserializers
+  7onAudioFramePlayStateChanged callback catch exception.
+  7onAudioFrameSendStateChanged callback catch exception.
+  7onVideoFramePlayStateChanged callback catch exception.
+  7onVideoFrameSendStateChanged callback catch exception.
+  7protocols must contain h2_prior_knowledge or http/1.1: 
+  7pushExternalVideoFrame: pushExternalVideoFrame timeout.
+  7pushExternalVideoFrame: videoFrame is null, drop frame.
+  8BotShortcutCommandInfo.BotShortcutCommandInfoBuilder(id=
+  8Cannot serialize bundle value to SharedPreferences. Type
+  8Cannot set framework drawable as indeterminate drawable.
+  8Using java.util.logging as the default logging framework
+  8Wrong object type used with protocol message reflection.
+  8com.baseus.mall.adapter.MallReturnSkuAdapter$getAmount$2
+  8com.baseus.mall.fragment.MallBillAllFragment$onEvent$2$1
+  8com.baseus.my.view.activity.FeedBackActivity$onEvent$1$1
+  8com.baseus.my.view.activity.FeedBackActivity$updateImg$1
+  8com.fasterxml.jackson.databind.ser.std.SqlDateSerializer
+  8com.fasterxml.jackson.databind.ser.std.SqlTimeSerializer
+  8kotlinx.coroutines.flow.StartedWhileSubscribed$command$1
+  8kotlinx.coroutines.flow.StartedWhileSubscribed$command$2
+  8native engine is invalid, pullExternalAudioFrame failed.
+  8native engine is invalid, pushExternalAudioFrame failed.
+  8native engine is invalid, setCellularEnhancement failed.
+  8onAdapterChange : bluetooth is on, try to start le scan.
+  8onFirstPublicStreamAudioFrame callback catch exception.
+  8org.springframework.aop.config.MethodLocatingFactoryBean
+  9Anchor keylines must be either the first or last keyline.
+  9Derived class did not call super.onRestoreInstanceState()
+  9android.support.v4.media.session.command.GET_EXTRA_BINDER
+  9com.baseus.mall.activity.MallFavoriteActivity$onEvent$3$1
+  9com.baseus.mall.fragment.MallHomeFragment$setHomeData$1$1
+  9null cannot be cast to non-null type java.io.Serializable
+  9onFirstRemoteVideoFrameDecoded callback catch exception.
+  9surfaceTextureHelper is null, drop current decoded frame.
+  : conversation.chat.cancel
+  :Bytebuffer frame captured but camera is no longer running.
+  :Protocol message end-group tag did not match expected tag.
+  :android.support.v4.media.session.command.ADD_QUEUE_ITEM_AT
+  :android.support.v4.media.session.command.REMOVE_QUEUE_ITEM
+  :com.amazon.identity.auth.device.authorization.onCancelType
+  :com.baseus.mall.viewmodels.CouponSharedViewModel$calcNum$2
+  :com.baseus.mall.viewmodels.MallInvoiceViewModel$invocing$1
+  :com.baseus.mall.viewmodels.RequestRefundViewModel$refund$1
+  :com.baseus.my.view.activity.FeedBackActivity$onEvent$1$1$1

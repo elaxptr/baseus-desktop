@@ -56,10 +56,19 @@ Open in Wireshark. Filter: `btrfcomm || avctp || a2dp`
 ```
 
 ## What to look for
-- **Bluetooth profile**: Check btsnoop for RFCOMM (UIH frames) vs ATT/GATT traffic.
-- **Service UUID**: Visible in the SDP query or GATT service discovery exchange.
-- **Framing format**: Look for repeating byte patterns at packet starts. Most TWS protocols: `<magic0> <magic1> <len> <cmd> <payload...> <crc>`.
-- **Checksum**: CRC-8 (poly 0x07), XOR of all preceding bytes, or other.
+- **Bluetooth profile**: The BP1 Pro ANC uses **BLE GATT** (not RFCOMM) for all runtime
+  control. Filter Wireshark for `btatt` and look for ATT writes to the Bluetrum CCSDK
+  service `02F00000-0000-0000-0000-00000000FE00`.
+- **Write characteristic**: `02F00000-0000-0000-0000-00000000FF01` (app → device commands)
+- **Notify characteristic**: `02F00000-0000-0000-0000-00000000FF02` (device → app events)
+- **Auth handshake**: Look for the challenge-response exchange immediately after GATT
+  service discovery. The pattern involves a DevAuthChallenge and DevAuthResponse.
+- **Battery command**: Triggered by opening the case lid; look for notify on `FF02` with
+  three power level bytes (left, right, case) and three charging-state bytes.
+- **ANC command**: Toggling ANC from the UI causes a write to `FF01`; command byte appears
+  to be `0x0C` based on `BleCommandUtil.resolveModify0C` method name in the APK.
+- **Frida note**: Java bridge does not work on x86_64 Android 12 emulators with Frida 17.x.
+  Use a **real Android device** for Frida captures, or use Android HCI snoop log only.
 
 ## Adding support for a new model
 1. Run the capture procedure above with your device paired.

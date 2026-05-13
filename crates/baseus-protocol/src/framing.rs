@@ -34,7 +34,11 @@ pub(crate) fn crc8(data: &[u8]) -> u8 {
 }
 
 /// Raw Baseus protocol frame: [magic0, magic1, len, cmd, payload..., checksum]
-/// Magic bytes and checksum algorithm are confirmed in Phase 0 and filled in Task 6.
+///
+/// PLACEHOLDER: The Bluetrum CCSDK wire format is not yet confirmed from live capture.
+/// The magic bytes [0xAA, 0x03] are a placeholder; the actual values from the Bluetrum
+/// BLE GATT protocol will differ. Update this once a live BLE capture is available.
+/// See docs/protocol/framing.md and docs/protocol/bp1-pro-anc.md for methodology.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Frame {
     pub cmd: u8,
