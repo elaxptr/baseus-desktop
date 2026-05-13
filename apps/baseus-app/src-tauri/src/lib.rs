@@ -15,9 +15,11 @@ pub fn run() {
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.hide();
             }
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(device::run_loop(handle));
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![commands::connect])
+        .invoke_handler(tauri::generate_handler![])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

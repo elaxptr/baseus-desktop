@@ -1,12 +1,7 @@
 import { createSignal, onCleanup, onMount } from 'solid-js';
 import BatteryCard from './components/BatteryCard';
 import ConnectionCard from './components/ConnectionCard';
-import { BatteryState, connectDevice, onDeviceEvent } from './lib/tauri';
-
-// The Bluetooth address of the BP1 Pro ANC.
-// Set VITE_BT_ADDR in apps/baseus-app/.env.local (hex, no colons).
-// e.g. VITE_BT_ADDR=AABBCCDDEEFF
-const DEVICE_ADDR = BigInt('0x' + (import.meta.env.VITE_BT_ADDR ?? '000000000000'));
+import { BatteryState, onConnectionState, onDeviceEvent } from './lib/tauri';
 
 type ConnStatus = 'connected' | 'connecting' | 'disconnected';
 
@@ -16,30 +11,19 @@ export default function App() {
   const [lastUpd, setLastUpd] = createSignal<string | null>(null);
 
   onMount(() => {
-    let unlistenFn: (() => void) | undefined;
-    onCleanup(() => unlistenFn?.());  // registered synchronously
+    const unlisteners: Array<() => void> = [];
+    onCleanup(() => unlisteners.forEach((fn) => fn()));
 
     onDeviceEvent((e) => {
       if (e.type === 'battery_update') {
-        const { type: _t, ...state } = e;
-        setBattery(state);
-        setStatus('connected');
+        setBattery(e.data);
         setLastUpd(new Date().toLocaleTimeString());
-      } else if (e.type === 'connected') {
-        setStatus('connected');
-      } else if (e.type === 'disconnected') {
-        setStatus('disconnected');
       }
-    }).then((fn) => {
-      unlistenFn = fn;
-    });
+    }).then((fn) => unlisteners.push(fn));
 
-    if (DEVICE_ADDR !== 0n) {
-      connectDevice(DEVICE_ADDR).catch((err) => {
-        console.error('connect failed:', err);
-        setStatus('disconnected');
-      });
-    }
+    onConnectionState((s) => {
+      setStatus(s);
+    }).then((fn) => unlisteners.push(fn));
   });
 
   return (

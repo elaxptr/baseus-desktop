@@ -1,5 +1,3 @@
-// `async fn` in public traits is intentional: this crate is internal-only
-// and we do not need `Send` bounds on the returned futures.
 #![allow(async_fn_in_trait)]
 
 use std::collections::VecDeque;
@@ -9,9 +7,9 @@ use thiserror::Error;
 pub enum TransportError {
     #[error("connection failed: {0}")]
     ConnectionFailed(String),
-    #[error("device not found for address {0:#014x}")]
-    DeviceNotFound(u64),
-    #[error("Bluetooth service not found on device")]
+    #[error("device '{0}' not found within scan window")]
+    DeviceNotFound(String),
+    #[error("Bluetooth service or characteristic not found on device")]
     ServiceNotFound,
     #[error("I/O error: {0}")]
     Io(String),
@@ -19,69 +17,56 @@ pub enum TransportError {
     Disconnected,
 }
 
-/// Abstraction over a bidirectional Bluetooth byte stream.
-/// The Windows (WinRT) implementation is in `win::rfcomm`.
-/// `MockTransport` is available for unit-testing the device event loop.
-pub trait BluetoothTransport: Send + 'static {
-    async fn connect(addr: u64) -> Result<Self, TransportError>
+/// Abstraction over a BLE GATT notification channel.
+/// The real implementation is `win::ble::GattTransport` (btleplug-backed).
+/// `MockTransport` is available for unit tests.
+pub trait BluetoothTransport: Send {
+    /// Connect to the named BLE peripheral and subscribe to its notify characteristic.
+    async fn connect(device_name: &str) -> Result<Self, TransportError>
     where
         Self: Sized;
+
+    /// Write a raw command frame to the write characteristic.
     async fn send(&mut self, data: &[u8]) -> Result<(), TransportError>;
-    /// Read the next packet. Returns the number of bytes written into `buf`.
-    async fn recv(&mut self, buf: &mut [u8]) -> Result<usize, TransportError>;
-    async fn disconnect(&mut self) -> Result<(), TransportError>;
+
+    /// Await the next GATT notification from the device.
+    async fn next_notification(&mut self) -> Result<Vec<u8>, TransportError>;
 }
 
-/// In-process mock for testing. Pre-load `recv_queue` with raw packet bytes.
-/// `send_log` records every outgoing packet for assertion.
+/// In-process mock for testing. Pre-load `rx_queue` with raw notification bytes.
+/// `tx_log` records every outgoing write for assertion.
 pub struct MockTransport {
-    pub recv_queue: VecDeque<Vec<u8>>,
-    pub send_log: Vec<Vec<u8>>,
+    pub rx_queue: VecDeque<Vec<u8>>,
+    pub tx_log:   Vec<Vec<u8>>,
 }
 
 impl MockTransport {
     pub fn new() -> Self {
-        Self {
-            recv_queue: VecDeque::new(),
-            send_log: Vec::new(),
-        }
+        Self { rx_queue: VecDeque::new(), tx_log: Vec::new() }
     }
 
     pub fn push_rx(&mut self, packet: Vec<u8>) {
-        self.recv_queue.push_back(packet);
+        self.rx_queue.push_back(packet);
     }
 }
 
 impl Default for MockTransport {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 impl BluetoothTransport for MockTransport {
-    async fn connect(_addr: u64) -> Result<Self, TransportError> {
+    async fn connect(_device_name: &str) -> Result<Self, TransportError> {
         Ok(Self::new())
     }
 
     async fn send(&mut self, data: &[u8]) -> Result<(), TransportError> {
-        self.send_log.push(data.to_vec());
+        self.tx_log.push(data.to_vec());
         Ok(())
     }
 
-    async fn recv(&mut self, buf: &mut [u8]) -> Result<usize, TransportError> {
-        if let Some(packet) = self.recv_queue.pop_front() {
-            let n = packet.len().min(buf.len());
-            buf[..n].copy_from_slice(&packet[..n]);
-            Ok(n)
-        } else {
-            Err(TransportError::Disconnected)
-        }
-    }
-
-    async fn disconnect(&mut self) -> Result<(), TransportError> {
-        Ok(())
+    async fn next_notification(&mut self) -> Result<Vec<u8>, TransportError> {
+        self.rx_queue.pop_front().ok_or(TransportError::Disconnected)
     }
 }
 
-#[cfg(windows)]
 pub mod win;

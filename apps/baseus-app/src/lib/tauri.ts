@@ -1,4 +1,3 @@
-import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 
 export interface BatteryState {
@@ -11,14 +10,17 @@ export interface BatteryState {
 }
 
 export type DeviceEvent =
-  | ({ type: 'battery_update' } & BatteryState)
+  | { type: 'battery_update'; data: BatteryState }
+  | { type: 'anc_mode_update'; data: { mode: string } }
   | { type: 'connected' }
   | { type: 'disconnected' };
 
-export function connectDevice(addr: bigint): Promise<void> {
-  return invoke('connect', { addr });
-}
+export type ConnectionState = 'connecting' | 'connected' | 'disconnected';
 
 export function onDeviceEvent(cb: (e: DeviceEvent) => void): Promise<UnlistenFn> {
   return listen<DeviceEvent>('device-event', (event) => cb(event.payload));
+}
+
+export function onConnectionState(cb: (s: ConnectionState) => void): Promise<UnlistenFn> {
+  return listen<ConnectionState>('connection-state', (event) => cb(event.payload));
 }

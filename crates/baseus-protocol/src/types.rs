@@ -22,13 +22,17 @@ pub struct BatteryState {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum AncMode {
     Off,
     Anc,
     Transparency,
 }
 
+/// Events emitted from the device to the app (via Tauri `device-event`).
+/// Serialised as `{ "type": "<variant>", "data": <payload> }` for TypeScript.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "type", content = "data", rename_all = "snake_case")]
 pub enum DeviceEvent {
     BatteryUpdate(BatteryState),
     AncModeUpdate(AncMode),
