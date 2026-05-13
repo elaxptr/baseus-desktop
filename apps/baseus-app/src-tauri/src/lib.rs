@@ -10,6 +10,9 @@ pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             tray::setup_tray(&app.handle())?;
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.hide();
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![commands::connect])

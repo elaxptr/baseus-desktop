@@ -5,7 +5,11 @@ use tauri::{
 
 pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     TrayIconBuilder::new()
-        .icon(app.default_window_icon().expect("default window icon not set").clone())
+        .icon(
+            app.default_window_icon()
+                .ok_or("default window icon not set")?
+                .clone(),
+        )
         .tooltip("Baseus Desktop")
         .on_tray_icon_event(|tray, event| {
             if let TrayIconEvent::Click {
