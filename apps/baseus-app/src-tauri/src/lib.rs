@@ -1,5 +1,5 @@
 mod commands;
-pub mod device;
+mod device;
 
 pub fn run() {
     tracing_subscriber::fmt()
