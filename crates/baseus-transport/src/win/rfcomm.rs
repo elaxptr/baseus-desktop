@@ -28,8 +28,7 @@ impl BluetoothTransport for RfcommTransport {
                 .get()
                 .map_err(|_| TransportError::DeviceNotFound(addr))?;
 
-            let service_id = spp_service_id()
-                .map_err(|_| TransportError::ServiceNotFound)?;
+            let service_id = spp_service_id().map_err(|_| TransportError::ServiceNotFound)?;
 
             let rfcomm_result = device
                 .GetRfcommServicesForIdAsync(&service_id)
@@ -45,10 +44,12 @@ impl BluetoothTransport for RfcommTransport {
                 return Err(TransportError::ServiceNotFound);
             }
 
-            let svc = services.GetAt(0).map_err(|_| TransportError::ServiceNotFound)?;
+            let svc = services
+                .GetAt(0)
+                .map_err(|_| TransportError::ServiceNotFound)?;
 
-            let socket = StreamSocket::new()
-                .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
+            let socket =
+                StreamSocket::new().map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
 
             socket
                 .ConnectAsync(
@@ -80,7 +81,11 @@ impl BluetoothTransport for RfcommTransport {
                 .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
 
             tracing::info!("RFCOMM connected to {:#014x}", addr);
-            Ok(Self { socket, reader, writer })
+            Ok(Self {
+                socket,
+                reader,
+                writer,
+            })
         })
     }
 
@@ -132,7 +137,9 @@ impl BluetoothTransport for RfcommTransport {
                 .get()
                 .map_err(|e| TransportError::Io(e.to_string()))
         })?;
-        self.socket.Close().map_err(|e| TransportError::Io(e.to_string()))?;
+        self.socket
+            .Close()
+            .map_err(|e| TransportError::Io(e.to_string()))?;
         Ok(())
     }
 }

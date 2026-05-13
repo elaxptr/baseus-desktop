@@ -1,3 +1,7 @@
+// `async fn` in public traits is intentional: this crate is internal-only
+// and we do not need `Send` bounds on the returned futures.
+#![allow(async_fn_in_trait)]
+
 use std::collections::VecDeque;
 use thiserror::Error;
 
@@ -32,12 +36,15 @@ pub trait BluetoothTransport: Send + 'static {
 /// `send_log` records every outgoing packet for assertion.
 pub struct MockTransport {
     pub recv_queue: VecDeque<Vec<u8>>,
-    pub send_log:   Vec<Vec<u8>>,
+    pub send_log: Vec<Vec<u8>>,
 }
 
 impl MockTransport {
     pub fn new() -> Self {
-        Self { recv_queue: VecDeque::new(), send_log: Vec::new() }
+        Self {
+            recv_queue: VecDeque::new(),
+            send_log: Vec::new(),
+        }
     }
 
     pub fn push_rx(&mut self, packet: Vec<u8>) {

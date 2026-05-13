@@ -21,14 +21,14 @@ pub enum FrontendEvent {
 fn device_event_to_frontend(e: DeviceEvent) -> Option<FrontendEvent> {
     match e {
         DeviceEvent::BatteryUpdate(b) => Some(FrontendEvent::BatteryUpdate {
-            left_pct:       b.left_pct,
-            right_pct:      b.right_pct,
-            case_pct:       b.case_pct,
-            left_charging:  b.left_charging,
+            left_pct: b.left_pct,
+            right_pct: b.right_pct,
+            case_pct: b.case_pct,
+            left_charging: b.left_charging,
             right_charging: b.right_charging,
-            case_charging:  b.case_charging,
+            case_charging: b.case_charging,
         }),
-        DeviceEvent::Connected    => Some(FrontendEvent::Connected),
+        DeviceEvent::Connected => Some(FrontendEvent::Connected),
         DeviceEvent::Disconnected => Some(FrontendEvent::Disconnected),
         DeviceEvent::AncModeUpdate(_) => None, // ANC not in v1 UI
     }
@@ -36,10 +36,10 @@ fn device_event_to_frontend(e: DeviceEvent) -> Option<FrontendEvent> {
 
 #[tauri::command]
 pub async fn connect(app: AppHandle, addr: u64) -> Result<(), String> {
+    use crate::device::Device;
     use baseus_protocol::types::BaseusModel;
     use baseus_transport::win::rfcomm::RfcommTransport;
     use baseus_transport::BluetoothTransport;
-    use crate::device::Device;
 
     let transport = RfcommTransport::connect(addr)
         .await

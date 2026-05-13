@@ -7,8 +7,8 @@
 async fn main() {
     tracing_subscriber::fmt::init();
     let addr_str = std::env::args().nth(1).expect("pass BT address as 0x<hex>");
-    let addr = u64::from_str_radix(addr_str.trim_start_matches("0x"), 16)
-        .expect("invalid hex address");
+    let addr =
+        u64::from_str_radix(addr_str.trim_start_matches("0x"), 16).expect("invalid hex address");
     use baseus_transport::{win::rfcomm::RfcommTransport, BluetoothTransport};
     match RfcommTransport::connect(addr).await {
         Ok(mut t) => {

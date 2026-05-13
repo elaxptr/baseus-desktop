@@ -1,4 +1,3 @@
-use crate::{types::DeviceEvent, Frame};
 use thiserror::Error;
 
 #[derive(Debug, Error)]

@@ -7,7 +7,7 @@ pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     TrayIconBuilder::new()
         .icon(
             app.default_window_icon()
-                .ok_or("default window icon not set")?
+                .ok_or_else(|| tauri::Error::AssetNotFound("default window icon".into()))?
                 .clone(),
         )
         .tooltip("Baseus Desktop")

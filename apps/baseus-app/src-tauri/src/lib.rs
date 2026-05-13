@@ -2,6 +2,8 @@ mod commands;
 mod device;
 mod tray;
 
+use tauri::Manager;
+
 pub fn run() {
     tracing_subscriber::fmt()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
@@ -9,7 +11,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .setup(|app| {
-            tray::setup_tray(&app.handle())?;
+            tray::setup_tray(app.handle())?;
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.hide();
             }
