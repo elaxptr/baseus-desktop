@@ -8,6 +8,10 @@ thiserror = { workspace = true }
 tokio     = { workspace = true }
 tracing   = { workspace = true }
 
+[dev-dependencies]
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.61", features = [
     "Devices_Bluetooth",
