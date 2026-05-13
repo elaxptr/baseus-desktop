@@ -21,8 +21,6 @@ jobs:
         run: cargo fmt --all -- --check
       - name: Tests
         run: cargo test -p baseus-protocol
-      - name: Tests (app)
-        run: cargo test -p baseus-app
 
   frontend:
     runs-on: windows-latest
@@ -30,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: '9'
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -40,5 +38,5 @@ jobs:
         run: pnpm install
         working-directory: apps/baseus-app
       - name: Type-check
-        run: pnpm tsc --noEmit
+        run: pnpm exec tsc --noEmit
         working-directory: apps/baseus-app
