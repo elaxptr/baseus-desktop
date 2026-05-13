@@ -1,15 +1,14 @@
 use serde::{Deserialize, Serialize};
 
-/// Bluetrum CCSDK BLE GATT UUIDs for the BP1 Pro ANC (and other Bluetrum-based Baseus earbuds).
-/// Source: static analysis of com.baseus.intelligent APK, classes2.dex.
+/// BLE GATT UUIDs confirmed from live nRF Connect capture on BASS BP1 PRO (4A:01:CE:BA:C8:03).
+/// The 02F00000-… UUIDs found in APK static analysis are for a different Bluetrum device variant.
 pub mod ble_uuids {
-    pub const SERVICE:  &str = "02F00000-0000-0000-0000-00000000FE00";
-    /// Write characteristic: app → device commands.
-    pub const WRITE:    &str = "02F00000-0000-0000-0000-00000000FF01";
-    /// Notify characteristic: device → app events (battery, ANC, etc.).
-    pub const NOTIFY:   &str = "02F00000-0000-0000-0000-00000000FF02";
-    /// Extra characteristic, purpose TBD (possibly OTA or config).
-    pub const EXTRA:    &str = "02F00000-0000-0000-0000-00000000FF05";
+    /// Primary service UUID observed on BASS BP1 PRO via nRF Connect.
+    pub const SERVICE: &str = "53527aa4-29f7-ae11-4e74-997334782568";
+    /// Write characteristic: app → device commands (WRITE property).
+    pub const WRITE:   &str = "ee684b1a-1e9b-ed3e-ee55-f894667e92ac";
+    /// Notify characteristic: device → app events, battery, ANC (NOTIFY + READ).
+    pub const NOTIFY:  &str = "654b749c-e37f-ae1f-ebab-40ca133e3690";
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

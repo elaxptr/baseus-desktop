@@ -1,44 +1,18 @@
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq)]
 pub enum FrameError {
     #[error("buffer too short: need at least {need} bytes, got {got}")]
     TooShort { need: usize, got: usize },
-    #[error(
-        "bad magic bytes: expected {expected:#04x} {expected2:#04x}, got {got:#04x} {got2:#04x}"
-    )]
-    BadMagic {
-        expected: u8,
-        expected2: u8,
-        got: u8,
-        got2: u8,
-    },
-    #[error("checksum mismatch: computed {computed:#04x}, packet has {packet:#04x}")]
-    ChecksumMismatch { computed: u8, packet: u8 },
+    #[error("bad magic byte: expected 0xaa, got {got:#04x}")]
+    BadMagic { got: u8 },
 }
 
-/// CRC-8 (poly=0x07, init=0x00).
-pub(crate) fn crc8(data: &[u8]) -> u8 {
-    let mut crc: u8 = 0x00;
-    for &byte in data {
-        crc ^= byte;
-        for _ in 0..8 {
-            if crc & 0x80 != 0 {
-                crc = (crc << 1) ^ 0x07;
-            } else {
-                crc <<= 1;
-            }
-        }
-    }
-    crc
-}
-
-/// Raw Baseus protocol frame: [magic0, magic1, len, cmd, payload..., checksum]
+/// A raw BP1 Pro ANC GATT frame: [0xAA, cmd, payload...]
 ///
-/// PLACEHOLDER: The Bluetrum CCSDK wire format is not yet confirmed from live capture.
-/// The magic bytes [0xAA, 0x03] are a placeholder; the actual values from the Bluetrum
-/// BLE GATT protocol will differ. Update this once a live BLE capture is available.
-/// See docs/protocol/framing.md and docs/protocol/bp1-pro-anc.md for methodology.
+/// The frame length is determined by the GATT PDU size.
+/// No embedded length field or checksum is present in the observed wire format.
+/// Confirmed from live nRF Connect capture on BASS BP1 PRO (4A:01:CE:BA:C8:03).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Frame {
     pub cmd: u8,
@@ -46,52 +20,27 @@ pub struct Frame {
 }
 
 impl Frame {
-    pub fn encode(&self) -> Vec<u8> {
-        const MAGIC: [u8; 2] = [0xAA, 0x03];
-        let len = self.payload.len() as u8;
-        let mut out = Vec::with_capacity(5 + self.payload.len());
-        out.extend_from_slice(&MAGIC);
-        out.push(len);
-        out.push(self.cmd);
-        out.extend_from_slice(&self.payload);
-        let chk = crc8(&out);
-        out.push(chk);
-        out
+    /// Parse a raw GATT notification or write payload.
+    pub fn decode(buf: &[u8]) -> Result<Self, FrameError> {
+        if buf.len() < 2 {
+            return Err(FrameError::TooShort { need: 2, got: buf.len() });
+        }
+        if buf[0] != 0xAA {
+            return Err(FrameError::BadMagic { got: buf[0] });
+        }
+        Ok(Self {
+            cmd: buf[1],
+            payload: buf[2..].to_vec(),
+        })
     }
 
-    pub fn decode(buf: &[u8]) -> Result<Self, FrameError> {
-        const MAGIC: [u8; 2] = [0xAA, 0x03];
-        const MIN_LEN: usize = 5; // magic(2) + len(1) + cmd(1) + crc(1)
-        if buf.len() < MIN_LEN {
-            return Err(FrameError::TooShort {
-                need: MIN_LEN,
-                got: buf.len(),
-            });
-        }
-        if buf[0] != MAGIC[0] || buf[1] != MAGIC[1] {
-            return Err(FrameError::BadMagic {
-                expected: MAGIC[0],
-                expected2: MAGIC[1],
-                got: buf[0],
-                got2: buf[1],
-            });
-        }
-        let payload_len = buf[2] as usize;
-        let total = MIN_LEN + payload_len;
-        if buf.len() < total {
-            return Err(FrameError::TooShort {
-                need: total,
-                got: buf.len(),
-            });
-        }
-        let cmd = buf[3];
-        let payload = buf[4..4 + payload_len].to_vec();
-        let computed = crc8(&buf[..total - 1]);
-        let packet = buf[total - 1];
-        if computed != packet {
-            return Err(FrameError::ChecksumMismatch { computed, packet });
-        }
-        Ok(Self { cmd, payload })
+    /// Encode a frame for writing to the GATT write characteristic.
+    pub fn encode(&self) -> Vec<u8> {
+        let mut out = Vec::with_capacity(2 + self.payload.len());
+        out.push(0xAA);
+        out.push(self.cmd);
+        out.extend_from_slice(&self.payload);
+        out
     }
 }
 
@@ -99,54 +48,62 @@ impl Frame {
 mod tests {
     use super::*;
 
-    // cmd=0x01, payload=[0x64, 0x5a, 0x78, 0x00]
-    // The last byte (0x6b) is the CRC-8 (poly=0x07, init=0x00) of all preceding bytes.
-    // Computed over: [0xaa, 0x03, 0x04, 0x01, 0x64, 0x5a, 0x78, 0x00] → 0x6b
-    const SYNTH_FRAME: &[u8] = &[0xaa, 0x03, 0x04, 0x01, 0x64, 0x5a, 0x78, 0x00, 0x6b];
+    #[test]
+    fn decode_anc_off() {
+        // Captured: AA 30 00 (ANC off, default state)
+        let f = Frame::decode(&[0xAA, 0x30, 0x00]).unwrap();
+        assert_eq!(f.cmd, 0x30);
+        assert_eq!(f.payload, &[0x00]);
+    }
 
     #[test]
-    fn decode_synth_frame_gives_correct_cmd_and_payload() {
-        let f = Frame::decode(SYNTH_FRAME).expect("should decode");
-        assert_eq!(f.cmd, 0x01);
-        assert_eq!(f.payload, &[0x64, 0x5a, 0x78, 0x00]);
+    fn decode_anc_transparency() {
+        // Captured: AA 32 02 FF
+        let f = Frame::decode(&[0xAA, 0x32, 0x02, 0xFF]).unwrap();
+        assert_eq!(f.cmd, 0x32);
+        assert_eq!(f.payload, &[0x02, 0xFF]);
+    }
+
+    #[test]
+    fn decode_anc_on() {
+        // Captured: AA 33 01 68
+        let f = Frame::decode(&[0xAA, 0x33, 0x01, 0x68]).unwrap();
+        assert_eq!(f.cmd, 0x33);
+        assert_eq!(f.payload, &[0x01, 0x68]);
+    }
+
+    #[test]
+    fn decode_battery() {
+        // Captured: AA 02 64 00 5A 01 → left=100% not charging, right=90% charging
+        let f = Frame::decode(&[0xAA, 0x02, 0x64, 0x00, 0x5A, 0x01]).unwrap();
+        assert_eq!(f.cmd, 0x02);
+        assert_eq!(f.payload, &[0x64, 0x00, 0x5A, 0x01]);
     }
 
     #[test]
     fn encode_then_decode_round_trips() {
-        let original = Frame {
-            cmd: 0x01,
-            payload: vec![0x64, 0x5a, 0x78, 0x00],
-        };
-        let bytes = original.encode();
-        let decoded = Frame::decode(&bytes).expect("should decode");
+        let original = Frame { cmd: 0x02, payload: vec![0x64, 0x00, 0x5A, 0x01] };
+        let decoded = Frame::decode(&original.encode()).unwrap();
         assert_eq!(decoded, original);
     }
 
     #[test]
     fn decode_rejects_bad_magic() {
-        let mut bad = SYNTH_FRAME.to_vec();
-        bad[0] = 0x00;
         assert!(matches!(
-            Frame::decode(&bad),
-            Err(FrameError::BadMagic { .. })
+            Frame::decode(&[0x00, 0x30]),
+            Err(FrameError::BadMagic { got: 0x00 })
         ));
     }
 
     #[test]
-    fn decode_rejects_checksum_mismatch() {
-        let mut bad = SYNTH_FRAME.to_vec();
-        *bad.last_mut().unwrap() ^= 0xff;
+    fn decode_rejects_too_short() {
         assert!(matches!(
-            Frame::decode(&bad),
-            Err(FrameError::ChecksumMismatch { .. })
+            Frame::decode(&[0xAA]),
+            Err(FrameError::TooShort { need: 2, got: 1 })
         ));
-    }
-
-    #[test]
-    fn decode_rejects_buffer_too_short() {
         assert!(matches!(
-            Frame::decode(&[0xaa]),
-            Err(FrameError::TooShort { .. })
+            Frame::decode(&[]),
+            Err(FrameError::TooShort { need: 2, got: 0 })
         ));
     }
 }

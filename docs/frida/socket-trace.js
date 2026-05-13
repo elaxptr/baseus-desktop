@@ -1,7 +1,8 @@
-// Hooks Bluetrum CCSDK BLE GATT writes and notifications to log every byte.
-// The BP1 Pro ANC uses BLE GATT (NOT RFCOMM) for all runtime control:
-//   Write char:  02F00000-0000-0000-0000-00000000FF01  (app → earbuds)
-//   Notify char: 02F00000-0000-0000-0000-00000000FF02  (earbuds → app)
+// Hooks BLE GATT writes and notifications to log every byte.
+// UUIDs confirmed via nRF Connect on BASS BP1 PRO (4A:01:CE:BA:C8:03).
+// The 02F0… UUIDs from APK static analysis are for a different Bluetrum device variant.
+//   Write char:  ee684b1a-1e9b-ed3e-ee55-f894667e92ac  (app → earbuds)
+//   Notify char: 654b749c-e37f-ae1f-ebab-40ca133e3690  (earbuds → app)
 //
 // Usage (real Android device, not emulator):
 //   frida -U -f com.baseus.intelligent -l docs/frida/socket-trace.js
@@ -96,8 +97,8 @@ Java.perform(function () {
   }
 
   console.log('[socket-trace] hooks installed — waiting for BLE GATT / SPP I/O...');
-  console.log('[socket-trace] Target UUIDs:');
-  console.log('[socket-trace]   Service  02f00000-0000-0000-0000-00000000fe00');
-  console.log('[socket-trace]   Write    02f00000-0000-0000-0000-00000000ff01');
-  console.log('[socket-trace]   Notify   02f00000-0000-0000-0000-00000000ff02');
+  console.log('[socket-trace] Target UUIDs (confirmed BASS BP1 PRO via nRF Connect):');
+  console.log('[socket-trace]   Service  53527aa4-29f7-ae11-4e74-997334782568');
+  console.log('[socket-trace]   Write    ee684b1a-1e9b-ed3e-ee55-f894667e92ac');
+  console.log('[socket-trace]   Notify   654b749c-e37f-ae1f-ebab-40ca133e3690');
 });
