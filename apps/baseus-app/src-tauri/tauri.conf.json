@@ -12,9 +12,10 @@
   "app": {
     "windows": [
       {
-        "title": "baseus-app",
-        "width": 800,
-        "height": 600
+        "label": "main",
+        "title": "Baseus Desktop",
+        "width": 480,
+        "height": 360
       }
     ],
     "security": {
