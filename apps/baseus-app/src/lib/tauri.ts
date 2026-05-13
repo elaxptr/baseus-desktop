@@ -16,7 +16,7 @@ export type DeviceEvent =
   | { type: 'disconnected' };
 
 export function connectDevice(addr: bigint): Promise<void> {
-  return invoke('connect', { addr: Number(addr) });
+  return invoke('connect', { addr });
 }
 
 export function onDeviceEvent(cb: (e: DeviceEvent) => void): Promise<UnlistenFn> {

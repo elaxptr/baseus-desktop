@@ -15,10 +15,14 @@ export default function App() {
   const [battery, setBattery] = createSignal<BatteryState | null>(null);
   const [lastUpd, setLastUpd] = createSignal<string | null>(null);
 
-  onMount(async () => {
-    const unlisten = await onDeviceEvent((e) => {
+  onMount(() => {
+    let unlistenFn: (() => void) | undefined;
+    onCleanup(() => unlistenFn?.());  // registered synchronously
+
+    onDeviceEvent((e) => {
       if (e.type === 'battery_update') {
-        setBattery(e);
+        const { type: _t, ...state } = e;
+        setBattery(state);
         setStatus('connected');
         setLastUpd(new Date().toLocaleTimeString());
       } else if (e.type === 'connected') {
@@ -26,14 +30,15 @@ export default function App() {
       } else if (e.type === 'disconnected') {
         setStatus('disconnected');
       }
+    }).then((fn) => {
+      unlistenFn = fn;
     });
-    onCleanup(unlisten);
 
-    try {
-      await connectDevice(DEVICE_ADDR);
-    } catch (err) {
-      console.error('connect failed:', err);
-      setStatus('disconnected');
+    if (DEVICE_ADDR !== 0n) {
+      connectDevice(DEVICE_ADDR).catch((err) => {
+        console.error('connect failed:', err);
+        setStatus('disconnected');
+      });
     }
   });
 
