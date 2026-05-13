@@ -14,6 +14,8 @@ fn spp_service_id() -> windows::core::Result<RfcommServiceId> {
 }
 
 pub struct RfcommTransport {
+    // socket must be kept alive; DataWriter/DataReader hold COM references into its streams.
+    socket: StreamSocket,
     reader: DataReader,
     writer: DataWriter,
 }
@@ -78,7 +80,7 @@ impl BluetoothTransport for RfcommTransport {
                 .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
 
             tracing::info!("RFCOMM connected to {:#014x}", addr);
-            Ok(Self { reader, writer })
+            Ok(Self { socket, reader, writer })
         })
     }
 
@@ -86,21 +88,31 @@ impl BluetoothTransport for RfcommTransport {
         self.writer
             .WriteBytes(data)
             .map_err(|e| TransportError::Io(e.to_string()))?;
-        self.writer
-            .StoreAsync()
-            .map_err(|e| TransportError::Io(e.to_string()))?
-            .get()
-            .map_err(|e| TransportError::Io(e.to_string()))?;
+        let stored = tokio::task::block_in_place(|| {
+            self.writer
+                .StoreAsync()
+                .map_err(|e| TransportError::Io(e.to_string()))?
+                .get()
+                .map_err(|e| TransportError::Io(e.to_string()))
+        })?;
+        if stored != data.len() as u32 {
+            return Err(TransportError::Io(format!(
+                "short write: sent {} of {} bytes",
+                stored,
+                data.len()
+            )));
+        }
         Ok(())
     }
 
     async fn recv(&mut self, buf: &mut [u8]) -> Result<usize, TransportError> {
-        let loaded = self
-            .reader
-            .LoadAsync(buf.len() as u32)
-            .map_err(|e| TransportError::Io(e.to_string()))?
-            .get()
-            .map_err(|_| TransportError::Disconnected)? as usize;
+        let loaded = tokio::task::block_in_place(|| {
+            self.reader
+                .LoadAsync(buf.len() as u32)
+                .map_err(|e| TransportError::Io(e.to_string()))?
+                .get()
+                .map_err(|_| TransportError::Disconnected)
+        })? as usize;
 
         if loaded == 0 {
             return Err(TransportError::Disconnected);
@@ -113,7 +125,14 @@ impl BluetoothTransport for RfcommTransport {
     }
 
     async fn disconnect(&mut self) -> Result<(), TransportError> {
-        let _ = self.writer.FlushAsync();
+        tokio::task::block_in_place(|| {
+            self.writer
+                .FlushAsync()
+                .map_err(|e| TransportError::Io(e.to_string()))?
+                .get()
+                .map_err(|e| TransportError::Io(e.to_string()))
+        })?;
+        self.socket.Close().map_err(|e| TransportError::Io(e.to_string()))?;
         Ok(())
     }
 }
