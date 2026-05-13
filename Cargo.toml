@@ -2,6 +2,7 @@
 members = [
     "crates/baseus-protocol",
     "crates/baseus-transport",
+    "apps/baseus-app/src-tauri",
 ]
 resolver = "2"
 
