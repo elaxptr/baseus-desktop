@@ -1,0 +1,11 @@
+[package]
+name    = "baseus-protocol"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+thiserror = { workspace = true }
+serde     = { workspace = true }
+
+[dev-dependencies]
+# no extra deps — golden tests use include_bytes! from captured files
