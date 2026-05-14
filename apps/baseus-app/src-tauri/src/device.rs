@@ -9,6 +9,13 @@ const DEVICE_NAME: &str = "Bass BP1 Pro";
 const RETRY_DELAY: Duration = Duration::from_secs(5);
 const NOTIF_TIMEOUT: Duration = Duration::from_secs(10);
 
+#[derive(Default)]
+struct BatteryThresholds {
+    left_was_ok: bool,
+    right_was_ok: bool,
+    case_was_ok: bool,
+}
+
 #[derive(Debug)]
 pub enum DeviceCommand {
     SetAncMode(AncMode),
@@ -56,8 +63,13 @@ async fn notification_loop(
     transport: &mut GattTransport,
     cmd_rx: &mut CommandReceiver,
 ) {
+    let mut thresholds = BatteryThresholds {
+        left_was_ok: true,
+        right_was_ok: true,
+        case_was_ok: true,
+    };
+
     loop {
-        // Drain pending commands before waiting for next notification.
         while let Ok(cmd) = cmd_rx.try_recv() {
             if let Err(e) = execute_command(transport, cmd).await {
                 tracing::warn!("command error: {e}");
@@ -72,6 +84,7 @@ async fn notification_loop(
                 };
                 match Bp1ProAnc::decode_frame(&frame) {
                     Ok(event) => {
+                        maybe_alert_battery(app, &event, &mut thresholds);
                         let _ = app.emit("device-event", &event);
                     }
                     Err(e) => tracing::debug!("unhandled frame: {e}"),
@@ -82,7 +95,6 @@ async fn notification_loop(
                 return;
             }
             Err(_timeout) => {
-                // No notification for NOTIF_TIMEOUT — check if still connected.
                 if !transport.is_connected().await {
                     tracing::info!("device disconnected (detected via connectivity check)");
                     return;
@@ -104,6 +116,58 @@ async fn execute_command(
         DeviceCommand::FindEarbud(Side::Right) => &[0xBA, 0x10, 0x01, 0x01],
     };
     transport.send(bytes).await.map_err(|e| e.to_string())
+}
+
+fn maybe_alert_battery(
+    app: &AppHandle,
+    event: &baseus_protocol::types::DeviceEvent,
+    thresholds: &mut BatteryThresholds,
+) {
+    use baseus_protocol::types::DeviceEvent;
+    use tauri_plugin_notification::NotificationExt;
+
+    let settings = crate::settings::load();
+    if !settings.low_battery_alerts {
+        return;
+    }
+
+    const LOW: u8 = 20;
+
+    match event {
+        DeviceEvent::BatteryUpdate(b) => {
+            let left_now_ok = b.left_pct >= LOW || b.left_pct == 0;
+            let right_now_ok = b.right_pct >= LOW || b.right_pct == 0;
+
+            if thresholds.left_was_ok && !left_now_ok {
+                let _ = app.notification()
+                    .builder()
+                    .title("Baseus — Left bud low")
+                    .body(format!("{}% remaining", b.left_pct))
+                    .show();
+            }
+            if thresholds.right_was_ok && !right_now_ok {
+                let _ = app.notification()
+                    .builder()
+                    .title("Baseus — Right bud low")
+                    .body(format!("{}% remaining", b.right_pct))
+                    .show();
+            }
+            thresholds.left_was_ok = left_now_ok;
+            thresholds.right_was_ok = right_now_ok;
+        }
+        DeviceEvent::CaseUpdate(c) => {
+            let case_now_ok = c.case_pct >= LOW || c.case_pct == 0;
+            if thresholds.case_was_ok && !case_now_ok {
+                let _ = app.notification()
+                    .builder()
+                    .title("Baseus — Case low")
+                    .body(format!("{}% remaining", c.case_pct))
+                    .show();
+            }
+            thresholds.case_was_ok = case_now_ok;
+        }
+        _ => {}
+    }
 }
 
 fn hex(bytes: &[u8]) -> String {
