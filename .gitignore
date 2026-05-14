@@ -4,3 +4,7 @@ dist/
 .DS_Store
 Thumbs.db
 *.local
+.claude/
+.playwright-mcp/
+.superpowers/
+bugreport-baseus2.zip
