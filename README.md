@@ -52,6 +52,10 @@ baseus_rebuild/
     └── frida/             # BLE capture scripts
 ```
 
+## Disclaimer
+
+This project is not affiliated with or endorsed by Baseus. All trademarks belong to their respective owners.
+
 ## License
 
 MIT
