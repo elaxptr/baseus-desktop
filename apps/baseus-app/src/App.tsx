@@ -44,8 +44,6 @@ export default function App() {
         setAncLoading(null);
       } else if (e.type === 'wear_update') {
         setWear(e.data);
-      } else if (e.type === 'eq_preset_update') {
-        setEqPresetSignal(e.data);
       }
     }).then((fn) => unlisteners.push(fn));
 
