@@ -27,4 +27,5 @@ baseus-transport = { path = "../../../crates/baseus-transport" }
 tokio    = { workspace = true }
 tracing  = { workspace = true }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+dirs-next = "2"
 

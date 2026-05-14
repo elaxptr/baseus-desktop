@@ -1,6 +1,7 @@
 mod commands;
 mod device;
 mod tray;
+mod settings;
 
 use tauri::Manager;
 
