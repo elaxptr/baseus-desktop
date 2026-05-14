@@ -13,6 +13,11 @@ pub async fn run_loop(app: AppHandle) {
         match GattTransport::connect(DEVICE_NAME).await {
             Ok(mut transport) => {
                 let _ = app.emit("connection-state", "connected");
+                // BA 05 00 = handshake; triggers the device to start pushing notifications.
+                // Confirmed from HomeBleDataResolvePresenter$2.b() bytecode analysis.
+                if let Err(e) = transport.send(&[0xBA, 0x05, 0x00]).await {
+                    tracing::warn!("handshake send failed: {e}");
+                }
                 notification_loop(&app, &mut transport).await;
                 let _ = app.emit("connection-state", "disconnected");
             }

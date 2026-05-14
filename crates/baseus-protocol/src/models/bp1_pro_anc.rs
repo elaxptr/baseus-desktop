@@ -1,6 +1,6 @@
 use crate::{
     models::DecodeError,
-    types::{AncMode, BatteryState, DeviceEvent},
+    types::{AncMode, BatteryState, CaseState, DeviceEvent},
     Frame,
 };
 
@@ -21,6 +21,7 @@ impl Bp1ProAnc {
             0x30 => Ok(DeviceEvent::AncModeUpdate(AncMode::Off)),
             0x32 => Ok(DeviceEvent::AncModeUpdate(AncMode::Transparency)),
             0x33 => Ok(DeviceEvent::AncModeUpdate(AncMode::Anc)),
+            0x80 => Self::decode_case(&frame.payload),
             other => Err(DecodeError::UnknownOpcode(other)),
         }
     }
@@ -28,7 +29,7 @@ impl Bp1ProAnc {
     fn decode_battery(payload: &[u8]) -> Result<DeviceEvent, DecodeError> {
         // payload: [left_pct, left_charging, right_pct, right_charging]
         // Confirmed: AA 02 64 00 5A 01 → left=100% not charging, right=90% charging
-        // Case battery arrives in AA 80 frames (not yet fully decoded).
+        // Case battery arrives via AA 80 frames decoded separately.
         if payload.len() < 4 {
             return Err(DecodeError::PayloadTooShort {
                 opcode: 0x02,
@@ -41,8 +42,23 @@ impl Bp1ProAnc {
             left_charging: payload[1] != 0,
             right_pct: payload[2],
             right_charging: payload[3] != 0,
-            case_pct: 0,
-            case_charging: false,
+        }))
+    }
+
+    fn decode_case(payload: &[u8]) -> Result<DeviceEvent, DecodeError> {
+        // Observed: AA 80 01 4A 01 A8 EF BF A9
+        // payload[0] = sub-type (0x01 = case-close event), payload[1] = case battery %
+        // Trailing bytes not decoded yet; 0x4A = 74 matches a plausible charge level.
+        if payload.len() < 2 {
+            return Err(DecodeError::PayloadTooShort {
+                opcode: 0x80,
+                need: 2,
+                got: payload.len(),
+            });
+        }
+        Ok(DeviceEvent::CaseUpdate(CaseState {
+            case_pct: payload[1],
+            case_charging: payload[0] != 0,
         }))
     }
 }
@@ -68,8 +84,6 @@ mod tests {
                 left_charging: false,
                 right_pct: 90,
                 right_charging: true,
-                case_pct: 0,
-                case_charging: false,
             })
         );
     }
@@ -108,6 +122,17 @@ mod tests {
             Bp1ProAnc::decode_frame(&frame),
             Err(DecodeError::PayloadTooShort { opcode: 0x02, need: 4, got: 3 })
         ));
+    }
+
+    #[test]
+    fn case_frame_decodes_correctly() {
+        // Observed: AA 80 01 4A 01 A8 EF BF A9
+        // payload[0]=0x01 (sub-type), payload[1]=0x4A=74 (case battery %)
+        let ev = decode(&[0xAA, 0x80, 0x01, 0x4A, 0x01, 0xA8, 0xEF, 0xBF, 0xA9]).unwrap();
+        assert_eq!(
+            ev,
+            DeviceEvent::CaseUpdate(CaseState { case_pct: 74, case_charging: true })
+        );
     }
 
     #[test]

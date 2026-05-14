@@ -3,15 +3,19 @@ import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 export interface BatteryState {
   left_pct: number;
   right_pct: number;
-  case_pct: number;
   left_charging: boolean;
   right_charging: boolean;
+}
+
+export interface CaseState {
+  case_pct: number;
   case_charging: boolean;
 }
 
 export type DeviceEvent =
   | { type: 'battery_update'; data: BatteryState }
-  | { type: 'anc_mode_update'; data: { mode: string } }
+  | { type: 'case_update'; data: CaseState }
+  | { type: 'anc_mode_update'; data: 'off' | 'anc' | 'transparency' }
   | { type: 'connected' }
   | { type: 'disconnected' };
 

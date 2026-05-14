@@ -1,13 +1,14 @@
 import { createSignal, onCleanup, onMount } from 'solid-js';
 import BatteryCard from './components/BatteryCard';
 import ConnectionCard from './components/ConnectionCard';
-import { BatteryState, onConnectionState, onDeviceEvent } from './lib/tauri';
+import { BatteryState, CaseState, onConnectionState, onDeviceEvent } from './lib/tauri';
 
 type ConnStatus = 'connected' | 'connecting' | 'disconnected';
 
 export default function App() {
   const [status, setStatus] = createSignal<ConnStatus>('connecting');
   const [battery, setBattery] = createSignal<BatteryState | null>(null);
+  const [caseState, setCaseState] = createSignal<CaseState | null>(null);
   const [lastUpd, setLastUpd] = createSignal<string | null>(null);
 
   onMount(() => {
@@ -17,6 +18,9 @@ export default function App() {
     onDeviceEvent((e) => {
       if (e.type === 'battery_update') {
         setBattery(e.data);
+        setLastUpd(new Date().toLocaleTimeString());
+      } else if (e.type === 'case_update') {
+        setCaseState(e.data);
         setLastUpd(new Date().toLocaleTimeString());
       }
     }).then((fn) => unlisteners.push(fn));
@@ -33,7 +37,7 @@ export default function App() {
       <div class="flex gap-4 flex-wrap justify-center">
         <BatteryCard label="Left" pct={battery()?.left_pct ?? 0} charging={battery()?.left_charging ?? false} />
         <BatteryCard label="Right" pct={battery()?.right_pct ?? 0} charging={battery()?.right_charging ?? false} />
-        <BatteryCard label="Case" pct={battery()?.case_pct ?? 0} charging={battery()?.case_charging ?? false} />
+        <BatteryCard label="Case" pct={caseState()?.case_pct ?? 0} charging={caseState()?.case_charging ?? false} />
       </div>
       <p class="text-xs text-neutral-600">
         {status() === 'disconnected' ? 'Open the case to reconnect.' : 'Showing live battery readings.'}

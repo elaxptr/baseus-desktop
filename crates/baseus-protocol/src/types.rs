@@ -15,10 +15,8 @@ pub mod ble_uuids {
 pub struct BatteryState {
     pub left_pct: u8,
     pub right_pct: u8,
-    pub case_pct: u8,
     pub left_charging: bool,
     pub right_charging: bool,
-    pub case_charging: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -35,9 +33,17 @@ pub enum AncMode {
 #[serde(tag = "type", content = "data", rename_all = "snake_case")]
 pub enum DeviceEvent {
     BatteryUpdate(BatteryState),
+    CaseUpdate(CaseState),
     AncModeUpdate(AncMode),
     Connected,
     Disconnected,
+}
+
+/// Case battery state, emitted by AA 80 frames separately from bud battery (AA 02).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CaseState {
+    pub case_pct: u8,
+    pub case_charging: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]

@@ -103,7 +103,7 @@ frame or a separate notification not yet captured.
 - [ ] Determine whether `AA 02` ever includes case battery (6-byte vs longer variant)
 - [ ] Capture write-side frames (app → device) to find the battery query and ANC set commands
 - [ ] Determine checksum/trailing byte semantics in ANC frames (`0xFF`, `0x68`)
-- [ ] Add golden test cases to `crates/baseus-protocol/src/models/bp1_pro_anc.rs`
+- [x] Add golden test cases to `crates/baseus-protocol/src/models/bp1_pro_anc.rs`
 
 ## Capture methodology
 
