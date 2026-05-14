@@ -4,6 +4,7 @@ import { getSettings, setSettings, type Settings } from '../lib/tauri';
 const [settings, setSettingsSignal] = createSignal<Settings>({
   launch_at_login: true,
   low_battery_alerts: true,
+  show_session_timer: true,
 });
 
 export async function loadSettings() {

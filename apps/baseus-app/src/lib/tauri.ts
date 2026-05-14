@@ -13,10 +13,18 @@ export interface CaseState {
   case_charging: boolean;
 }
 
+export interface WearState {
+  left_in_ear: boolean;
+  right_in_ear: boolean;
+}
+
+export type AncMode = 'off' | 'anc' | 'transparency';
+
 export type DeviceEvent =
   | { type: 'battery_update'; data: BatteryState }
   | { type: 'case_update'; data: CaseState }
-  | { type: 'anc_mode_update'; data: 'off' | 'anc' | 'transparency' }
+  | { type: 'anc_mode_update'; data: AncMode }
+  | { type: 'wear_update'; data: WearState }
   | { type: 'connected' }
   | { type: 'disconnected' };
 
@@ -33,10 +41,11 @@ export function onConnectionState(cb: (s: ConnectionState) => void): Promise<Unl
 export interface Settings {
   launch_at_login: boolean;
   low_battery_alerts: boolean;
+  show_session_timer: boolean;
 }
 
-export function setAncMode(mode: 'off' | 'anc' | 'transparency'): Promise<void> {
-  return invoke('set_anc_mode', { mode });
+export function setAncMode(mode: AncMode, level?: number): Promise<void> {
+  return invoke('set_anc_mode', { mode, level });
 }
 
 export function findEarbud(side: 'left' | 'right'): Promise<void> {

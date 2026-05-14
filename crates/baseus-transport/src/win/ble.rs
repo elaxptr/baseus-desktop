@@ -133,7 +133,7 @@ impl GattTransport {
 
     pub async fn send(&mut self, data: &[u8]) -> Result<(), TransportError> {
         self.peripheral
-            .write(&self.write_char, data, WriteType::WithoutResponse)
+            .write(&self.write_char, data, WriteType::WithResponse)
             .await
             .map_err(|e| TransportError::Io(e.to_string()))
     }
