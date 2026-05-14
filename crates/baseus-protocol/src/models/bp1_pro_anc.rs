@@ -19,7 +19,9 @@ impl Bp1ProAnc {
         match frame.cmd {
             0x02 => Self::decode_battery(&frame.payload),
             0x27 => Self::decode_case(&frame.payload),
-            0x30 => Ok(DeviceEvent::AncModeUpdate(AncMode::Off)),
+            // 0x30 appears as a periodic keepalive in BLE — NOT an ANC state update.
+            // ANC acks arrive as AA 34 [type] and are handled in device.rs.
+            // 0x32/0x33 kept for safety in case the device ever sends them directly.
             0x32 => Ok(DeviceEvent::AncModeUpdate(AncMode::Transparency)),
             0x33 => Ok(DeviceEvent::AncModeUpdate(AncMode::Anc)),
             other => Err(DecodeError::UnknownOpcode(other)),
@@ -89,12 +91,13 @@ mod tests {
     }
 
     #[test]
-    fn anc_off_decodes_correctly() {
-        // Golden: AA 30 00
-        assert_eq!(
-            decode(&[0xAA, 0x30, 0x00]).unwrap(),
-            DeviceEvent::AncModeUpdate(AncMode::Off)
-        );
+    fn anc_off_keepalive_is_ignored() {
+        // AA 30 00 is a periodic BLE keepalive, not an ANC state notification.
+        // ANC off state arrives as AA 34 00 (handled in device.rs, not here).
+        assert!(matches!(
+            decode(&[0xAA, 0x30, 0x00]),
+            Err(DecodeError::UnknownOpcode(0x30))
+        ));
     }
 
     #[test]

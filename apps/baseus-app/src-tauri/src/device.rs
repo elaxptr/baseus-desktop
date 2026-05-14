@@ -22,7 +22,7 @@ pub enum DeviceCommand {
     FindEarbud(Side),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Side {
     Left,
     Right,
@@ -68,6 +68,10 @@ async fn notification_loop(
         right_was_ok: true,
         case_was_ok: true,
     };
+    // Track the last commanded ANC mode so AA34 acks can resolve the correct mode.
+    let mut last_anc_mode: Option<AncMode> = None;
+    // Internal channel for find-earbud auto-stop after 5 seconds.
+    let (find_stop_tx, mut find_stop_rx) = tokio::sync::mpsc::unbounded_channel::<Side>();
 
     loop {
         tokio::select! {
@@ -76,22 +80,25 @@ async fn notification_loop(
                     Ok(Ok(data)) => {
                         tracing::debug!("raw notification: {}", hex(&data));
                         if let Ok(frame) = Frame::decode(&data) {
-                            match Bp1ProAnc::decode_frame(&frame) {
-                                Ok(event) => {
-                                    maybe_alert_battery(app, &event, &mut thresholds);
-                                    let _ = app.emit("device-event", &event);
+                            if frame.cmd == 0x34 {
+                                // AA 34 [type]: device ack for BA34 ANC write.
+                                // type=0 means Off; non-zero means whichever mode we just commanded.
+                                let ev = if frame.payload.first().copied().unwrap_or(0) == 0 {
+                                    last_anc_mode = None;
+                                    DeviceEvent::AncModeUpdate(AncMode::Off)
+                                } else {
+                                    DeviceEvent::AncModeUpdate(last_anc_mode.clone().unwrap_or(AncMode::Anc))
+                                };
+                                let _ = app.emit("device-event", &ev);
+                            } else {
+                                match Bp1ProAnc::decode_frame(&frame) {
+                                    Ok(event) => {
+                                        maybe_alert_battery(app, &event, &mut thresholds);
+                                        let _ = app.emit("device-event", &event);
+                                    }
+                                    Err(e) => tracing::debug!("unhandled frame cmd={:#04x}: {e}", frame.cmd),
                                 }
-                                Err(e) => tracing::debug!("unhandled frame cmd={:#04x}: {e}", data.get(1).copied().unwrap_or(0)),
                             }
-                        } else if data.len() >= 3 && data[0] == 0xBA && data[1] == 0x34 {
-                            // Device may respond to BA34 ANC write with a BA34 echo
-                            let ev = match data[2] {
-                                0x00 => Some(DeviceEvent::AncModeUpdate(AncMode::Off)),
-                                0x01 => Some(DeviceEvent::AncModeUpdate(AncMode::Anc)),
-                                0x02 => Some(DeviceEvent::AncModeUpdate(AncMode::Transparency)),
-                                t => { tracing::debug!("BA34 unknown type {t:#04x}"); None }
-                            };
-                            if let Some(ev) = ev { let _ = app.emit("device-event", &ev); }
                         } else {
                             tracing::debug!("rejected notification (unknown magic {:#04x})", data.first().copied().unwrap_or(0));
                         }
@@ -113,12 +120,35 @@ async fn notification_loop(
                 match execute_command(transport, &cmd).await {
                     Ok(()) => {
                         tracing::debug!("command sent ok");
-                        // Optimistic UI update: device may not echo for ANC commands
-                        if let DeviceCommand::SetAncMode(ref mode) = cmd {
-                            let _ = app.emit("device-event", &DeviceEvent::AncModeUpdate(mode.clone()));
+                        match &cmd {
+                            DeviceCommand::SetAncMode(mode) => {
+                                last_anc_mode = Some(mode.clone());
+                                // Optimistic emit so UI updates before AA34 ack arrives.
+                                let _ = app.emit("device-event", &DeviceEvent::AncModeUpdate(mode.clone()));
+                            }
+                            DeviceCommand::FindEarbud(side) => {
+                                // Auto-stop the find beep after 5 seconds.
+                                let tx = find_stop_tx.clone();
+                                let side = side.clone();
+                                tokio::spawn(async move {
+                                    tokio::time::sleep(Duration::from_secs(5)).await;
+                                    let _ = tx.send(side);
+                                });
+                            }
                         }
                     }
                     Err(e) => tracing::warn!("command error: {e}"),
+                }
+            }
+            Some(side) = find_stop_rx.recv() => {
+                let stop_bytes: &[u8] = match side {
+                    Side::Left  => &[0xBA, 0x10, 0x00, 0x00],
+                    Side::Right => &[0xBA, 0x10, 0x01, 0x00],
+                };
+                if let Err(e) = transport.send(stop_bytes).await {
+                    tracing::warn!("find auto-stop failed: {e}");
+                } else {
+                    tracing::debug!("find auto-stop sent");
                 }
             }
         }
