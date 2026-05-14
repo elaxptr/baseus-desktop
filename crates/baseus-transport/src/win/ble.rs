@@ -141,6 +141,10 @@ impl GattTransport {
     pub async fn next_notification(&mut self) -> Result<Vec<u8>, TransportError> {
         self.rx.recv().await.ok_or(TransportError::Disconnected)
     }
+
+    pub async fn is_connected(&self) -> bool {
+        self.peripheral.is_connected().await.unwrap_or(false)
+    }
 }
 
 async fn find_in_cache(adapter: &Adapter, name: &str) -> btleplug::Result<Option<Peripheral>> {

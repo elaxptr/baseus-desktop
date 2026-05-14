@@ -18,18 +18,19 @@ impl Bp1ProAnc {
     pub fn decode_frame(frame: &Frame) -> Result<DeviceEvent, DecodeError> {
         match frame.cmd {
             0x02 => Self::decode_battery(&frame.payload),
+            0x27 => Self::decode_case(&frame.payload),
             0x30 => Ok(DeviceEvent::AncModeUpdate(AncMode::Off)),
             0x32 => Ok(DeviceEvent::AncModeUpdate(AncMode::Transparency)),
             0x33 => Ok(DeviceEvent::AncModeUpdate(AncMode::Anc)),
-            0x80 => Self::decode_case(&frame.payload),
             other => Err(DecodeError::UnknownOpcode(other)),
         }
     }
 
     fn decode_battery(payload: &[u8]) -> Result<DeviceEvent, DecodeError> {
-        // payload: [left_pct, left_charging, right_pct, right_charging]
-        // Confirmed: AA 02 64 00 5A 01 → left=100% not charging, right=90% charging
-        // Case battery arrives via AA 80 frames decoded separately.
+        // Confirmed live: AA 02 64 00 64 01 = left 100%, right 100% (both in ear).
+        // Frame structure: [left_pct, 0x00, right_pct, 0x01]
+        // Bytes 1 and 3 are fixed bud-ID markers (0x00=left, 0x01=right), NOT charging flags.
+        // Charging state is not present in this frame; set false until a charging frame is found.
         if payload.len() < 4 {
             return Err(DecodeError::PayloadTooShort {
                 opcode: 0x02,
@@ -39,26 +40,25 @@ impl Bp1ProAnc {
         }
         Ok(DeviceEvent::BatteryUpdate(BatteryState {
             left_pct: payload[0],
-            left_charging: payload[1] != 0,
+            left_charging: false,
             right_pct: payload[2],
-            right_charging: payload[3] != 0,
+            right_charging: false,
         }))
     }
 
     fn decode_case(payload: &[u8]) -> Result<DeviceEvent, DecodeError> {
-        // Observed: AA 80 01 4A 01 A8 EF BF A9
-        // payload[0] = sub-type (0x01 = case-close event), payload[1] = case battery %
-        // Trailing bytes not decoded yet; 0x4A = 74 matches a plausible charge level.
+        // Confirmed live: AA 27 32 00 = case 50%, not charging.
+        // payload[0] = case_pct, payload[1] = charging flag (0x00=no, 0x01=yes).
         if payload.len() < 2 {
             return Err(DecodeError::PayloadTooShort {
-                opcode: 0x80,
+                opcode: 0x27,
                 need: 2,
                 got: payload.len(),
             });
         }
         Ok(DeviceEvent::CaseUpdate(CaseState {
-            case_pct: payload[1],
-            case_charging: payload[0] != 0,
+            case_pct: payload[0],
+            case_charging: payload[1] != 0,
         }))
     }
 }
@@ -74,16 +74,16 @@ mod tests {
 
     #[test]
     fn battery_frame_decodes_correctly() {
-        // Golden: AA 02 64 00 5A 01 — confirmed against Baseus app display
-        // left=100% not charging, right=90% charging
-        let ev = decode(&[0xAA, 0x02, 0x64, 0x00, 0x5A, 0x01]).unwrap();
+        // Golden: AA 02 64 00 64 01 — captured live, both buds in ear at 100%.
+        // Bytes [1] and [3] are bud-ID markers (0x00=left, 0x01=right), not charging flags.
+        let ev = decode(&[0xAA, 0x02, 0x64, 0x00, 0x64, 0x01]).unwrap();
         assert_eq!(
             ev,
             DeviceEvent::BatteryUpdate(BatteryState {
                 left_pct: 100,
                 left_charging: false,
-                right_pct: 90,
-                right_charging: true,
+                right_pct: 100,
+                right_charging: false,
             })
         );
     }
@@ -126,12 +126,11 @@ mod tests {
 
     #[test]
     fn case_frame_decodes_correctly() {
-        // Observed: AA 80 01 4A 01 A8 EF BF A9
-        // payload[0]=0x01 (sub-type), payload[1]=0x4A=74 (case battery %)
-        let ev = decode(&[0xAA, 0x80, 0x01, 0x4A, 0x01, 0xA8, 0xEF, 0xBF, 0xA9]).unwrap();
+        // Golden: AA 27 32 00 — captured live, case at 50%, not charging.
+        let ev = decode(&[0xAA, 0x27, 0x32, 0x00]).unwrap();
         assert_eq!(
             ev,
-            DeviceEvent::CaseUpdate(CaseState { case_pct: 74, case_charging: true })
+            DeviceEvent::CaseUpdate(CaseState { case_pct: 50, case_charging: false })
         );
     }
 

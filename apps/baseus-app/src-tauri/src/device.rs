@@ -4,8 +4,9 @@ use baseus_protocol::{framing::Frame, models::bp1_pro_anc::Bp1ProAnc};
 use baseus_transport::win::ble::GattTransport;
 use tauri::{AppHandle, Emitter};
 
-const DEVICE_NAME: &str = "BASS BP1 PRO";
+const DEVICE_NAME: &str = "Bass BP1 Pro";
 const RETRY_DELAY: Duration = Duration::from_secs(5);
+const NOTIF_TIMEOUT: Duration = Duration::from_secs(10);
 
 pub async fn run_loop(app: AppHandle) {
     loop {
@@ -32,8 +33,9 @@ pub async fn run_loop(app: AppHandle) {
 
 async fn notification_loop(app: &AppHandle, transport: &mut GattTransport) {
     loop {
-        match transport.next_notification().await {
-            Ok(data) => {
+        match tokio::time::timeout(NOTIF_TIMEOUT, transport.next_notification()).await {
+            Ok(Ok(data)) => {
+                tracing::debug!("raw notification: {}", hex(&data));
                 let Ok(frame) = Frame::decode(&data) else {
                     continue;
                 };
@@ -44,10 +46,21 @@ async fn notification_loop(app: &AppHandle, transport: &mut GattTransport) {
                     Err(e) => tracing::debug!("unhandled frame: {e}"),
                 }
             }
-            Err(e) => {
+            Ok(Err(e)) => {
                 tracing::warn!("transport error: {e}");
                 return;
             }
+            Err(_timeout) => {
+                // No notification for NOTIF_TIMEOUT — check if still connected.
+                if !transport.is_connected().await {
+                    tracing::info!("device disconnected (detected via connectivity check)");
+                    return;
+                }
+            }
         }
     }
+}
+
+fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|b| format!("{b:02X}")).collect::<Vec<_>>().join(" ")
 }

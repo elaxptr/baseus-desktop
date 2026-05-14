@@ -10,7 +10,7 @@
 | BT profiles | BLE GATT (control) + Classic SPP (OTA only) |
 | App package | `com.baseus.intelligent` |
 | Control protocol | Proprietary BLE GATT (not Bluetrum CCCOMM 02F0 UUIDs) |
-| BLE device name | `BASS BP1 PRO` |
+| BLE device name | `Bass BP1 Pro` |
 | BLE MAC (test unit) | `4A:01:CE:BA:C8:03` |
 
 ## BLE GATT endpoints
@@ -50,20 +50,34 @@ strength/level parameters or checksums — need write-side captures to confirm.
 
 ## Battery notifications  (device → app, notify char)
 
-CMD byte `0x02` = battery report.
+CMD byte `0x02` = bud battery report (left + right).
 
 ```
-AA 02 [left_pct: u8] [left_charging: u8] [right_pct: u8] [right_charging: u8]
+AA 02 [left_pct: u8] 0x00 [right_pct: u8] 0x01
 ```
 
-Example capture:
+`0x00` and `0x01` are fixed bud-ID markers (left=0, right=1), **not** charging flags.
+Charging state for individual buds is not present in this frame; source TBD.
+
+Confirmed live capture (both buds in ear, 100%):
 ```
-AA 02 64 00 5A 01
-         ^^       left bud: 100%, not charging
-               ^^ right bud: 90%, charging
+AA 02 64 00 64 01
 ```
 
-`charging` flag: `0x00` = discharging, `0x01` = charging.
+## Case battery notification  (device → app, notify char)
+
+CMD byte `0x27` = case battery report.
+
+```
+AA 27 [case_pct: u8] [case_charging: u8]
+```
+
+`case_charging`: `0x00` = not charging, `0x01` = charging (in charger).
+
+Confirmed live capture (case at 50%, not plugged in):
+```
+AA 27 32 00
+```
 
 ## Case / connection event  (device → app, notify char)
 
@@ -73,9 +87,7 @@ CMD byte `0x80` = case/connection event (observed on case-close).
 AA 80 01 4A 01 A8 EF BF A9   (example — case closed)
 ```
 
-Byte layout beyond the first three bytes is not yet fully decoded. `0x4A` = 74 is
-a plausible case battery percentage. The trailing four bytes `A8 EF BF A9` are
-under analysis (possibly device identifier or extended status).
+Byte layout not fully decoded. Separate from battery — does not carry case_pct.
 
 ## Battery / Power state — SDK model
 
@@ -98,12 +110,13 @@ frame or a separate notification not yet captured.
 
 ## Outstanding TODOs
 
-- [ ] Confirm battery % values against Baseus app display
-- [ ] Decode `AA 80` case frame fully (case_pct field, trailing bytes)
-- [ ] Determine whether `AA 02` ever includes case battery (6-byte vs longer variant)
-- [ ] Capture write-side frames (app → device) to find the battery query and ANC set commands
-- [ ] Determine checksum/trailing byte semantics in ANC frames (`0xFF`, `0x68`)
+- [x] Confirm battery % values against Baseus app display
+- [x] Identify case battery notification opcode (`0x27`)
 - [x] Add golden test cases to `crates/baseus-protocol/src/models/bp1_pro_anc.rs`
+- [ ] Capture bud charging state — need a live frame with a bud in-case charging to identify the byte
+- [ ] Decode `AA 80` case event fully (trailing bytes purpose unknown)
+- [ ] Capture write-side frames (app → device) to confirm ANC set commands
+- [ ] Determine checksum/trailing byte semantics in ANC frames (`0xFF`, `0x68`)
 
 ## Capture methodology
 
