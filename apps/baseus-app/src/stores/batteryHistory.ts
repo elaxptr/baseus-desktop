@@ -38,14 +38,8 @@ export function pushCase(pct: number) {
   push('case', pct);
 }
 
-export function getLeft(): Reading[] {
-  return history.left;
-}
+export const left = () => history.left;
 
-export function getRight(): Reading[] {
-  return history.right;
-}
+export const right = () => history.right;
 
-export function getCase(): Reading[] {
-  return history.case;
-}
+export const caseData = () => history.case;
