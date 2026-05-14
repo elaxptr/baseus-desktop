@@ -1,4 +1,5 @@
-use tauri::State;
+use tauri::{AppHandle, Runtime, State};
+use tauri_plugin_autostart::ManagerExt;
 use crate::device::{CommandSender, DeviceCommand, Side};
 use crate::settings::{self, Settings};
 use baseus_protocol::types::AncMode;
@@ -33,6 +34,11 @@ pub fn get_settings() -> Settings {
 }
 
 #[tauri::command]
-pub fn set_settings(settings: Settings) -> Result<(), String> {
-    settings::save(&settings)
+pub fn set_settings<R: Runtime>(app: AppHandle<R>, settings: Settings) -> Result<(), String> {
+    settings::save(&settings)?;
+    if settings.launch_at_login {
+        app.autolaunch().enable().map_err(|e| e.to_string())
+    } else {
+        app.autolaunch().disable().map_err(|e| e.to_string())
+    }
 }
