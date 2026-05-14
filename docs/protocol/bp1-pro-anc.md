@@ -57,12 +57,32 @@ AA 02 [left_pct: u8] 0x00 [right_pct: u8] 0x01
 ```
 
 `0x00` and `0x01` are fixed bud-ID markers (left=0, right=1), **not** charging flags.
-Charging state for individual buds is not present in this frame; source TBD.
+A bud reports **0%** when seated in the case (device provides power, bud goes passive).
 
-Confirmed live capture (both buds in ear, 100%):
+Live captures:
+
+| Situation | Frame |
+|---|---|
+| Both buds in ear, 100% | `AA 02 64 00 64 01` |
+| Left in case, right in ear 100% | `AA 02 00 00 64 01` |
+
+Bud charging detection: a bud is in-case (and likely charging) when `pct == 0`
+while the case itself is present and reporting via `AA 27`.
+
+## Device identity frame  (device → app, notify char)
+
+CMD byte `0x12` = device identity, sent once on connect.
+
 ```
-AA 02 64 00 64 01
+AA 12 [mac_byte5..mac_byte0: 6 bytes] 00 00 00 00 00 00 01
 ```
+
+MAC bytes are in reverse order. Example:
+```
+AA 12 03 C8 BA CE 01 4A …   →   MAC 4A:01:CE:BA:C8:03
+```
+
+Trailing bytes purpose unknown. Not decoded by the app.
 
 ## Case battery notification  (device → app, notify char)
 
