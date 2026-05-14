@@ -1,0 +1,27 @@
+[     507ms] TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:1420/node_modules/.vite/deps/chunk-SNETGTVY.js?v=03ca1b21:109:37)
+    at getSettings (http://localhost:1420/src/lib/tauri.ts:16:10)
+    at loadSettings (http://localhost:1420/src/stores/settings.ts:8:19)
+    at http://localhost:1420/src/App.tsx?t=1778753221887:17:11
+    at untrack (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:459:12)
+    at Object.fn (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:484:22)
+    at runComputation (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:731:22)
+    at updateComputation (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:714:3)
+    at runTop (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:835:7)
+    at runUserEffects (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:948:36)
+[  640155ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:1420/@vite/client:963
+[  642469ms] [ERROR] WebSocket connection to 'ws://localhost:1420/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:1420/@vite/client:1034
+[  645801ms] [ERROR] WebSocket connection to 'ws://localhost:1420/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:1420/@vite/client:1034
+[  649108ms] [ERROR] WebSocket connection to 'ws://localhost:1420/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:1420/@vite/client:1034
+[  652416ms] [ERROR] WebSocket connection to 'ws://localhost:1420/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:1420/@vite/client:1034
+[  653911ms] TypeError: Cannot read properties of undefined (reading 'invoke')
+    at invoke (http://localhost:1420/node_modules/.vite/deps/chunk-SNETGTVY.js?v=03ca1b21:109:37)
+    at getSettings (http://localhost:1420/src/lib/tauri.ts:16:10)
+    at loadSettings (http://localhost:1420/src/stores/settings.ts:8:19)
+    at http://localhost:1420/src/App.tsx:17:11
+    at untrack (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:459:12)
+    at Object.fn (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:484:22)
+    at runComputation (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:731:22)
+    at updateComputation (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:714:3)
+    at runTop (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:835:7)
+    at runUserEffects (http://localhost:1420/node_modules/.vite/deps/chunk-W436EO47.js?v=03ca1b21:948:36)

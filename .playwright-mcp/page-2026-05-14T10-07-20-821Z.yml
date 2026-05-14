@@ -1,0 +1,63 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e9]: Bass BP1 Pro ANC
+    - generic [ref=e10]: Connecting…
+  - generic [ref=e12]:
+    - generic [ref=e13]: Earbuds
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e21]:
+            - generic [ref=e22]: "0"
+            - generic [ref=e23]: "%"
+        - img [ref=e24]
+        - generic [ref=e25]: LEFT
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - img [ref=e28]
+          - generic [ref=e31]:
+            - generic [ref=e32]: "0"
+            - generic [ref=e33]: "%"
+        - img [ref=e34]
+        - generic [ref=e35]: RIGHT
+  - generic [ref=e36]:
+    - generic [ref=e37]: Case
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - img [ref=e41]
+        - generic [ref=e44]:
+          - generic [ref=e45]: "0"
+          - generic [ref=e46]: "%"
+      - generic [ref=e47]:
+        - generic [ref=e48]: CASE BATTERY
+        - img [ref=e49]
+  - generic [ref=e50]:
+    - generic [ref=e51]: Noise Control
+    - generic [ref=e53]:
+      - generic [ref=e54] [cursor=pointer]:
+        - generic [ref=e55]: 🔇
+        - generic [ref=e56]: "Off"
+      - generic [ref=e57] [cursor=pointer]:
+        - generic [ref=e58]: 🎧
+        - generic [ref=e59]: ANC
+      - generic [ref=e60] [cursor=pointer]:
+        - generic [ref=e61]: 🌬️
+        - generic [ref=e62]: Transparent
+  - generic [ref=e63]:
+    - generic [ref=e64]: Find Earbuds
+    - generic [ref=e66]:
+      - generic [ref=e67] [cursor=pointer]:
+        - generic [ref=e68]: 🔊
+        - text: Play Left
+      - generic [ref=e69] [cursor=pointer]:
+        - generic [ref=e70]: 🔊
+        - text: Play Right
+  - generic [ref=e71]:
+    - generic [ref=e72]: Settings
+    - generic [ref=e75]:
+      - generic [ref=e76]: Launch at login
+      - generic [ref=e77]: Start automatically with Windows
+    - generic [ref=e82]:
+      - generic [ref=e83]: Low battery alerts
+      - generic [ref=e84]: Notify when a bud drops below 20%

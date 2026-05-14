@@ -1,0 +1,61 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e9]: Bass BP1 Pro ANC
+    - generic [ref=e10]: Connecting…
+  - generic [ref=e12]:
+    - generic [ref=e13]: Earbuds
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - img [ref=e18]
+          - generic [ref=e21]:
+            - generic [ref=e22]: "0"
+            - generic [ref=e23]: "%"
+        - img [ref=e24]
+        - generic [ref=e25]: LEFT
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - img [ref=e28]
+          - generic [ref=e31]:
+            - generic [ref=e32]: "0"
+            - generic [ref=e33]: "%"
+        - img [ref=e34]
+        - generic [ref=e35]: RIGHT
+  - generic [ref=e36]:
+    - generic [ref=e37]: Case
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - img [ref=e41]
+        - generic [ref=e44]: "0"
+      - generic [ref=e45]:
+        - generic [ref=e46]: CASE BATTERY
+        - img [ref=e47]
+  - generic [ref=e48]:
+    - generic [ref=e49]: Noise Control
+    - generic [ref=e51]:
+      - generic [ref=e52] [cursor=pointer]:
+        - generic [ref=e53]: 🔇
+        - generic [ref=e54]: "Off"
+      - generic [ref=e55] [cursor=pointer]:
+        - generic [ref=e56]: 🎧
+        - generic [ref=e57]: ANC
+      - generic [ref=e58] [cursor=pointer]:
+        - generic [ref=e59]: 🌬️
+        - generic [ref=e60]: Transparent
+  - generic [ref=e61]:
+    - generic [ref=e62]: Find Earbuds
+    - generic [ref=e64]:
+      - generic [ref=e65] [cursor=pointer]:
+        - generic [ref=e66]: 🔊
+        - text: Play Left
+      - generic [ref=e67] [cursor=pointer]:
+        - generic [ref=e68]: 🔊
+        - text: Play Right
+  - generic [ref=e69]:
+    - generic [ref=e70]: Settings
+    - generic [ref=e73]:
+      - generic [ref=e74]: Launch at login
+      - generic [ref=e75]: Start automatically with Windows
+    - generic [ref=e80]:
+      - generic [ref=e81]: Low battery alerts
+      - generic [ref=e82]: Notify when a bud drops below 20%
