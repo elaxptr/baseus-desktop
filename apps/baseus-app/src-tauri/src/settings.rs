@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Settings {
     pub launch_at_login: bool,
     pub low_battery_alerts: bool,

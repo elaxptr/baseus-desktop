@@ -119,7 +119,11 @@ async fn notification_loop(
                         tracing::debug!("command sent ok");
                         match &cmd {
                             DeviceCommand::SetAncMode(mode, level) => {
-                                last_anc_mode = Some((mode.clone(), *level));
+                                last_anc_mode = if matches!(mode, AncMode::Off) {
+                                    None
+                                } else {
+                                    Some((mode.clone(), *level))
+                                };
                                 let _ = app.emit("device-event", &DeviceEvent::AncModeUpdate(mode.clone()));
                             }
                             DeviceCommand::FindEarbud(side) => {
