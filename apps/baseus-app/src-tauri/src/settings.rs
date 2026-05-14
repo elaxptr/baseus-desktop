@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct Settings {
     pub launch_at_login: bool,
     pub low_battery_alerts: bool,
+    pub show_session_timer: bool,
 }
 
 impl Default for Settings {
@@ -12,6 +13,7 @@ impl Default for Settings {
         Self {
             launch_at_login: true,
             low_battery_alerts: true,
+            show_session_timer: true,
         }
     }
 }

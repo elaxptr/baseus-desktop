@@ -7,6 +7,7 @@ use baseus_protocol::types::AncMode;
 #[tauri::command]
 pub fn set_anc_mode(
     mode: String,
+    level: Option<u8>,
     cmd_tx: State<CommandSender>,
 ) -> Result<(), String> {
     let anc_mode = match mode.as_str() {
@@ -15,7 +16,8 @@ pub fn set_anc_mode(
         "transparency" => AncMode::Transparency,
         other => return Err(format!("unknown mode: {other}")),
     };
-    cmd_tx.send(DeviceCommand::SetAncMode(anc_mode)).map_err(|e| e.to_string())
+    let byte = level.unwrap_or(0x68);
+    cmd_tx.send(DeviceCommand::SetAncMode(anc_mode, byte)).map_err(|e| e.to_string())
 }
 
 #[tauri::command]

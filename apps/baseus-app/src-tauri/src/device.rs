@@ -18,7 +18,7 @@ struct BatteryThresholds {
 
 #[derive(Debug)]
 pub enum DeviceCommand {
-    SetAncMode(AncMode),
+    SetAncMode(AncMode, u8),
     FindEarbud(Side),
 }
 
@@ -41,8 +41,6 @@ pub async fn run_loop(app: AppHandle, mut cmd_rx: CommandReceiver) {
         match GattTransport::connect(DEVICE_NAME).await {
             Ok(mut transport) => {
                 let _ = app.emit("connection-state", "connected");
-                // BA 05 00 = handshake; triggers the device to start pushing notifications.
-                // Confirmed from HomeBleDataResolvePresenter$2.b() bytecode analysis.
                 if let Err(e) = transport.send(&[0xBA, 0x05, 0x00]).await {
                     tracing::warn!("handshake send failed: {e}");
                 }
@@ -68,8 +66,7 @@ async fn notification_loop(
         right_was_ok: true,
         case_was_ok: true,
     };
-    // Track the last commanded ANC mode so AA34 acks can resolve the correct mode.
-    let mut last_anc_mode: Option<AncMode> = None;
+    let mut last_anc_mode: Option<(AncMode, u8)> = None;
     // Internal channel for find-earbud auto-stop after 5 seconds.
     let (find_stop_tx, mut find_stop_rx) = tokio::sync::mpsc::unbounded_channel::<Side>();
 
@@ -81,13 +78,13 @@ async fn notification_loop(
                         tracing::debug!("raw notification: {}", hex(&data));
                         if let Ok(frame) = Frame::decode(&data) {
                             if frame.cmd == 0x34 {
-                                // AA 34 [type]: device ack for BA34 ANC write.
-                                // type=0 means Off; non-zero means whichever mode we just commanded.
                                 let ev = if frame.payload.first().copied().unwrap_or(0) == 0 {
                                     last_anc_mode = None;
                                     DeviceEvent::AncModeUpdate(AncMode::Off)
                                 } else {
-                                    DeviceEvent::AncModeUpdate(last_anc_mode.clone().unwrap_or(AncMode::Anc))
+                                    DeviceEvent::AncModeUpdate(
+                                        last_anc_mode.as_ref().map(|(m, _)| m.clone()).unwrap_or(AncMode::Anc)
+                                    )
                                 };
                                 let _ = app.emit("device-event", &ev);
                             } else {
@@ -121,13 +118,11 @@ async fn notification_loop(
                     Ok(()) => {
                         tracing::debug!("command sent ok");
                         match &cmd {
-                            DeviceCommand::SetAncMode(mode) => {
-                                last_anc_mode = Some(mode.clone());
-                                // Optimistic emit so UI updates before AA34 ack arrives.
+                            DeviceCommand::SetAncMode(mode, level) => {
+                                last_anc_mode = Some((mode.clone(), *level));
                                 let _ = app.emit("device-event", &DeviceEvent::AncModeUpdate(mode.clone()));
                             }
                             DeviceCommand::FindEarbud(side) => {
-                                // Auto-stop the find beep after 5 seconds.
                                 let tx = find_stop_tx.clone();
                                 let side = side.clone();
                                 tokio::spawn(async move {
@@ -159,18 +154,14 @@ async fn execute_command(
     transport: &mut GattTransport,
     cmd: &DeviceCommand,
 ) -> Result<(), String> {
-    let bytes: &[u8] = match cmd {
-        // BA 34 [type] [level] — BLE GATT write format (BA prefix = app→device).
-        // Device echoes back AA 33/32/30 notifications which the decoder handles.
-        // Type/level confirmed from NoiseReduceDataModel bytecode + btsnoop RX BA34 patterns.
-        DeviceCommand::SetAncMode(AncMode::Off) => &[0xBA, 0x34, 0x00, 0xFF],
-        DeviceCommand::SetAncMode(AncMode::Anc) => &[0xBA, 0x34, 0x01, 0x68],
-        DeviceCommand::SetAncMode(AncMode::Transparency) => &[0xBA, 0x34, 0x02, 0xFF],
-        // BA 10 [ear_index] 01 — confirmed from FindEarPhoneActivity bytecode: BA100001=Left, BA100101=Right.
-        DeviceCommand::FindEarbud(Side::Left) => &[0xBA, 0x10, 0x00, 0x01],
-        DeviceCommand::FindEarbud(Side::Right) => &[0xBA, 0x10, 0x01, 0x01],
+    let bytes: Vec<u8> = match cmd {
+        DeviceCommand::SetAncMode(AncMode::Off, _) => vec![0xBA, 0x34, 0x00, 0xFF],
+        DeviceCommand::SetAncMode(AncMode::Anc, level) => vec![0xBA, 0x34, 0x01, *level],
+        DeviceCommand::SetAncMode(AncMode::Transparency, level) => vec![0xBA, 0x34, 0x02, *level],
+        DeviceCommand::FindEarbud(Side::Left) => vec![0xBA, 0x10, 0x00, 0x01],
+        DeviceCommand::FindEarbud(Side::Right) => vec![0xBA, 0x10, 0x01, 0x01],
     };
-    transport.send(bytes).await.map_err(|e| e.to_string())
+    transport.send(&bytes).await.map_err(|e| e.to_string())
 }
 
 fn maybe_alert_battery(
