@@ -48,14 +48,15 @@ export default function CaseCard(props: Props) {
             position: 'absolute',
             inset: '0',
             display: 'flex',
+            'flex-direction': 'column',
             'align-items': 'center',
             'justify-content': 'center',
-            'font-size': '14px',
-            'font-weight': '700',
-            color: '#fff',
           }}
         >
-          {props.pct}
+          <span style={{ 'font-size': '13px', 'font-weight': '700', color: '#fff', 'line-height': '1' }}>
+            {props.pct}
+          </span>
+          <span style={{ 'font-size': '8px', color: '#6366f1', 'font-weight': '600' }}>%</span>
         </div>
       </div>
 

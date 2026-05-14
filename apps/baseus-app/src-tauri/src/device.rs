@@ -70,34 +70,37 @@ async fn notification_loop(
     };
 
     loop {
-        while let Ok(cmd) = cmd_rx.try_recv() {
-            if let Err(e) = execute_command(transport, cmd).await {
-                tracing::warn!("command error: {e}");
-            }
-        }
-
-        match tokio::time::timeout(NOTIF_TIMEOUT, transport.next_notification()).await {
-            Ok(Ok(data)) => {
-                tracing::debug!("raw notification: {}", hex(&data));
-                let Ok(frame) = Frame::decode(&data) else {
-                    continue;
-                };
-                match Bp1ProAnc::decode_frame(&frame) {
-                    Ok(event) => {
-                        maybe_alert_battery(app, &event, &mut thresholds);
-                        let _ = app.emit("device-event", &event);
+        tokio::select! {
+            result = tokio::time::timeout(NOTIF_TIMEOUT, transport.next_notification()) => {
+                match result {
+                    Ok(Ok(data)) => {
+                        tracing::debug!("raw notification: {}", hex(&data));
+                        let Ok(frame) = Frame::decode(&data) else {
+                            continue;
+                        };
+                        match Bp1ProAnc::decode_frame(&frame) {
+                            Ok(event) => {
+                                maybe_alert_battery(app, &event, &mut thresholds);
+                                let _ = app.emit("device-event", &event);
+                            }
+                            Err(e) => tracing::debug!("unhandled frame: {e}"),
+                        }
                     }
-                    Err(e) => tracing::debug!("unhandled frame: {e}"),
+                    Ok(Err(e)) => {
+                        tracing::warn!("transport error: {e}");
+                        return;
+                    }
+                    Err(_timeout) => {
+                        if !transport.is_connected().await {
+                            tracing::info!("device disconnected (detected via connectivity check)");
+                            return;
+                        }
+                    }
                 }
             }
-            Ok(Err(e)) => {
-                tracing::warn!("transport error: {e}");
-                return;
-            }
-            Err(_timeout) => {
-                if !transport.is_connected().await {
-                    tracing::info!("device disconnected (detected via connectivity check)");
-                    return;
+            Some(cmd) = cmd_rx.recv() => {
+                if let Err(e) = execute_command(transport, cmd).await {
+                    tracing::warn!("command error: {e}");
                 }
             }
         }

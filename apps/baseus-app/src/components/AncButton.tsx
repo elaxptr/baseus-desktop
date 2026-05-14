@@ -7,6 +7,8 @@ interface Props {
 }
 
 export default function AncButton(props: Props) {
+  const highlighted = () => props.active || props.loading;
+
   const baseStyle = {
     flex: '1',
     padding: '10px 6px',
@@ -32,20 +34,20 @@ export default function AncButton(props: Props) {
   const inactiveStyle = {
     background: '#111113',
     'border-color': '#1a1a1e',
-    color: '#404040',
+    color: '#737373',
   };
 
   return (
     <div
       style={{
         ...baseStyle,
-        ...(props.active ? activeStyle : inactiveStyle),
+        ...(highlighted() ? activeStyle : inactiveStyle),
         animation: props.loading ? 'pulse 0.8s ease-in-out infinite' : 'none',
       }}
       onClick={props.onClick}
     >
       <span style={{ 'font-size': '16px' }}>{props.icon}</span>
-      <span style={{ color: props.active ? '#818cf8' : '#404040' }}>{props.label}</span>
+      <span style={{ color: highlighted() ? '#818cf8' : '#737373' }}>{props.label}</span>
     </div>
   );
 }

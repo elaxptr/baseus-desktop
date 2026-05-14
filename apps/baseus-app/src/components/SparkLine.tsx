@@ -11,7 +11,10 @@ export default function SparkLine(props: Props) {
 
   const points = () => {
     const d = props.data;
-    if (d.length < 2) return '';
+    if (d.length < 2) {
+      // Flat baseline at 50% height as a placeholder
+      return `0,${(h() / 2).toFixed(1)} ${w().toFixed(1)},${(h() / 2).toFixed(1)}`;
+    }
     const step = w() / (d.length - 1);
     return d
       .map((v, i) => {
@@ -21,6 +24,8 @@ export default function SparkLine(props: Props) {
       })
       .join(' ');
   };
+
+  const opacity = () => (props.data.length < 2 ? 0.15 : 0.5);
 
   return (
     <svg
@@ -36,7 +41,7 @@ export default function SparkLine(props: Props) {
         stroke-width="1.5"
         stroke-linecap="round"
         stroke-linejoin="round"
-        opacity="0.5"
+        opacity={opacity()}
       />
     </svg>
   );
