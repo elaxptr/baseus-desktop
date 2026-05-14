@@ -14,13 +14,23 @@
       {
         "label": "main",
         "title": "Baseus Desktop",
-        "width": 480,
-        "height": 360
+        "width": 380,
+        "height": 620,
+        "resizable": false,
+        "alwaysOnTop": false
       }
     ],
     "security": {
       "csp": null
     }
+  },
+  "plugins": {
+    "autostart": {
+      "desktopFile": null,
+      "hidden": false,
+      "args": []
+    },
+    "notification": {}
   },
   "bundle": {
     "active": true,

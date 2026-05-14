@@ -13,6 +13,11 @@ pub fn run() {
     let (cmd_tx, cmd_rx) = device::command_channel();
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            Some(vec!["--minimized"]),
+        ))
+        .plugin(tauri_plugin_notification::init())
         .manage(cmd_tx)
         .setup(|app| {
             tray::setup_tray(app.handle())?;
