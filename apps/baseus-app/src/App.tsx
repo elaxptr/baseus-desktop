@@ -18,26 +18,20 @@ type AncMode = 'off' | 'anc' | 'transparency';
 
 export default function App() {
   const [status, setStatus] = createSignal<ConnStatus>('connecting');
-  const [leftPct, setLeftPct] = createSignal(0);
-  const [rightPct, setRightPct] = createSignal(0);
-  const [casePct, setCasePct] = createSignal(0);
   const [ancMode, setAncModeSignal] = createSignal<AncMode>('off');
   const [ancLoading, setAncLoading] = createSignal<AncMode | null>(null);
 
   onMount(async () => {
-    await loadSettings();
-
     const unlisteners: Array<() => void> = [];
     onCleanup(() => unlisteners.forEach((fn) => fn()));
 
+    await loadSettings();
+
     onDeviceEvent((e) => {
       if (e.type === 'battery_update') {
-        setLeftPct(e.data.left_pct);
-        setRightPct(e.data.right_pct);
         pushLeft(e.data.left_pct);
         pushRight(e.data.right_pct);
       } else if (e.type === 'case_update') {
-        setCasePct(e.data.case_pct);
         pushCase(e.data.case_pct);
       } else if (e.type === 'anc_mode_update') {
         setAncModeSignal(e.data);
@@ -129,12 +123,12 @@ export default function App() {
         <div style={{ display: 'flex', gap: '12px' }}>
           <BudCard
             label="LEFT"
-            pct={leftPct()}
+            pct={left()[left().length - 1]?.pct ?? 0}
             history={left().map((r) => r.pct)}
           />
           <BudCard
             label="RIGHT"
-            pct={rightPct()}
+            pct={right()[right().length - 1]?.pct ?? 0}
             history={right().map((r) => r.pct)}
           />
         </div>
@@ -147,7 +141,7 @@ export default function App() {
           <div style={{ flex: '1', height: '1px', background: '#161618' }} />
         </div>
         <CaseCard
-          pct={casePct()}
+          pct={caseData()[caseData().length - 1]?.pct ?? 0}
           history={caseData().map((r) => r.pct)}
         />
       </div>
