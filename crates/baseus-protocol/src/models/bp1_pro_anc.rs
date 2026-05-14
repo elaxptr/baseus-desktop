@@ -129,10 +129,17 @@ mod tests {
 
     #[test]
     fn battery_too_short_is_error() {
-        let frame = Frame { cmd: 0x02, payload: vec![0x64, 0x00, 0x5A] };
+        let frame = Frame {
+            cmd: 0x02,
+            payload: vec![0x64, 0x00, 0x5A],
+        };
         assert!(matches!(
             Bp1ProAnc::decode_frame(&frame),
-            Err(DecodeError::PayloadTooShort { opcode: 0x02, need: 4, got: 3 })
+            Err(DecodeError::PayloadTooShort {
+                opcode: 0x02,
+                need: 4,
+                got: 3
+            })
         ));
     }
 
@@ -142,13 +149,19 @@ mod tests {
         let ev = decode(&[0xAA, 0x27, 0x32, 0x00]).unwrap();
         assert_eq!(
             ev,
-            DeviceEvent::CaseUpdate(CaseState { case_pct: 50, case_charging: false })
+            DeviceEvent::CaseUpdate(CaseState {
+                case_pct: 50,
+                case_charging: false
+            })
         );
     }
 
     #[test]
     fn unknown_opcode_is_error() {
-        let frame = Frame { cmd: 0x99, payload: vec![] };
+        let frame = Frame {
+            cmd: 0x99,
+            payload: vec![],
+        };
         assert!(matches!(
             Bp1ProAnc::decode_frame(&frame),
             Err(DecodeError::UnknownOpcode(0x99))

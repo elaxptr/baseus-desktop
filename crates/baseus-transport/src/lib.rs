@@ -37,12 +37,15 @@ pub trait BluetoothTransport: Send {
 /// `tx_log` records every outgoing write for assertion.
 pub struct MockTransport {
     pub rx_queue: VecDeque<Vec<u8>>,
-    pub tx_log:   Vec<Vec<u8>>,
+    pub tx_log: Vec<Vec<u8>>,
 }
 
 impl MockTransport {
     pub fn new() -> Self {
-        Self { rx_queue: VecDeque::new(), tx_log: Vec::new() }
+        Self {
+            rx_queue: VecDeque::new(),
+            tx_log: Vec::new(),
+        }
     }
 
     pub fn push_rx(&mut self, packet: Vec<u8>) {
@@ -51,7 +54,9 @@ impl MockTransport {
 }
 
 impl Default for MockTransport {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl BluetoothTransport for MockTransport {
@@ -65,7 +70,9 @@ impl BluetoothTransport for MockTransport {
     }
 
     async fn next_notification(&mut self) -> Result<Vec<u8>, TransportError> {
-        self.rx_queue.pop_front().ok_or(TransportError::Disconnected)
+        self.rx_queue
+            .pop_front()
+            .ok_or(TransportError::Disconnected)
     }
 }
 

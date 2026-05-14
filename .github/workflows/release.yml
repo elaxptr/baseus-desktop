@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'apps/baseus-app/pnpm-lock.yaml'
+
+      - name: Install frontend deps
+        run: pnpm install
+        working-directory: apps/baseus-app
+
+      - name: Build and publish release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: apps/baseus-app
+          tagName: ${{ github.ref_name }}
+          releaseName: 'baseus-desktop ${{ github.ref_name }}'
+          releaseBody: |
+            Windows desktop companion for Baseus BP1 Pro ANC earbuds.
+
+            **Requires:** Windows 10 1903+ with Bluetooth.
+
+            Download `baseus-desktop_*_x64-setup.exe` below.
+          releaseDraft: false
+          prerelease: false

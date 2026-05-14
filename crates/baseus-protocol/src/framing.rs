@@ -23,7 +23,10 @@ impl Frame {
     /// Parse a raw GATT notification or write payload.
     pub fn decode(buf: &[u8]) -> Result<Self, FrameError> {
         if buf.len() < 2 {
-            return Err(FrameError::TooShort { need: 2, got: buf.len() });
+            return Err(FrameError::TooShort {
+                need: 2,
+                got: buf.len(),
+            });
         }
         if buf[0] != 0xAA {
             return Err(FrameError::BadMagic { got: buf[0] });
@@ -82,7 +85,10 @@ mod tests {
 
     #[test]
     fn encode_then_decode_round_trips() {
-        let original = Frame { cmd: 0x02, payload: vec![0x64, 0x00, 0x5A, 0x01] };
+        let original = Frame {
+            cmd: 0x02,
+            payload: vec![0x64, 0x00, 0x5A, 0x01],
+        };
         let decoded = Frame::decode(&original.encode()).unwrap();
         assert_eq!(decoded, original);
     }

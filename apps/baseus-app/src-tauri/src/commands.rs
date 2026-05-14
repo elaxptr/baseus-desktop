@@ -1,8 +1,8 @@
-use tauri::{AppHandle, Runtime, State};
-use tauri_plugin_autostart::ManagerExt;
 use crate::device::{CommandSender, DeviceCommand, Side};
 use crate::settings::{self, Settings};
 use baseus_protocol::types::{AncMode, EqPreset};
+use tauri::{AppHandle, Runtime, State};
+use tauri_plugin_autostart::ManagerExt;
 
 #[tauri::command]
 pub fn set_anc_mode(
@@ -17,14 +17,17 @@ pub fn set_anc_mode(
         other => return Err(format!("unknown mode: {other}")),
     };
     let byte = level.unwrap_or(0x68);
-    cmd_tx.send(DeviceCommand::SetAncMode(anc_mode, byte)).map_err(|e| e.to_string())
+    cmd_tx
+        .send(DeviceCommand::SetAncMode(anc_mode, byte))
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn set_eq_preset(preset: u8, cmd_tx: State<CommandSender>) -> Result<(), String> {
-    let eq = EqPreset::from_byte(preset)
-        .ok_or_else(|| format!("unknown EQ preset: {preset}"))?;
-    cmd_tx.send(DeviceCommand::SetEqPreset(eq)).map_err(|e| e.to_string())
+    let eq = EqPreset::from_byte(preset).ok_or_else(|| format!("unknown EQ preset: {preset}"))?;
+    cmd_tx
+        .send(DeviceCommand::SetEqPreset(eq))
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -34,7 +37,9 @@ pub fn find_earbud(side: String, cmd_tx: State<CommandSender>) -> Result<(), Str
         "right" => Side::Right,
         other => return Err(format!("unknown side: {other}")),
     };
-    cmd_tx.send(DeviceCommand::FindEarbud(s)).map_err(|e| e.to_string())
+    cmd_tx
+        .send(DeviceCommand::FindEarbud(s))
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]

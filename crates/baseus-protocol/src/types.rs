@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 pub mod ble_uuids {
     pub const SERVICE: &str = "53527aa4-29f7-ae11-4e74-997334782568";
-    pub const WRITE:   &str = "ee684b1a-1e9b-ed3e-ee55-f894667e92ac";
-    pub const NOTIFY:  &str = "654b749c-e37f-ae1f-ebab-40ca133e3690";
+    pub const WRITE: &str = "ee684b1a-1e9b-ed3e-ee55-f894667e92ac";
+    pub const NOTIFY: &str = "654b749c-e37f-ae1f-ebab-40ca133e3690";
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -25,10 +25,10 @@ pub enum AncMode {
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum EqPreset {
-    Balanced   = 0,
-    BassBoost  = 1,
-    Voice      = 2,
-    Clear      = 3,
+    Balanced = 0,
+    BassBoost = 1,
+    Voice = 2,
+    Clear = 3,
 }
 
 impl EqPreset {

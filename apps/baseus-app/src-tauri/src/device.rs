@@ -1,6 +1,10 @@
 use std::time::Duration;
 
-use baseus_protocol::{framing::Frame, models::bp1_pro_anc::Bp1ProAnc, types::{AncMode, DeviceEvent, EqPreset}};
+use baseus_protocol::{
+    framing::Frame,
+    models::bp1_pro_anc::Bp1ProAnc,
+    types::{AncMode, DeviceEvent, EqPreset},
+};
 use baseus_transport::win::ble::GattTransport;
 use tauri::{AppHandle, Emitter};
 use tokio::sync::mpsc;
@@ -158,10 +162,7 @@ async fn notification_loop(
     }
 }
 
-async fn execute_command(
-    transport: &mut GattTransport,
-    cmd: &DeviceCommand,
-) -> Result<(), String> {
+async fn execute_command(transport: &mut GattTransport, cmd: &DeviceCommand) -> Result<(), String> {
     let bytes: Vec<u8> = match cmd {
         DeviceCommand::SetAncMode(AncMode::Off, _) => vec![0xBA, 0x34, 0x00, 0xFF],
         DeviceCommand::SetAncMode(AncMode::Anc, level) => vec![0xBA, 0x34, 0x01, *level],
@@ -173,11 +174,7 @@ async fn execute_command(
     transport.send(&bytes).await.map_err(|e| e.to_string())
 }
 
-fn maybe_alert_battery(
-    app: &AppHandle,
-    event: &DeviceEvent,
-    thresholds: &mut BatteryThresholds,
-) {
+fn maybe_alert_battery(app: &AppHandle, event: &DeviceEvent, thresholds: &mut BatteryThresholds) {
     use tauri_plugin_notification::NotificationExt;
 
     let settings = crate::settings::load();
@@ -193,14 +190,16 @@ fn maybe_alert_battery(
             let right_now_ok = b.right_pct >= LOW || b.right_pct == 0;
 
             if thresholds.left_was_ok && !left_now_ok {
-                let _ = app.notification()
+                let _ = app
+                    .notification()
                     .builder()
                     .title("Baseus — Left bud low")
                     .body(format!("{}% remaining", b.left_pct))
                     .show();
             }
             if thresholds.right_was_ok && !right_now_ok {
-                let _ = app.notification()
+                let _ = app
+                    .notification()
                     .builder()
                     .title("Baseus — Right bud low")
                     .body(format!("{}% remaining", b.right_pct))
@@ -212,7 +211,8 @@ fn maybe_alert_battery(
         DeviceEvent::CaseUpdate(c) => {
             let case_now_ok = c.case_pct >= LOW || c.case_pct == 0;
             if thresholds.case_was_ok && !case_now_ok {
-                let _ = app.notification()
+                let _ = app
+                    .notification()
                     .builder()
                     .title("Baseus — Case low")
                     .body(format!("{}% remaining", c.case_pct))
@@ -225,5 +225,9 @@ fn maybe_alert_battery(
 }
 
 fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02X}")).collect::<Vec<_>>().join(" ")
+    bytes
+        .iter()
+        .map(|b| format!("{b:02X}"))
+        .collect::<Vec<_>>()
+        .join(" ")
 }
