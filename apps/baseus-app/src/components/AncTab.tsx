@@ -15,8 +15,6 @@ const MODES: Array<{ mode: AncMode; icon: string; name: string; desc: string }> 
 ];
 
 export default function AncTab(props: Props) {
-  const levelByte = (v: number) => Math.round(((v - 1) / 9) * (0xff - 0x10) + 0x10);
-
   function handleSlider(e: Event) {
     const v = Number((e.target as HTMLInputElement).value);
     props.onLevel(v);
