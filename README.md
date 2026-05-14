@@ -16,6 +16,8 @@ the official Baseus Android app.
 - Low-battery desktop notifications
 - Launch at login
 
+![Baseus Desktop Screenshot](image.png)
+
 ## Building
 
 ```
