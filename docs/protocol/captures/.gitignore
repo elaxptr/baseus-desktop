@@ -1,2 +1,5 @@
-# APK binary — too large for git, pull from emulator via adb
-baseus.apk
+# Raw capture files contain device MAC addresses and possibly personal Android data.
+# Put your own captures here for local analysis but do not commit them.
+*.apk
+*.zip
+*.log

@@ -1,14 +1,13 @@
 # Backlog
 
-These are post-v1 features, intentionally deferred.
+Post-v1 features, intentionally deferred.
 
-- [ ] ANC mode switching (off / ANC / transparency)
-- [ ] EQ presets + custom EQ
-- [ ] Touch gesture remapping
-- [ ] Find-my-buds (play beep)
+- [ ] Touch gesture remapping (opcode `0x92` likely candidate — needs full protocol capture)
+- [ ] Custom EQ (per-band sliders, not just presets)
+- [ ] Confirm EQ preset `0x03` (Clear) — extrapolated, not yet observed in captures
+- [ ] Bud charging state — no captured frame yet; currently hardcoded false
 - [ ] Firmware version display
-- [ ] Multi-device fleet support
-- [ ] Linux support (BlueZ transport impl)
-- [ ] macOS support (IOBluetooth transport impl)
-- [ ] Auto-start on Windows login
-- [ ] Windows notifications on low battery
+- [ ] Multi-device support
+- [ ] Linux support (BlueZ transport)
+- [ ] macOS support (IOBluetooth transport)
+- [ ] Baseus models beyond BP1 Pro ANC (see [docs/re-methodology.md](docs/re-methodology.md))

@@ -3,7 +3,6 @@ import Sidebar, { type Tab } from './components/Sidebar';
 import HomeTab from './components/HomeTab';
 import AncTab from './components/AncTab';
 import EqTab from './components/EqTab';
-import GesturesTab from './components/GesturesTab';
 import SettingsTab from './components/SettingsTab';
 import { onDeviceEvent, onConnectionState, setAncMode, setEqPreset, type AncMode, type EqPreset, type WearState } from './lib/tauri';
 import { pushLeft, pushRight, pushCase, left, right, caseData } from './stores/batteryHistory';
@@ -175,10 +174,6 @@ export default function App() {
 
           <div style={tab('eq')}>
             <EqTab preset={eqPreset()} onPreset={handleEqPreset} />
-          </div>
-
-          <div style={tab('gestures')}>
-            <GesturesTab />
           </div>
 
           <div style={tab('settings')}>

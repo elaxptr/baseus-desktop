@@ -1,4 +1,4 @@
-export type Tab = 'home' | 'anc' | 'eq' | 'gestures' | 'settings';
+export type Tab = 'home' | 'anc' | 'eq' | 'settings';
 
 interface Props {
   active: Tab;
@@ -6,10 +6,9 @@ interface Props {
 }
 
 const NAV: Array<{ tab: Tab; icon: string; label: string }> = [
-  { tab: 'home',     icon: '⊙',  label: 'Battery' },
-  { tab: 'anc',      icon: '◎',  label: 'Noise Control' },
-  { tab: 'eq',       icon: '≋',  label: 'EQ' },
-  { tab: 'gestures', icon: '⊡',  label: 'Gestures' },
+  { tab: 'home', icon: '⊙', label: 'Battery' },
+  { tab: 'anc',  icon: '◎', label: 'Noise Control' },
+  { tab: 'eq',   icon: '≋', label: 'EQ' },
 ];
 
 export default function Sidebar(props: Props) {
