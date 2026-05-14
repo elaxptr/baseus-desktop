@@ -17,7 +17,7 @@ export default function SettingRow(props: Props) {
     >
       <div>
         <div style={{ 'font-size': '13px', color: '#a3a3a3' }}>{props.label}</div>
-        <div style={{ 'font-size': '11px', color: '#333', 'margin-top': '1px' }}>{props.description}</div>
+        <div style={{ 'font-size': '11px', color: '#525252', 'margin-top': '1px' }}>{props.description}</div>
       </div>
 
       <div
