@@ -64,7 +64,11 @@ export default function App() {
     }
   }
 
-  async function handleLevel(v: number) {
+  function handleLevel(v: number) {
+    setAncLevel(v); // live display only — no BLE command
+  }
+
+  async function handleLevelCommit(v: number) {
     setAncLevel(v);
     const mode = ancMode();
     if (mode !== 'off') {
@@ -158,6 +162,7 @@ export default function App() {
               level={ancLevel()}
               onMode={handleAnc}
               onLevel={handleLevel}
+              onLevelCommit={handleLevelCommit}
             />
           </div>
 

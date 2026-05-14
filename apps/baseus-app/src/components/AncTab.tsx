@@ -5,7 +5,8 @@ interface Props {
   loading: AncMode | null;
   level: number; // 1–10
   onMode: (mode: AncMode) => void;
-  onLevel: (level: number) => void;
+  onLevel: (level: number) => void;      // live display update (onInput)
+  onLevelCommit: (level: number) => void; // send BLE command (onChange / release)
 }
 
 const MODES: Array<{ mode: AncMode; icon: string; name: string; desc: string }> = [
@@ -15,9 +16,11 @@ const MODES: Array<{ mode: AncMode; icon: string; name: string; desc: string }> 
 ];
 
 export default function AncTab(props: Props) {
-  function handleSlider(e: Event) {
-    const v = Number((e.target as HTMLInputElement).value);
-    props.onLevel(v);
+  function sliderInput(e: Event) {
+    props.onLevel(Number((e.target as HTMLInputElement).value));
+  }
+  function sliderCommit(e: Event) {
+    props.onLevelCommit(Number((e.target as HTMLInputElement).value));
   }
 
   return (
@@ -90,7 +93,8 @@ export default function AncTab(props: Props) {
             </div>
             <input
               type="range" min="1" max="10" value={props.level}
-              onInput={handleSlider}
+              onInput={sliderInput}
+              onChange={sliderCommit}
               style={{
                 width: '100%', height: '4px',
                 'accent-color': '#6366f1',
