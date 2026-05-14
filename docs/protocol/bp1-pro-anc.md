@@ -128,15 +128,65 @@ data class ComponentPower(
 The `AA 02` frame covers left and right buds. Case battery may arrive via the `AA 80`
 frame or a separate notification not yet captured.
 
+## EQ preset commands  (app → device, write char)
+
+CMD byte `0x43` = set EQ preset. CMD byte `0x42` = query current preset.
+
+Source: btsnoop RFCOMM captures from bugreport ZIPs (`bugreport-baseus.zip`,
+`bugreport-baseus2.zip`). RFCOMM format is `BA BA opcode payload CRC`;
+BLE GATT format drops the repeated magic and trailing CRC.
+
+```
+BA 43 [preset: u8]     ← set preset
+BA 42                  ← query current preset (no payload)
+```
+
+Device acknowledges with the same opcode:
+```
+AA 43 [preset: u8]     ← ack / notification after set
+AA 42 [preset: u8]     ← query response
+```
+
+Preset values seen in captures (values 0x00–0x02 confirmed; 0x03 extrapolated):
+
+| Value | Label |
+|---|---|
+| `0x00` | Balanced |
+| `0x01` | Bass Boost |
+| `0x02` | Voice |
+| `0x03` | Clear (not yet captured — extrapolated from app UI order) |
+
+## ANC write commands  (app → device, write char)
+
+Confirmed from same btsnoop RFCOMM captures.
+
+```
+BA 34 [mode: u8] [level: u8]
+```
+
+| `mode` | ANC state |
+|---|---|
+| `0x00` | Off (`level = 0xFF`) |
+| `0x01` | ANC active (`level = 0x68` default, `0x10`–`0xFF` range) |
+| `0x02` | Transparency (`level = 0xFF`) |
+
+Device responds on notify char:
+```
+AA 33 [mode: u8] [level: u8]   ← ANC state ack/notification
+```
+
 ## Outstanding TODOs
 
 - [x] Confirm battery % values against Baseus app display
 - [x] Identify case battery notification opcode (`0x27`)
 - [x] Add golden test cases to `crates/baseus-protocol/src/models/bp1_pro_anc.rs`
-- [ ] Capture bud charging state — need a live frame with a bud in-case charging to identify the byte
+- [x] Capture write-side frames (app → device) — confirmed via btsnoop RFCOMM
+- [x] Determine ANC level semantics (`0x68` default, `0x10`–`0xFF` range)
+- [x] Identify EQ preset opcode (`0x43` set, `0x42` query)
+- [ ] Capture bud charging state — need a live frame with a bud in-case charging
 - [ ] Decode `AA 80` case event fully (trailing bytes purpose unknown)
-- [ ] Capture write-side frames (app → device) to confirm ANC set commands
-- [ ] Determine checksum/trailing byte semantics in ANC frames (`0xFF`, `0x68`)
+- [ ] Confirm EQ preset `0x03` (Clear) — not yet observed in captures
+- [ ] Identify gesture command opcode (`0x92` likely gesture-related, values 01–02 seen)
 
 ## Capture methodology
 

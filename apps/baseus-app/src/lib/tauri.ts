@@ -19,12 +19,14 @@ export interface WearState {
 }
 
 export type AncMode = 'off' | 'anc' | 'transparency';
+export type EqPreset = 'balanced' | 'bass_boost' | 'voice' | 'clear';
 
 export type DeviceEvent =
   | { type: 'battery_update'; data: BatteryState }
   | { type: 'case_update'; data: CaseState }
   | { type: 'anc_mode_update'; data: AncMode }
   | { type: 'wear_update'; data: WearState }
+  | { type: 'eq_preset_update'; data: EqPreset }
   | { type: 'connected' }
   | { type: 'disconnected' };
 
@@ -58,4 +60,9 @@ export function getSettings(): Promise<Settings> {
 
 export function setSettings(settings: Settings): Promise<void> {
   return invoke('set_settings', { settings });
+}
+
+export function setEqPreset(preset: EqPreset): Promise<void> {
+  const map: Record<EqPreset, number> = { balanced: 0, bass_boost: 1, voice: 2, clear: 3 };
+  return invoke('set_eq_preset', { preset: map[preset] });
 }

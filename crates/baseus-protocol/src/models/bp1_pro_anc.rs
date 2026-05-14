@@ -1,6 +1,6 @@
 use crate::{
     models::DecodeError,
-    types::{AncMode, BatteryState, CaseState, DeviceEvent},
+    types::{AncMode, BatteryState, CaseState, DeviceEvent, EqPreset},
     Frame,
 };
 
@@ -24,8 +24,17 @@ impl Bp1ProAnc {
             // 0x32/0x33 kept for safety in case the device ever sends them directly.
             0x32 => Ok(DeviceEvent::AncModeUpdate(AncMode::Transparency)),
             0x33 => Ok(DeviceEvent::AncModeUpdate(AncMode::Anc)),
+            // EQ preset ack: AA 43 [preset_byte] or AA 42 [preset_byte] (query response).
+            // Confirmed via btsnoop RFCOMM captures — same opcode echoed back by device.
+            0x42 | 0x43 => Self::decode_eq_preset(&frame.payload),
             other => Err(DecodeError::UnknownOpcode(other)),
         }
+    }
+
+    fn decode_eq_preset(payload: &[u8]) -> Result<DeviceEvent, DecodeError> {
+        let byte = *payload.first().unwrap_or(&0);
+        let preset = EqPreset::from_byte(byte).unwrap_or(EqPreset::Balanced);
+        Ok(DeviceEvent::EqPresetUpdate(preset))
     }
 
     fn decode_battery(payload: &[u8]) -> Result<DeviceEvent, DecodeError> {
@@ -144,5 +153,47 @@ mod tests {
             Bp1ProAnc::decode_frame(&frame),
             Err(DecodeError::UnknownOpcode(0x99))
         ));
+    }
+
+    #[test]
+    fn eq_set_ack_balanced_decodes() {
+        // AA 43 00 — device ack after BA 43 00 (set Balanced)
+        let ev = decode(&[0xAA, 0x43, 0x00]).unwrap();
+        assert_eq!(ev, DeviceEvent::EqPresetUpdate(EqPreset::Balanced));
+    }
+
+    #[test]
+    fn eq_set_ack_bass_boost_decodes() {
+        // AA 43 01 — device ack after BA 43 01 (set BassBoost)
+        let ev = decode(&[0xAA, 0x43, 0x01]).unwrap();
+        assert_eq!(ev, DeviceEvent::EqPresetUpdate(EqPreset::BassBoost));
+    }
+
+    #[test]
+    fn eq_set_ack_voice_decodes() {
+        // AA 43 02 — device ack after BA 43 02 (set Voice)
+        let ev = decode(&[0xAA, 0x43, 0x02]).unwrap();
+        assert_eq!(ev, DeviceEvent::EqPresetUpdate(EqPreset::Voice));
+    }
+
+    #[test]
+    fn eq_set_ack_clear_decodes() {
+        // AA 43 03 — device ack after BA 43 03 (set Clear; value extrapolated)
+        let ev = decode(&[0xAA, 0x43, 0x03]).unwrap();
+        assert_eq!(ev, DeviceEvent::EqPresetUpdate(EqPreset::Clear));
+    }
+
+    #[test]
+    fn eq_query_response_decodes() {
+        // AA 42 01 — query response (opcode 0x42) returning current preset BassBoost
+        let ev = decode(&[0xAA, 0x42, 0x01]).unwrap();
+        assert_eq!(ev, DeviceEvent::EqPresetUpdate(EqPreset::BassBoost));
+    }
+
+    #[test]
+    fn eq_unknown_preset_falls_back_to_balanced() {
+        // AA 43 FF — unknown preset byte falls back to Balanced rather than erroring
+        let ev = decode(&[0xAA, 0x43, 0xFF]).unwrap();
+        assert_eq!(ev, DeviceEvent::EqPresetUpdate(EqPreset::Balanced));
     }
 }

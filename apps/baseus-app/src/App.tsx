@@ -5,7 +5,7 @@ import AncTab from './components/AncTab';
 import EqTab from './components/EqTab';
 import GesturesTab from './components/GesturesTab';
 import SettingsTab from './components/SettingsTab';
-import { onDeviceEvent, onConnectionState, setAncMode, type AncMode, type WearState } from './lib/tauri';
+import { onDeviceEvent, onConnectionState, setAncMode, setEqPreset, type AncMode, type EqPreset, type WearState } from './lib/tauri';
 import { pushLeft, pushRight, pushCase, left, right, caseData } from './stores/batteryHistory';
 import { loadSettings, getSettingsStore } from './stores/settings';
 import { startTimer, stopTimer, useElapsed } from './lib/timer';
@@ -22,6 +22,7 @@ export default function App() {
   const [rightCharging, setRightCharging] = createSignal(false);
   const [caseCharging, setCaseCharging] = createSignal(false);
   const [wear, setWear] = createSignal<WearState | null>(null);
+  const [eqPreset, setEqPresetSignal] = createSignal<EqPreset>('balanced');
 
   onMount(async () => {
     const unlisteners: Array<() => void> = [];
@@ -43,6 +44,8 @@ export default function App() {
         setAncLoading(null);
       } else if (e.type === 'wear_update') {
         setWear(e.data);
+      } else if (e.type === 'eq_preset_update') {
+        setEqPresetSignal(e.data);
       }
     }).then((fn) => unlisteners.push(fn));
 
@@ -62,6 +65,12 @@ export default function App() {
     } catch {
       setAncLoading(null);
     }
+  }
+
+  async function handleEqPreset(preset: EqPreset) {
+    if (eqPreset() === preset) return;
+    setEqPresetSignal(preset);
+    await setEqPreset(preset).catch(() => {});
   }
 
   function handleLevel(v: number) {
@@ -167,7 +176,7 @@ export default function App() {
           </div>
 
           <div style={tab('eq')}>
-            <EqTab />
+            <EqTab preset={eqPreset()} onPreset={handleEqPreset} />
           </div>
 
           <div style={tab('gestures')}>

@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use baseus_protocol::{framing::Frame, models::bp1_pro_anc::Bp1ProAnc, types::{AncMode, DeviceEvent}};
+use baseus_protocol::{framing::Frame, models::bp1_pro_anc::Bp1ProAnc, types::{AncMode, DeviceEvent, EqPreset}};
 use baseus_transport::win::ble::GattTransport;
 use tauri::{AppHandle, Emitter};
 use tokio::sync::mpsc;
@@ -19,6 +19,7 @@ struct BatteryThresholds {
 #[derive(Debug)]
 pub enum DeviceCommand {
     SetAncMode(AncMode, u8),
+    SetEqPreset(EqPreset),
     FindEarbud(Side),
 }
 
@@ -96,7 +97,7 @@ async fn notification_loop(
                                     Err(e) => tracing::debug!("unhandled frame cmd={:#04x}: {e}", frame.cmd),
                                 }
                             }
-                        } else {
+                        } else if data.len() >= 2 && data[0] == 0xAA {
                             tracing::debug!("rejected notification (unknown magic {:#04x})", data.first().copied().unwrap_or(0));
                         }
                     }
@@ -125,6 +126,9 @@ async fn notification_loop(
                                     Some((mode.clone(), *level))
                                 };
                                 let _ = app.emit("device-event", &DeviceEvent::AncModeUpdate(mode.clone()));
+                            }
+                            DeviceCommand::SetEqPreset(preset) => {
+                                let _ = app.emit("device-event", &DeviceEvent::EqPresetUpdate(*preset));
                             }
                             DeviceCommand::FindEarbud(side) => {
                                 let tx = find_stop_tx.clone();
@@ -162,6 +166,7 @@ async fn execute_command(
         DeviceCommand::SetAncMode(AncMode::Off, _) => vec![0xBA, 0x34, 0x00, 0xFF],
         DeviceCommand::SetAncMode(AncMode::Anc, level) => vec![0xBA, 0x34, 0x01, *level],
         DeviceCommand::SetAncMode(AncMode::Transparency, level) => vec![0xBA, 0x34, 0x02, *level],
+        DeviceCommand::SetEqPreset(preset) => vec![0xBA, 0x43, preset.to_byte()],
         DeviceCommand::FindEarbud(Side::Left) => vec![0xBA, 0x10, 0x00, 0x01],
         DeviceCommand::FindEarbud(Side::Right) => vec![0xBA, 0x10, 0x01, 0x01],
     };

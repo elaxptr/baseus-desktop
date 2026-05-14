@@ -22,6 +22,31 @@ pub enum AncMode {
     Transparency,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EqPreset {
+    Balanced   = 0,
+    BassBoost  = 1,
+    Voice      = 2,
+    Clear      = 3,
+}
+
+impl EqPreset {
+    pub fn from_byte(b: u8) -> Option<Self> {
+        match b {
+            0 => Some(Self::Balanced),
+            1 => Some(Self::BassBoost),
+            2 => Some(Self::Voice),
+            3 => Some(Self::Clear),
+            _ => None,
+        }
+    }
+
+    pub fn to_byte(self) -> u8 {
+        self as u8
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct WearState {
     pub left_in_ear: bool,
@@ -37,6 +62,7 @@ pub enum DeviceEvent {
     CaseUpdate(CaseState),
     AncModeUpdate(AncMode),
     WearUpdate(WearState),
+    EqPresetUpdate(EqPreset),
     Connected,
     Disconnected,
 }
