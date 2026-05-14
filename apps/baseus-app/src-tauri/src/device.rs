@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use baseus_protocol::{framing::Frame, models::bp1_pro_anc::Bp1ProAnc, types::AncMode};
+use baseus_protocol::{framing::Frame, models::bp1_pro_anc::Bp1ProAnc, types::{AncMode, DeviceEvent}};
 use baseus_transport::win::ble::GattTransport;
 use tauri::{AppHandle, Emitter};
 use tokio::sync::mpsc;
@@ -75,15 +75,25 @@ async fn notification_loop(
                 match result {
                     Ok(Ok(data)) => {
                         tracing::debug!("raw notification: {}", hex(&data));
-                        let Ok(frame) = Frame::decode(&data) else {
-                            continue;
-                        };
-                        match Bp1ProAnc::decode_frame(&frame) {
-                            Ok(event) => {
-                                maybe_alert_battery(app, &event, &mut thresholds);
-                                let _ = app.emit("device-event", &event);
+                        if let Ok(frame) = Frame::decode(&data) {
+                            match Bp1ProAnc::decode_frame(&frame) {
+                                Ok(event) => {
+                                    maybe_alert_battery(app, &event, &mut thresholds);
+                                    let _ = app.emit("device-event", &event);
+                                }
+                                Err(e) => tracing::debug!("unhandled frame cmd={:#04x}: {e}", data.get(1).copied().unwrap_or(0)),
                             }
-                            Err(e) => tracing::debug!("unhandled frame: {e}"),
+                        } else if data.len() >= 3 && data[0] == 0xBA && data[1] == 0x34 {
+                            // Device may respond to BA34 ANC write with a BA34 echo
+                            let ev = match data[2] {
+                                0x00 => Some(DeviceEvent::AncModeUpdate(AncMode::Off)),
+                                0x01 => Some(DeviceEvent::AncModeUpdate(AncMode::Anc)),
+                                0x02 => Some(DeviceEvent::AncModeUpdate(AncMode::Transparency)),
+                                t => { tracing::debug!("BA34 unknown type {t:#04x}"); None }
+                            };
+                            if let Some(ev) = ev { let _ = app.emit("device-event", &ev); }
+                        } else {
+                            tracing::debug!("rejected notification (unknown magic {:#04x})", data.first().copied().unwrap_or(0));
                         }
                     }
                     Ok(Err(e)) => {
@@ -99,8 +109,16 @@ async fn notification_loop(
                 }
             }
             Some(cmd) = cmd_rx.recv() => {
-                if let Err(e) = execute_command(transport, cmd).await {
-                    tracing::warn!("command error: {e}");
+                tracing::debug!("executing command: {cmd:?}");
+                match execute_command(transport, &cmd).await {
+                    Ok(()) => {
+                        tracing::debug!("command sent ok");
+                        // Optimistic UI update: device may not echo for ANC commands
+                        if let DeviceCommand::SetAncMode(ref mode) = cmd {
+                            let _ = app.emit("device-event", &DeviceEvent::AncModeUpdate(mode.clone()));
+                        }
+                    }
+                    Err(e) => tracing::warn!("command error: {e}"),
                 }
             }
         }
@@ -109,13 +127,17 @@ async fn notification_loop(
 
 async fn execute_command(
     transport: &mut GattTransport,
-    cmd: DeviceCommand,
+    cmd: &DeviceCommand,
 ) -> Result<(), String> {
-    let bytes: &[u8] = match &cmd {
-        DeviceCommand::SetAncMode(AncMode::Off) => &[0xAA, 0x30, 0x00],
-        DeviceCommand::SetAncMode(AncMode::Anc) => &[0xAA, 0x33, 0x01, 0x68],
-        DeviceCommand::SetAncMode(AncMode::Transparency) => &[0xAA, 0x32, 0x02, 0xFF],
-        DeviceCommand::FindEarbud(Side::Left) => &[0xBA, 0x10, 0x01, 0x00],
+    let bytes: &[u8] = match cmd {
+        // BA 34 [type] [level] — BLE GATT write format (BA prefix = app→device).
+        // Device echoes back AA 33/32/30 notifications which the decoder handles.
+        // Type/level confirmed from NoiseReduceDataModel bytecode + btsnoop RX BA34 patterns.
+        DeviceCommand::SetAncMode(AncMode::Off) => &[0xBA, 0x34, 0x00, 0xFF],
+        DeviceCommand::SetAncMode(AncMode::Anc) => &[0xBA, 0x34, 0x01, 0x68],
+        DeviceCommand::SetAncMode(AncMode::Transparency) => &[0xBA, 0x34, 0x02, 0xFF],
+        // BA 10 [ear_index] 01 — confirmed from FindEarPhoneActivity bytecode: BA100001=Left, BA100101=Right.
+        DeviceCommand::FindEarbud(Side::Left) => &[0xBA, 0x10, 0x00, 0x01],
         DeviceCommand::FindEarbud(Side::Right) => &[0xBA, 0x10, 0x01, 0x01],
     };
     transport.send(bytes).await.map_err(|e| e.to_string())
@@ -123,10 +145,9 @@ async fn execute_command(
 
 fn maybe_alert_battery(
     app: &AppHandle,
-    event: &baseus_protocol::types::DeviceEvent,
+    event: &DeviceEvent,
     thresholds: &mut BatteryThresholds,
 ) {
-    use baseus_protocol::types::DeviceEvent;
     use tauri_plugin_notification::NotificationExt;
 
     let settings = crate::settings::load();
