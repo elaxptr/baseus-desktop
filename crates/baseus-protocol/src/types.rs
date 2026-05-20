@@ -173,11 +173,13 @@ impl BaseusModel {
                 "654b749c-e37f-ae1f-ebab-40ca133e3690",
                 "ee684b1a-1e9b-ed3e-ee55-f894667e92ac",
             ),
-            // APK-EXTRACTED, UNVERIFIED — 0000ae0x family from classes6.dex.
-            // Alternative: 0000fae0-fae2 family from classes4.dex.
+            // APK-EXTRACTED, UNVERIFIED — Bluetrum CCSDK (com.bluetrum.ccsdk) from classes4.dex.
+            // Service UUID: 0000fae0-0000-1000-8000-00805f9b34fb.
+            // fae1=TX/notify (device→host), fae2=RX/write (host→device).
+            // The ae01/ae02 UUIDs (JieLi BT OTA SDK, classes6.dex) are for firmware OTA only.
             BaseusModel::InspireXh1 | BaseusModel::InspireXp1 | BaseusModel::InspireXc1 => (
-                "0000ae02-0000-1000-8000-00805f9b34fb",
-                "0000ae01-0000-1000-8000-00805f9b34fb",
+                "0000fae1-0000-1000-8000-00805f9b34fb",
+                "0000fae2-0000-1000-8000-00805f9b34fb",
             ),
         }
     }
