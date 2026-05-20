@@ -86,7 +86,11 @@ pub(crate) async fn check_update_silent(app: &AppHandle) -> Option<String> {
 #[tauri::command]
 pub async fn check_for_update(app: AppHandle) -> Result<Option<String>, String> {
     let updater = app.updater().map_err(|e| e.to_string())?;
-    Ok(updater.check().await.map_err(|e| e.to_string())?.map(|u| u.version))
+    Ok(updater
+        .check()
+        .await
+        .map_err(|e| e.to_string())?
+        .map(|u| u.version))
 }
 
 #[tauri::command]
