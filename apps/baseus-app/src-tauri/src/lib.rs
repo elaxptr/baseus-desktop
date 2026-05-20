@@ -34,6 +34,7 @@ pub fn run() {
             commands::find_earbud,
             commands::get_settings,
             commands::set_settings,
+            commands::get_supported_anc_modes,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
