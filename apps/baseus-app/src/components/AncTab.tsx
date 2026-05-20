@@ -4,16 +4,24 @@ interface Props {
   mode: AncMode;
   loading: AncMode | null;
   level: number; // 1–10
+  supportedModes: AncMode[];
   onMode: (mode: AncMode) => void;
-  onLevel: (level: number) => void;      // live display update (onInput)
-  onLevelCommit: (level: number) => void; // send BLE command (onChange / release)
+  onLevel: (level: number) => void;
+  onLevelCommit: (level: number) => void;
 }
 
-const MODES: Array<{ mode: AncMode; icon: string; name: string; desc: string }> = [
-  { mode: 'off',          icon: '🔇', name: 'Off',                     desc: 'Passthrough — no processing' },
-  { mode: 'anc',          icon: '🎧', name: 'Active Noise Cancellation', desc: 'Blocks ambient sound' },
-  { mode: 'transparency', icon: '🌬️', name: 'Transparency',             desc: 'Lets ambient sound in' },
-];
+const MODE_META: Record<AncMode, { icon: string; name: string; desc: string }> = {
+  off:               { icon: '🔇', name: 'Off',                      desc: 'Passthrough — no processing' },
+  anc:               { icon: '🎧', name: 'Active Noise Cancellation', desc: 'Blocks ambient sound' },
+  transparency:      { icon: '🌬️', name: 'Transparency',              desc: 'Lets ambient sound in' },
+  adaptive_self:     { icon: '👤', name: 'Adaptive — Self',           desc: 'Calibrated to your hearing profile' },
+  adaptive_indoor:   { icon: '🏠', name: 'Adaptive — Indoor',         desc: 'Optimised for indoor environments' },
+  adaptive_outdoor:  { icon: '🌳', name: 'Adaptive — Outdoor',        desc: 'Handles wind and open spaces' },
+  adaptive_commute:  { icon: '🚇', name: 'Adaptive — Commute',        desc: 'Transit noise suppression' },
+};
+
+// Level slider only applies to BP1 ANC/Transparency modes.
+const LEVEL_MODES: AncMode[] = ['anc', 'transparency'];
 
 export default function AncTab(props: Props) {
   function sliderInput(e: Event) {
@@ -28,7 +36,8 @@ export default function AncTab(props: Props) {
       <div style={labelStyle}>Noise Control <Divider /></div>
 
       <div style={{ display: 'flex', 'flex-direction': 'column', gap: '8px', 'margin-bottom': '16px' }}>
-        {MODES.map(({ mode, icon, name, desc }) => {
+        {props.supportedModes.map((mode) => {
+          const meta = MODE_META[mode] ?? { icon: '?', name: mode, desc: '' };
           const isActive = () => props.mode === mode;
           const isLoading = () => props.loading === mode;
           return (
@@ -49,12 +58,12 @@ export default function AncTab(props: Props) {
                 'text-align': 'left',
               }}
             >
-              <span style={{ 'font-size': '20px', width: '28px', 'text-align': 'center' }}>{icon}</span>
+              <span style={{ 'font-size': '20px', width: '28px', 'text-align': 'center' }}>{meta.icon}</span>
               <div style={{ flex: '1' }}>
                 <div style={{ 'font-size': '13px', 'font-weight': '600', color: isActive() ? '#c7d2fe' : '#aaa' }}>
-                  {name}
+                  {meta.name}
                 </div>
-                <div style={{ 'font-size': '10px', color: '#444', 'margin-top': '2px' }}>{desc}</div>
+                <div style={{ 'font-size': '10px', color: '#444', 'margin-top': '2px' }}>{meta.desc}</div>
               </div>
               {isActive() && (
                 <div
@@ -73,8 +82,8 @@ export default function AncTab(props: Props) {
         })}
       </div>
 
-      {/* Level slider — only meaningful for ANC and Transparency */}
-      {props.mode !== 'off' && (
+      {/* Level slider — only shown for BP1 ANC/Transparency modes */}
+      {LEVEL_MODES.includes(props.mode) && (
         <>
           <div style={labelStyle}>Strength <Divider /></div>
           <div

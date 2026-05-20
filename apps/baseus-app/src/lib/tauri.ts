@@ -8,6 +8,11 @@ export interface BatteryState {
   right_charging: boolean;
 }
 
+export interface HeadphoneBattery {
+  pct: number;
+  charging: boolean;
+}
+
 export interface CaseState {
   case_pct: number;
   case_charging: boolean;
@@ -18,11 +23,28 @@ export interface WearState {
   right_in_ear: boolean;
 }
 
-export type AncMode = 'off' | 'anc' | 'transparency';
+export type AncMode =
+  | 'off'
+  | 'anc'
+  | 'transparency'
+  // Inspire XH1 adaptive modes — APK-extracted, unverified wire format
+  | 'adaptive_self'
+  | 'adaptive_indoor'
+  | 'adaptive_outdoor'
+  | 'adaptive_commute';
+
 export type EqPreset = 'balanced' | 'bass_boost' | 'voice' | 'clear';
+
+export type ModelStatus = 'verified' | 'experimental';
+
+export interface ModelInfo {
+  name: string;
+  status: ModelStatus;
+}
 
 export type DeviceEvent =
   | { type: 'battery_update'; data: BatteryState }
+  | { type: 'headphone_battery_update'; data: HeadphoneBattery }
   | { type: 'case_update'; data: CaseState }
   | { type: 'anc_mode_update'; data: AncMode }
   | { type: 'wear_update'; data: WearState }
@@ -38,6 +60,10 @@ export function onDeviceEvent(cb: (e: DeviceEvent) => void): Promise<UnlistenFn>
 
 export function onConnectionState(cb: (s: ConnectionState) => void): Promise<UnlistenFn> {
   return listen<ConnectionState>('connection-state', (event) => cb(event.payload));
+}
+
+export function onModelInfo(cb: (info: ModelInfo) => void): Promise<UnlistenFn> {
+  return listen<ModelInfo>('model-info', (event) => cb(event.payload));
 }
 
 export interface Settings {
@@ -65,4 +91,8 @@ export function setSettings(settings: Settings): Promise<void> {
 export function setEqPreset(preset: EqPreset): Promise<void> {
   const map: Record<EqPreset, number> = { balanced: 0, bass_boost: 1, voice: 2, clear: 3 };
   return invoke('set_eq_preset', { preset: map[preset] });
+}
+
+export function getSupportedAncModes(modelName: string): Promise<AncMode[]> {
+  return invoke('get_supported_anc_modes', { modelName });
 }
