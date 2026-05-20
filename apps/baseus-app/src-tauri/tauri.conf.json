@@ -24,6 +24,14 @@
       "csp": null
     }
   },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/elaxptr/baseus-desktop/releases/latest/download/latest.json"
+      ],
+      "pubkey": "REPLACE_WITH_OUTPUT_OF_pnpm_tauri_signer_generate"
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",

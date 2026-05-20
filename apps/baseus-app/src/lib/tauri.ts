@@ -96,3 +96,15 @@ export function setEqPreset(preset: EqPreset): Promise<void> {
 export function getSupportedAncModes(modelName: string): Promise<AncMode[]> {
   return invoke('get_supported_anc_modes', { modelName });
 }
+
+export function onUpdateAvailable(cb: (version: string) => void): Promise<UnlistenFn> {
+  return listen<string>('update-available', (event) => cb(event.payload));
+}
+
+export function checkForUpdate(): Promise<string | null> {
+  return invoke('check_for_update');
+}
+
+export function installUpdate(): Promise<void> {
+  return invoke('install_update');
+}

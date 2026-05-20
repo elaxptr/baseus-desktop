@@ -3,6 +3,7 @@ use crate::settings::{self, Settings};
 use baseus_protocol::types::{AncMode, BaseusModel, EqPreset};
 use tauri::{AppHandle, Runtime, State};
 use tauri_plugin_autostart::ManagerExt;
+use tauri_plugin_updater::UpdaterExt;
 
 #[tauri::command]
 pub fn set_anc_mode(
@@ -75,6 +76,30 @@ pub fn get_supported_anc_modes(model_name: String) -> Vec<String> {
                 .unwrap_or_default()
         })
         .collect()
+}
+
+/// Silent background check — returns version string if an update is available, None otherwise.
+pub(crate) async fn check_update_silent(app: &AppHandle) -> Option<String> {
+    app.updater().ok()?.check().await.ok()?.map(|u| u.version)
+}
+
+#[tauri::command]
+pub async fn check_for_update(app: AppHandle) -> Result<Option<String>, String> {
+    let updater = app.updater().map_err(|e| e.to_string())?;
+    Ok(updater.check().await.map_err(|e| e.to_string())?.map(|u| u.version))
+}
+
+#[tauri::command]
+pub async fn install_update(app: AppHandle) -> Result<(), String> {
+    let updater = app.updater().map_err(|e| e.to_string())?;
+    if let Some(update) = updater.check().await.map_err(|e| e.to_string())? {
+        update
+            .download_and_install(|_, _| {}, || {})
+            .await
+            .map_err(|e| e.to_string())?;
+        app.restart();
+    }
+    Ok(())
 }
 
 #[tauri::command]

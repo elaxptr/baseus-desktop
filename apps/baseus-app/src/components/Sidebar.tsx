@@ -3,6 +3,7 @@ export type Tab = 'home' | 'anc' | 'eq' | 'settings';
 interface Props {
   active: Tab;
   onSwitch: (tab: Tab) => void;
+  updateAvailable?: boolean;
 }
 
 const NAV: Array<{ tab: Tab; icon: string; label: string }> = [
@@ -96,6 +97,20 @@ export default function Sidebar(props: Props) {
           />
         )}
         ⚙
+        {props.updateAvailable && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '4px',
+              right: '4px',
+              width: '7px',
+              height: '7px',
+              'border-radius': '50%',
+              background: '#22c55e',
+              border: '1.5px solid #0a0a0c',
+            }}
+          />
+        )}
       </button>
     </div>
   );

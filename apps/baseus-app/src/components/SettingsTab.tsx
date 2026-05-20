@@ -1,6 +1,53 @@
+import { createSignal, onMount, Show } from 'solid-js';
 import { getSettingsStore, updateSetting } from '../stores/settings';
+import { checkForUpdate, installUpdate } from '../lib/tauri';
+import { getVersion } from '@tauri-apps/api/app';
 
-export default function SettingsTab() {
+interface Props {
+  initialUpdateVersion: string | null;
+  onUpdateInstalled: () => void;
+}
+
+type UpdateState = 'idle' | 'checking' | 'up-to-date' | 'available' | 'installing';
+
+export default function SettingsTab(props: Props) {
+  const [appVersion, setAppVersion] = createSignal('');
+  const [updateState, setUpdateState] = createSignal<UpdateState>('idle');
+  const [availableVersion, setAvailableVersion] = createSignal<string | null>(props.initialUpdateVersion);
+
+  onMount(async () => {
+    setAppVersion(await getVersion());
+    // If the background check already found an update, reflect that immediately.
+    if (props.initialUpdateVersion) setUpdateState('available');
+  });
+
+  async function handleCheck() {
+    setUpdateState('checking');
+    try {
+      const version = await checkForUpdate();
+      if (version) {
+        setAvailableVersion(version);
+        setUpdateState('available');
+      } else {
+        setUpdateState('up-to-date');
+      }
+    } catch {
+      setUpdateState('idle');
+    }
+  }
+
+  async function handleInstall() {
+    setUpdateState('installing');
+    try {
+      await installUpdate();
+      props.onUpdateInstalled();
+    } catch {
+      setUpdateState('available');
+    }
+  }
+
+  const busy = () => updateState() === 'checking' || updateState() === 'installing';
+
   return (
     <div>
       <div style={labelStyle}>Preferences <Divider /></div>
@@ -24,6 +71,90 @@ export default function SettingsTab() {
         value={getSettingsStore().show_session_timer}
         onChange={(v) => updateSetting('show_session_timer', v)}
       />
+
+      <div style={{ 'margin-top': '20px' }}>
+        <div style={labelStyle}>Software <Divider /></div>
+        <div
+          style={{
+            background: '#111113',
+            border: '1px solid #1a1a1e',
+            'border-radius': '12px',
+            padding: '14px 16px',
+          }}
+        >
+          <div style={{ display: 'flex', 'align-items': 'center', 'justify-content': 'space-between' }}>
+            <div>
+              <div style={{ 'font-size': '13px', color: '#ccc', 'font-weight': '500' }}>
+                baseus-desktop
+              </div>
+              <div style={{ 'font-size': '10px', color: '#444', 'margin-top': '2px' }}>
+                {appVersion() ? `v${appVersion()}` : '…'}
+              </div>
+            </div>
+
+            <Show when={updateState() !== 'available'}>
+              <button
+                onClick={handleCheck}
+                disabled={busy()}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid #2a2a2e',
+                  'border-radius': '8px',
+                  padding: '5px 10px',
+                  'font-size': '11px',
+                  color: busy() ? '#444' : '#888',
+                  cursor: busy() ? 'default' : 'pointer',
+                }}
+              >
+                {updateState() === 'checking' ? 'Checking…' :
+                 updateState() === 'up-to-date' ? '✓ Up to date' : 'Check for updates'}
+              </button>
+            </Show>
+          </div>
+
+          <Show when={updateState() === 'available'}>
+            <div
+              style={{
+                'margin-top': '12px',
+                padding: '10px 12px',
+                background: 'rgba(34,197,94,0.06)',
+                border: '1px solid rgba(34,197,94,0.2)',
+                'border-radius': '8px',
+                display: 'flex',
+                'align-items': 'center',
+                'justify-content': 'space-between',
+                gap: '8px',
+              }}
+            >
+              <div>
+                <div style={{ 'font-size': '12px', color: '#4ade80', 'font-weight': '600' }}>
+                  Update available
+                </div>
+                <div style={{ 'font-size': '10px', color: '#444', 'margin-top': '2px' }}>
+                  v{availableVersion()}
+                </div>
+              </div>
+              <button
+                onClick={handleInstall}
+                disabled={updateState() === 'installing'}
+                style={{
+                  background: 'rgba(34,197,94,0.15)',
+                  border: '1px solid rgba(34,197,94,0.3)',
+                  'border-radius': '8px',
+                  padding: '5px 12px',
+                  'font-size': '11px',
+                  'font-weight': '600',
+                  color: updateState() === 'installing' ? '#444' : '#4ade80',
+                  cursor: updateState() === 'installing' ? 'default' : 'pointer',
+                  'white-space': 'nowrap',
+                }}
+              >
+                {updateState() === 'installing' ? 'Installing…' : 'Install & Restart'}
+              </button>
+            </div>
+          </Show>
+        </div>
+      </div>
     </div>
   );
 }

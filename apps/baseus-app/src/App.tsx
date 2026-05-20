@@ -8,6 +8,7 @@ import {
   onDeviceEvent,
   onConnectionState,
   onModelInfo,
+  onUpdateAvailable,
   setAncMode,
   setEqPreset,
   type AncMode,
@@ -36,6 +37,7 @@ export default function App() {
   const [caseCharging, setCaseCharging] = createSignal(false);
   const [wear, setWear] = createSignal<WearState | null>(null);
   const [eqPreset, setEqPresetSignal] = createSignal<EqPreset>('balanced');
+  const [updateVersion, setUpdateVersion] = createSignal<string | null>(null);
 
   const isExperimental = createMemo(() => modelInfo()?.status === 'experimental');
   const connectedModelName = createMemo(() => modelInfo()?.name ?? 'Bass BP1 Pro ANC');
@@ -88,6 +90,9 @@ export default function App() {
         setAncModeSignal('off');
       }
     }).then((fn) => unlisteners.push(fn));
+
+    onUpdateAvailable((version) => setUpdateVersion(version))
+      .then((fn) => unlisteners.push(fn));
   });
 
   async function handleAnc(mode: AncMode) {
@@ -208,7 +213,7 @@ export default function App() {
 
       {/* Body: sidebar + content */}
       <div style={{ display: 'flex', flex: '1' }}>
-        <Sidebar active={activeTab()} onSwitch={setActiveTab} />
+        <Sidebar active={activeTab()} onSwitch={setActiveTab} updateAvailable={updateVersion() !== null} />
 
         <div style={{ flex: '1', padding: '16px', 'overflow-y': 'auto' }}>
           <div style={tab('home')}>
@@ -246,7 +251,7 @@ export default function App() {
           </div>
 
           <div style={tab('settings')}>
-            <SettingsTab />
+            <SettingsTab initialUpdateVersion={updateVersion()} onUpdateInstalled={() => setUpdateVersion(null)} />
           </div>
         </div>
       </div>
