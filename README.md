@@ -3,8 +3,19 @@
 Open-source Windows desktop client for Baseus earbuds, built by reverse-engineering
 the official Baseus Android app.
 
-**Supported hardware:** Baseus Bass BP1 Pro ANC  
 **Platform:** Windows 10 1903+ (WinRT Bluetooth APIs)
+
+## Supported hardware
+
+| Model | Status | Battery | ANC | EQ |
+|---|---|---|---|---|
+| Bass BP1 Pro ANC | ✅ Verified | ✅ L/R/case | ✅ 3-mode + strength | ✅ 4 presets |
+| Inspire XH1 | 🧪 Experimental | ⚠ Untested | ⚠ 5-mode adaptive (untested) | — |
+
+**Experimental** means the protocol was extracted from the Baseus Android APK via static analysis —
+no physical device has been tested. If you own an XH1, install the app and
+[report what works](https://github.com/elaxptr/baseus-desktop/issues). See
+[docs/protocol/inspire-xh1.md](docs/protocol/inspire-xh1.md) for the full protocol draft.
 
 ## Features
 

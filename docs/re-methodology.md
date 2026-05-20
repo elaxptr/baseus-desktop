@@ -71,8 +71,44 @@ Open in Wireshark. Filter: `btrfcomm || avctp || a2dp`
   Use a **real Android device** for Frida captures, or use Android HCI snoop log only.
 
 ## Adding support for a new model
+
+### Option A: Full RE from scratch (you own the device)
 1. Run the capture procedure above with your device paired.
 2. Create `docs/protocol/<your-model>.md` with the packet table.
 3. Create `crates/baseus-protocol/src/models/<your_model>.rs` implementing `decode_frame`.
 4. Add your model variant to `BaseusModel` in `crates/baseus-protocol/src/types.rs`.
 5. Open a PR with captures committed to `docs/protocol/captures/`.
+
+### Option B: APK-extracted draft (you own the device but skip deep RE)
+1. Run `python tools/extract_apk_model.py --name "Baseus <Your Model>"` and review the output.
+2. Install the app and let it connect to your device.
+3. In nRF Connect, find your device and list its GATT services. Identify the service, write, and
+   notify UUIDs. These override the APK candidates in `types.rs`.
+4. Subscribe to the notify characteristic and interact with the device (open case, toggle ANC,
+   check battery). Capture the raw hex frames.
+5. Update `docs/protocol/<your-model>.md` and `crates/baseus-protocol/src/models/<your_model>.rs`
+   with confirmed values.
+6. Change `ModelStatus` from `Experimental` to `Verified` in `types.rs`.
+7. Open a PR — the review checklist is in `docs/protocol/inspire-xh1.md` under "How to verify".
+
+## Confirming an experimental model (e.g. Inspire XH1)
+
+If the app ships an **experimental** model (yellow banner in the UI), here is how to promote it
+to Verified:
+
+1. **Install the app** and let it attempt to connect to your device.
+2. **Check the logs** (`RUST_LOG=debug` in the environment) for connection attempts — you'll see
+   which advertising name it scanned for and whether the GATT characteristics were found.
+3. **Run nRF Connect** (free, Google Play) on an Android phone with your device paired.
+   List services → note which UUID family is actually present. Update `types.rs::gatt_uuids()`.
+4. **Subscribe to the notify characteristic** in nRF Connect and interact with the device:
+   - Toggle ANC modes in the Baseus app → capture the `0xAA 0x??` notifications.
+   - Open/close case or check battery in the Baseus app → capture battery notifications.
+5. **Update `docs/protocol/<model>.md`** with confirmed byte values and remove ⚠ markers.
+6. **Update `crates/baseus-protocol/src/models/<model>.rs`**:
+   - Replace candidate opcodes with confirmed values.
+   - Remove `// APK-EXTRACTED, UNVERIFIED` comments from confirmed lines.
+   - Remove `#[ignore]` from hardware test placeholders and fill in real captures.
+7. **Change `ModelStatus` to `Verified`** in `types.rs::status()`.
+8. **Open a PR** — title: `feat: verify <model> protocol`. Include a screenshot of the app
+   showing your device's battery/ANC with confirmed data.
