@@ -11,9 +11,11 @@ the official Baseus Android app.
 |---|---|---|---|---|
 | Bass BP1 Pro ANC | ✅ Verified | ✅ L/R/case | ✅ 3-mode + strength | ✅ 4 presets |
 | Inspire XH1 | 🧪 Experimental | ⚠ Untested | ⚠ 5-mode adaptive (untested) | — |
+| Inspire XP1 | 🧪 Experimental | ⚠ Untested | ⚠ 3-mode (untested) | ⚠ Untested |
+| Inspire XC1 | 🧪 Experimental | ⚠ Untested | ⚠ 3-mode (untested) | ⚠ Untested |
 
 **Experimental** means the protocol was extracted from the Baseus Android APK via static analysis —
-no physical device has been tested. If you own an XH1, install the app and
+no physical device has been tested. If you own any of these, install the app and
 [report what works](https://github.com/elaxptr/baseus-desktop/issues). See
 [docs/protocol/inspire-xh1.md](docs/protocol/inspire-xh1.md) for the full protocol draft.
 

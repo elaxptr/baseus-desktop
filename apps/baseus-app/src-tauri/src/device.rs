@@ -129,7 +129,11 @@ async fn notification_loop(
                         tracing::debug!("raw notification: {}", hex(&data));
                         if let Ok(frame) = Frame::decode(&data) {
                             let event = match model {
-                                BaseusModel::Bp1ProAnc => {
+                                // XP1/XC1 share the same earbud protocol as BP1 (same 0x0C ANC
+                                // family, same battery framing) — APK-extracted, unverified.
+                                BaseusModel::Bp1ProAnc
+                                | BaseusModel::InspireXp1
+                                | BaseusModel::InspireXc1 => {
                                     if frame.cmd == 0x34 {
                                         let ev = if frame.payload.first().copied().unwrap_or(0) == 0 {
                                             last_anc_mode = None;
@@ -231,27 +235,32 @@ async fn execute_command(
     model: BaseusModel,
 ) -> Result<(), String> {
     let bytes: Vec<u8> = match (cmd, model) {
-        // BP1 Pro ANC — verified wire format
-        (DeviceCommand::SetAncMode(AncMode::Off, _), BaseusModel::Bp1ProAnc) => {
-            vec![0xBA, 0x34, 0x00, 0xFF]
-        }
-        (DeviceCommand::SetAncMode(AncMode::Anc, level), BaseusModel::Bp1ProAnc) => {
-            vec![0xBA, 0x34, 0x01, *level]
-        }
-        (DeviceCommand::SetAncMode(AncMode::Transparency, level), BaseusModel::Bp1ProAnc) => {
-            vec![0xBA, 0x34, 0x02, *level]
-        }
-        (DeviceCommand::SetEqPreset(preset), BaseusModel::Bp1ProAnc) => {
-            vec![0xBA, 0x43, preset.to_byte()]
-        }
-        (DeviceCommand::FindEarbud(Side::Left), BaseusModel::Bp1ProAnc) => {
-            vec![0xBA, 0x10, 0x00, 0x01]
-        }
-        (DeviceCommand::FindEarbud(Side::Right), BaseusModel::Bp1ProAnc) => {
-            vec![0xBA, 0x10, 0x01, 0x01]
-        }
-        // Inspire XH1 — setting ANC not yet supported (wire format unverified).
-        // Logging the attempt lets XH1 owners see what was sent via tracing.
+        // BP1 / XP1 / XC1 — verified for BP1; XP1/XC1 assumed same protocol (APK-extracted).
+        (
+            DeviceCommand::SetAncMode(AncMode::Off, _),
+            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
+        ) => vec![0xBA, 0x34, 0x00, 0xFF],
+        (
+            DeviceCommand::SetAncMode(AncMode::Anc, level),
+            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
+        ) => vec![0xBA, 0x34, 0x01, *level],
+        (
+            DeviceCommand::SetAncMode(AncMode::Transparency, level),
+            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
+        ) => vec![0xBA, 0x34, 0x02, *level],
+        (
+            DeviceCommand::SetEqPreset(preset),
+            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
+        ) => vec![0xBA, 0x43, preset.to_byte()],
+        (
+            DeviceCommand::FindEarbud(Side::Left),
+            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
+        ) => vec![0xBA, 0x10, 0x00, 0x01],
+        (
+            DeviceCommand::FindEarbud(Side::Right),
+            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
+        ) => vec![0xBA, 0x10, 0x01, 0x01],
+        // Inspire XH1 — setting ANC/EQ not yet supported (wire format unverified).
         (DeviceCommand::SetAncMode(mode, _), BaseusModel::InspireXh1) => {
             tracing::info!("XH1 ANC set for {mode:?} not yet supported — wire format unverified");
             return Ok(());
@@ -264,7 +273,7 @@ async fn execute_command(
             tracing::info!("XH1 find not yet supported");
             return Ok(());
         }
-        // Adaptive ANC modes — only used by XH1; should not appear for Bp1ProAnc.
+        // Adaptive ANC modes — only used by XH1; unreachable for earbud models.
         (DeviceCommand::SetAncMode(_, _), _) => {
             return Err("ANC mode not supported for this model".to_string());
         }

@@ -25,7 +25,7 @@ pub struct HeadphoneBattery {
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AncMode {
-    // BP1 Pro ANC — verified
+    // BP1 Pro ANC / Inspire XP1 / Inspire XC1 — verified for BP1
     Off,
     Anc,
     Transparency,
@@ -41,7 +41,9 @@ impl AncMode {
     /// ANC modes supported by a given model (for UI filtering).
     pub fn supported_by(model: BaseusModel) -> &'static [AncMode] {
         match model {
-            BaseusModel::Bp1ProAnc => &[AncMode::Off, AncMode::Anc, AncMode::Transparency],
+            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1 => {
+                &[AncMode::Off, AncMode::Anc, AncMode::Transparency]
+            }
             BaseusModel::InspireXh1 => &[
                 AncMode::AdaptiveSelf,
                 AncMode::AdaptiveIndoor,
@@ -116,17 +118,28 @@ pub enum ModelStatus {
 pub enum BaseusModel {
     Bp1ProAnc,
     InspireXh1,
+    /// In-ear earbuds — APK-extracted protocol, same 0x0C ANC family as BP1.
+    InspireXp1,
+    /// Clip-on earphones — APK-extracted protocol, same 0x0C ANC family as BP1.
+    InspireXc1,
 }
 
 impl BaseusModel {
     pub fn all() -> &'static [BaseusModel] {
-        &[BaseusModel::Bp1ProAnc, BaseusModel::InspireXh1]
+        &[
+            BaseusModel::Bp1ProAnc,
+            BaseusModel::InspireXh1,
+            BaseusModel::InspireXp1,
+            BaseusModel::InspireXc1,
+        ]
     }
 
     pub fn status(self) -> ModelStatus {
         match self {
             BaseusModel::Bp1ProAnc => ModelStatus::Verified,
-            BaseusModel::InspireXh1 => ModelStatus::Experimental,
+            BaseusModel::InspireXh1 | BaseusModel::InspireXp1 | BaseusModel::InspireXc1 => {
+                ModelStatus::Experimental
+            }
         }
     }
 
@@ -134,20 +147,26 @@ impl BaseusModel {
         match self {
             BaseusModel::Bp1ProAnc => "Bass BP1 Pro ANC",
             BaseusModel::InspireXh1 => "Inspire XH1",
+            BaseusModel::InspireXp1 => "Inspire XP1",
+            BaseusModel::InspireXc1 => "Inspire XC1",
         }
     }
 
     /// BLE advertising name(s) used to identify this device during scan.
+    /// Includes short-form aliases for devices that omit the model suffix.
     pub fn advertising_names(self) -> &'static [&'static str] {
         match self {
             BaseusModel::Bp1ProAnc => &["Bass BP1 Pro"],
-            // APK-EXTRACTED: exact string key from EarFunctionManager2 dispatch.
-            BaseusModel::InspireXh1 => &["Baseus Inspire XH1"],
+            // APK-EXTRACTED: exact string keys from EarFunctionManager2 dispatch.
+            // Short aliases cover devices that advertise without trailing model number.
+            BaseusModel::InspireXh1 => &["Baseus Inspire XH1", "Baseus Inspire XH"],
+            BaseusModel::InspireXp1 => &["Baseus Inspire XP1", "Baseus Inspire XP"],
+            BaseusModel::InspireXc1 => &["Baseus Inspire XC1", "Baseus Inspire XC"],
         }
     }
 
     /// GATT (notify_uuid, write_uuid) for BLE control.
-    /// BP1 values confirmed via nRF Connect. XH1 values APK-extracted, unverified.
+    /// BP1 values confirmed via nRF Connect. Inspire values APK-extracted, unverified.
     pub fn gatt_uuids(self) -> (&'static str, &'static str) {
         match self {
             BaseusModel::Bp1ProAnc => (
@@ -156,7 +175,7 @@ impl BaseusModel {
             ),
             // APK-EXTRACTED, UNVERIFIED — 0000ae0x family from classes6.dex.
             // Alternative: 0000fae0-fae2 family from classes4.dex.
-            BaseusModel::InspireXh1 => (
+            BaseusModel::InspireXh1 | BaseusModel::InspireXp1 | BaseusModel::InspireXc1 => (
                 "0000ae02-0000-1000-8000-00805f9b34fb",
                 "0000ae01-0000-1000-8000-00805f9b34fb",
             ),
@@ -164,10 +183,15 @@ impl BaseusModel {
     }
 
     /// Look up the model from a BLE advertising name seen during a scan.
+    /// Matching is case-insensitive to handle firmware variations.
     pub fn from_advertising_name(name: &str) -> Option<Self> {
         Self::all()
             .iter()
-            .find(|m| m.advertising_names().contains(&name))
+            .find(|m| {
+                m.advertising_names()
+                    .iter()
+                    .any(|n| n.eq_ignore_ascii_case(name))
+            })
             .copied()
     }
 }
