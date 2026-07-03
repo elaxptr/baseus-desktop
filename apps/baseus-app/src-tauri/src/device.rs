@@ -24,6 +24,7 @@ struct BatteryThresholds {
 pub enum DeviceCommand {
     SetAncMode(AncMode, u8),
     SetEqPreset(EqPreset),
+    SetGameMode(bool),
     FindEarbud(Side),
 }
 
@@ -135,15 +136,13 @@ async fn notification_loop(
                                 | BaseusModel::InspireXp1
                                 | BaseusModel::InspireXc1 => {
                                     if frame.cmd == 0x34 {
-                                        let ev = if frame.payload.first().copied().unwrap_or(0) == 0 {
-                                            last_anc_mode = None;
-                                            Some(DeviceEvent::AncModeUpdate(AncMode::Off))
-                                        } else {
-                                            Some(DeviceEvent::AncModeUpdate(
-                                                last_anc_mode.map(|(m, _)| m).unwrap_or(AncMode::Anc)
-                                            ))
-                                        };
-                                        ev
+                                        // Ack payload semantics vary by firmware (issue #3):
+                                        // some units send a flat AA 34 01 for every ANC command,
+                                        // including Off — resolve against the last commanded mode.
+                                        Some(DeviceEvent::AncModeUpdate(Bp1ProAnc::resolve_anc_ack(
+                                            &frame.payload,
+                                            last_anc_mode.map(|(m, _)| m),
+                                        )))
                                     } else {
                                         match Bp1ProAnc::decode_frame(&frame) {
                                             Ok(ev) => Some(ev),
@@ -191,15 +190,17 @@ async fn notification_loop(
                         tracing::debug!("command sent ok");
                         match &cmd {
                             DeviceCommand::SetAncMode(mode, level) => {
-                                last_anc_mode = if matches!(mode, AncMode::Off) {
-                                    None
-                                } else {
-                                    Some((*mode, *level))
-                                };
+                                // Track Off too — flat-ack firmware (issue #3) answers Off
+                                // with AA 34 01, and resolve_anc_ack needs to know Off was
+                                // the last commanded mode to not misreport it as Anc.
+                                last_anc_mode = Some((*mode, *level));
                                 let _ = app.emit("device-event", &DeviceEvent::AncModeUpdate(*mode));
                             }
                             DeviceCommand::SetEqPreset(preset) => {
                                 let _ = app.emit("device-event", &DeviceEvent::EqPresetUpdate(*preset));
+                            }
+                            DeviceCommand::SetGameMode(on) => {
+                                let _ = app.emit("device-event", &DeviceEvent::GameModeUpdate(*on));
                             }
                             DeviceCommand::FindEarbud(side) => {
                                 let tx = find_stop_tx.clone();
@@ -252,6 +253,11 @@ async fn execute_command(
             DeviceCommand::SetEqPreset(preset),
             BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
         ) => vec![0xBA, 0x43, preset.to_byte()],
+        // Game/low-latency mode — verified for BP1 over both SPP and BLE (issue #3).
+        (
+            DeviceCommand::SetGameMode(on),
+            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
+        ) => vec![0xBA, 0x24, u8::from(*on)],
         (
             DeviceCommand::FindEarbud(Side::Left),
             BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
@@ -267,6 +273,10 @@ async fn execute_command(
         }
         (DeviceCommand::SetEqPreset(_), BaseusModel::InspireXh1) => {
             tracing::info!("XH1 EQ preset not yet supported — wire format unverified");
+            return Ok(());
+        }
+        (DeviceCommand::SetGameMode(_), BaseusModel::InspireXh1) => {
+            tracing::info!("XH1 game mode not yet supported — wire format unverified");
             return Ok(());
         }
         (DeviceCommand::FindEarbud(_), BaseusModel::InspireXh1) => {

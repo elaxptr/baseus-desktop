@@ -11,6 +11,7 @@ impl Bp1ProAnc {
     ///
     /// Wire format confirmed via nRF Connect on BASS BP1 PRO (4A:01:CE:BA:C8:03):
     ///   AA 02 L% L_chg R% R_chg   → battery report (left + right buds)
+    ///   AA 23 [00|01]              → game mode state (issue #3, community-verified)
     ///   AA 30 …                    → ANC off
     ///   AA 32 …                    → Transparency mode
     ///   AA 33 …                    → ANC active
@@ -18,6 +19,12 @@ impl Bp1ProAnc {
     pub fn decode_frame(frame: &Frame) -> Result<DeviceEvent, DecodeError> {
         match frame.cmd {
             0x02 => Self::decode_battery(&frame.payload),
+            // Game/low-latency mode state: AA 23 01 = on, AA 23 00 = off (issue #3).
+            // The companion AA 24 01 is a flat "command received" ack carrying no
+            // state — it intentionally falls through to UnknownOpcode below.
+            0x23 => Ok(DeviceEvent::GameModeUpdate(
+                *frame.payload.first().unwrap_or(&0) != 0,
+            )),
             0x27 => Self::decode_case(&frame.payload),
             // 0x30 appears as a periodic keepalive in BLE — NOT an ANC state update.
             // ANC acks arrive as AA 34 [type] and are handled in device.rs.
@@ -28,6 +35,20 @@ impl Bp1ProAnc {
             // Confirmed via btsnoop RFCOMM captures — same opcode echoed back by device.
             0x42 | 0x43 => Self::decode_eq_preset(&frame.payload),
             other => Err(DecodeError::UnknownOpcode(other)),
+        }
+    }
+
+    /// Resolve an `AA 34` ANC ack into an ANC state.
+    ///
+    /// Firmware variants differ here (issue #3): some units echo the mode in the
+    /// payload (`00` = off, non-zero = active), while others ack every ANC command
+    /// with a flat `AA 34 01` — even for Off. A zero payload therefore always means
+    /// Off, but a non-zero payload only confirms whatever mode was last commanded.
+    pub fn resolve_anc_ack(payload: &[u8], last_commanded: Option<AncMode>) -> AncMode {
+        if payload.first().copied().unwrap_or(0) == 0 {
+            AncMode::Off
+        } else {
+            last_commanded.unwrap_or(AncMode::Anc)
         }
     }
 
@@ -208,5 +229,60 @@ mod tests {
         // AA 43 FF — unknown preset byte falls back to Balanced rather than erroring
         let ev = decode(&[0xAA, 0x43, 0xFF]).unwrap();
         assert_eq!(ev, DeviceEvent::EqPresetUpdate(EqPreset::Balanced));
+    }
+
+    #[test]
+    fn game_mode_state_on_decodes() {
+        // Issue #3: AA 23 01 — state confirmation after BA 24 01 (game mode on)
+        let ev = decode(&[0xAA, 0x23, 0x01]).unwrap();
+        assert_eq!(ev, DeviceEvent::GameModeUpdate(true));
+    }
+
+    #[test]
+    fn game_mode_state_off_decodes() {
+        // Issue #3: AA 23 00 — state confirmation after BA 24 00 (game mode off)
+        let ev = decode(&[0xAA, 0x23, 0x00]).unwrap();
+        assert_eq!(ev, DeviceEvent::GameModeUpdate(false));
+    }
+
+    #[test]
+    fn game_mode_generic_ack_is_ignored() {
+        // Issue #3: AA 24 01 is a flat "command received" ack (payload is 01 even
+        // for game-mode-off) — it carries no state and must never decode as one.
+        assert!(matches!(
+            decode(&[0xAA, 0x24, 0x01]),
+            Err(DecodeError::UnknownOpcode(0x24))
+        ));
+    }
+
+    #[test]
+    fn anc_ack_zero_payload_resolves_off() {
+        assert_eq!(
+            Bp1ProAnc::resolve_anc_ack(&[0x00], Some(AncMode::Anc)),
+            AncMode::Off
+        );
+    }
+
+    #[test]
+    fn anc_ack_flat_nonzero_after_off_command_resolves_off() {
+        // Issue #3: some firmware acks every ANC command with AA 34 01 — even Off.
+        // A non-zero payload must not override a just-commanded Off.
+        assert_eq!(
+            Bp1ProAnc::resolve_anc_ack(&[0x01], Some(AncMode::Off)),
+            AncMode::Off
+        );
+    }
+
+    #[test]
+    fn anc_ack_nonzero_confirms_last_commanded_mode() {
+        assert_eq!(
+            Bp1ProAnc::resolve_anc_ack(&[0x01], Some(AncMode::Transparency)),
+            AncMode::Transparency
+        );
+    }
+
+    #[test]
+    fn anc_ack_nonzero_with_no_history_defaults_to_anc() {
+        assert_eq!(Bp1ProAnc::resolve_anc_ack(&[0x01], None), AncMode::Anc);
     }
 }

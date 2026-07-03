@@ -7,7 +7,7 @@
 | App product name | "BP1 Ultra" (seen in APK strings) |
 | Chip vendor | Bluetrum (蓝特无线), CCSDK v? |
 | Secondary OTA chip | JieLi (杰理) via jl_bt_ota SDK |
-| BT profiles | BLE GATT (control) + Classic SPP (OTA only) |
+| BT profiles | BLE GATT (control) + Classic SPP (control + OTA — same command bytes on both, see issue #3) |
 | App package | `com.baseus.intelligent` |
 | Control protocol | Proprietary BLE GATT (not Bluetrum CCCOMM 02F0 UUIDs) |
 | BLE device name | `Bass BP1 Pro` |
@@ -133,8 +133,12 @@ frame or a separate notification not yet captured.
 CMD byte `0x43` = set EQ preset. CMD byte `0x42` = query current preset.
 
 Source: btsnoop RFCOMM captures from bugreport ZIPs (`bugreport-baseus.zip`,
-`bugreport-baseus2.zip`). RFCOMM format is `BA BA opcode payload CRC`;
-BLE GATT format drops the repeated magic and trailing CRC.
+`bugreport-baseus2.zip`). The official app frames RFCOMM traffic as
+`BA BA opcode payload CRC`; BLE GATT format drops the repeated magic and
+trailing CRC. The device also *accepts* the bare BLE-style frames
+(`BA opcode payload`, no CRC) over RFCOMM channel 1 — independently confirmed
+in [issue #3](https://github.com/elaxptr/baseus-desktop/issues/3), where the
+exact same command bytes worked unmodified over both transports.
 
 ```
 BA 43 [preset: u8]     ← set preset
@@ -170,10 +174,41 @@ BA 34 [mode: u8] [level: u8]
 | `0x01` | ANC active (`level = 0x68` default, `0x10`–`0xFF` range) |
 | `0x02` | Transparency (`level = 0xFF`) |
 
-Device responds on notify char:
+Device responds on notify char with an `AA 34` ack. **Payload semantics vary by
+firmware revision** ([issue #3](https://github.com/elaxptr/baseus-desktop/issues/3)):
+
+- Some units echo the mode: `AA 34 00` = off, non-zero = active. Mode-specific
+  `AA 33 [mode] [level]` notifications have also been observed in app captures.
+- Other units answer **every** ANC command — including Off — with a flat
+  `AA 34 01`, never `AA 32`/`AA 33`. On these units the payload byte carries no
+  mode information.
+
+Because of this, the client decoder treats a zero ack payload as Off and a
+non-zero payload as confirming the *last commanded* mode (see
+`Bp1ProAnc::resolve_anc_ack`), instead of trusting the ack byte as a mode value.
+
+## Game / low-latency mode  (bidirectional)
+
+Community-verified over both SPP and BLE
+([issue #3](https://github.com/elaxptr/baseus-desktop/issues/3) — HCI snoop of
+the official app, then confirmed live against a physical BP1 Pro).
+Independent toggle — not a mutually-exclusive ANC state.
+
 ```
-AA 33 [mode: u8] [level: u8]   ← ANC state ack/notification
+BA 24 [on: u8]     ← set game mode (0x01 = on, 0x00 = off)
 ```
+
+Device responds with two notifications:
+
+| Action | Outgoing | Ack(s) |
+|---|---|---|
+| Game Mode ON | `BA 24 01` | `AA 24 01`, then `AA 23 01` |
+| Game Mode OFF | `BA 24 00` | `AA 24 01`, then `AA 23 00` |
+
+`AA 24 01` is a flat "command received" ack (payload is `01` regardless of
+on/off — mirroring the flat ANC ack convention above) and carries no state.
+`AA 23 [00|01]` is the actual state confirmation and is what the client decodes
+(`DeviceEvent::GameModeUpdate`).
 
 ## Outstanding TODOs
 
@@ -183,6 +218,7 @@ AA 33 [mode: u8] [level: u8]   ← ANC state ack/notification
 - [x] Capture write-side frames (app → device) — confirmed via btsnoop RFCOMM
 - [x] Determine ANC level semantics (`0x68` default, `0x10`–`0xFF` range)
 - [x] Identify EQ preset opcode (`0x43` set, `0x42` query)
+- [x] Identify game mode opcodes (`0x24` set, `0x23` state — issue #3, community-verified)
 - [ ] Capture bud charging state — need a live frame with a bud in-case charging
 - [ ] Decode `AA 80` case event fully (trailing bytes purpose unknown)
 - [ ] Confirm EQ preset `0x03` (Clear) — not yet observed in captures

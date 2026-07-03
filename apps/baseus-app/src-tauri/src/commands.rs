@@ -38,6 +38,13 @@ pub fn set_eq_preset(preset: u8, cmd_tx: State<CommandSender>) -> Result<(), Str
 }
 
 #[tauri::command]
+pub fn set_game_mode(enabled: bool, cmd_tx: State<CommandSender>) -> Result<(), String> {
+    cmd_tx
+        .send(DeviceCommand::SetGameMode(enabled))
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn find_earbud(side: String, cmd_tx: State<CommandSender>) -> Result<(), String> {
     let s = match side.as_str() {
         "left" => Side::Left,

@@ -11,6 +11,7 @@ import {
   onUpdateAvailable,
   setAncMode,
   setEqPreset,
+  setGameMode,
   type AncMode,
   type EqPreset,
   type ModelInfo,
@@ -31,6 +32,7 @@ export default function App() {
   const [ancMode, setAncModeSignal] = createSignal<AncMode>('off');
   const [ancLoading, setAncLoading] = createSignal<AncMode | null>(null);
   const [ancLevel, setAncLevel] = createSignal(7);
+  const [gameMode, setGameModeSignal] = createSignal(false);
   const [activeTab, setActiveTab] = createSignal<Tab>('home');
   const [leftCharging, setLeftCharging] = createSignal(false);
   const [rightCharging, setRightCharging] = createSignal(false);
@@ -47,6 +49,8 @@ export default function App() {
     if (info.name === 'Inspire XH1') return XH1_ANC_MODES;
     return BP1_ANC_MODES;
   });
+  // Game mode is verified for the BP1 family; XH1 wire format is unknown.
+  const supportsGameMode = createMemo(() => modelInfo()?.name !== 'Inspire XH1');
 
   onMount(async () => {
     const unlisteners: Array<() => void> = [];
@@ -70,6 +74,8 @@ export default function App() {
       } else if (e.type === 'anc_mode_update') {
         setAncModeSignal(e.data);
         setAncLoading(null);
+      } else if (e.type === 'game_mode_update') {
+        setGameModeSignal(e.data);
       } else if (e.type === 'wear_update') {
         setWear(e.data);
       }
@@ -104,6 +110,11 @@ export default function App() {
     } catch {
       setAncLoading(null);
     }
+  }
+
+  async function handleGameMode(on: boolean) {
+    setGameModeSignal(on);
+    await setGameMode(on).catch(() => setGameModeSignal(!on));
   }
 
   async function handleEqPreset(preset: EqPreset) {
@@ -240,9 +251,12 @@ export default function App() {
               loading={ancLoading()}
               level={ancLevel()}
               supportedModes={supportedAncModes()}
+              gameMode={gameMode()}
+              showGameMode={supportsGameMode()}
               onMode={handleAnc}
               onLevel={handleLevel}
               onLevelCommit={handleLevelCommit}
+              onGameMode={handleGameMode}
             />
           </div>
 

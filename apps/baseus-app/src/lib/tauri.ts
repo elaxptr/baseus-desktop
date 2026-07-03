@@ -47,6 +47,7 @@ export type DeviceEvent =
   | { type: 'headphone_battery_update'; data: HeadphoneBattery }
   | { type: 'case_update'; data: CaseState }
   | { type: 'anc_mode_update'; data: AncMode }
+  | { type: 'game_mode_update'; data: boolean }
   | { type: 'wear_update'; data: WearState }
   | { type: 'eq_preset_update'; data: EqPreset }
   | { type: 'connected' }
@@ -74,6 +75,10 @@ export interface Settings {
 
 export function setAncMode(mode: AncMode, level?: number): Promise<void> {
   return invoke('set_anc_mode', { mode, level });
+}
+
+export function setGameMode(enabled: boolean): Promise<void> {
+  return invoke('set_game_mode', { enabled });
 }
 
 export function findEarbud(side: 'left' | 'right'): Promise<void> {

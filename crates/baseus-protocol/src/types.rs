@@ -94,6 +94,8 @@ pub enum DeviceEvent {
     HeadphoneBatteryUpdate(HeadphoneBattery),
     CaseUpdate(CaseState),
     AncModeUpdate(AncMode),
+    /// Game/low-latency mode — independent toggle, not a mutually-exclusive ANC state.
+    GameModeUpdate(bool),
     WearUpdate(WearState),
     EqPresetUpdate(EqPreset),
     Connected,
