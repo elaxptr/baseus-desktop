@@ -15,12 +15,6 @@ pub fn set_anc_mode(
         "off" => AncMode::Off,
         "anc" => AncMode::Anc,
         "transparency" => AncMode::Transparency,
-        // XH1 adaptive modes — command is accepted but will no-op in execute_command
-        // (wire format unverified). Logged server-side for debugging.
-        "adaptive_self" => AncMode::AdaptiveSelf,
-        "adaptive_indoor" => AncMode::AdaptiveIndoor,
-        "adaptive_outdoor" => AncMode::AdaptiveOutdoor,
-        "adaptive_commute" => AncMode::AdaptiveCommute,
         other => return Err(format!("unknown mode: {other}")),
     };
     let byte = level.unwrap_or(0x68);

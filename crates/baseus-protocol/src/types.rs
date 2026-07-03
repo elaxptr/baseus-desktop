@@ -15,41 +15,20 @@ pub struct BatteryState {
     pub right_charging: bool,
 }
 
-/// Single-unit battery for over-ear headphones (no L/R split, no case).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct HeadphoneBattery {
-    pub pct: u8,
-    pub charging: bool,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AncMode {
-    // BP1 Pro ANC / Inspire XP1 / Inspire XC1 — verified for BP1
+    // BP1 Pro ANC — verified on hardware.
     Off,
     Anc,
     Transparency,
-    // Inspire XH1 adaptive modes — APK-extracted, unverified wire format.
-    // Mode IDs from NoiseTypeBean: Commute=0x08, Outdoor=0x09, Indoor=0x0A.
-    AdaptiveCommute,
-    AdaptiveOutdoor,
-    AdaptiveIndoor,
-    AdaptiveSelf,
 }
 
 impl AncMode {
     /// ANC modes supported by a given model (for UI filtering).
     pub fn supported_by(model: BaseusModel) -> &'static [AncMode] {
         match model {
-            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1 => {
-                &[AncMode::Off, AncMode::Anc, AncMode::Transparency]
-            }
-            BaseusModel::InspireXh1 => &[
-                AncMode::AdaptiveSelf,
-                AncMode::AdaptiveIndoor,
-                AncMode::AdaptiveOutdoor,
-                AncMode::AdaptiveCommute,
-            ],
+            BaseusModel::Bp1ProAnc => &[AncMode::Off, AncMode::Anc, AncMode::Transparency],
         }
     }
 }
@@ -91,7 +70,6 @@ pub struct WearState {
 #[serde(tag = "type", content = "data", rename_all = "snake_case")]
 pub enum DeviceEvent {
     BatteryUpdate(BatteryState),
-    HeadphoneBatteryUpdate(HeadphoneBattery),
     CaseUpdate(CaseState),
     AncModeUpdate(AncMode),
     /// Game/low-latency mode — independent toggle, not a mutually-exclusive ANC state.
@@ -108,49 +86,24 @@ pub struct CaseState {
     pub case_charging: bool,
 }
 
-/// Whether a model's support is owner-verified or APK-derived and untested.
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ModelStatus {
-    Verified,
-    Experimental,
-}
-
+/// Registry of supported Baseus models.
+///
+/// Only hardware-verified models live here. The enum is intentionally kept as a
+/// registry (rather than flattened to BP1-only) so future owner-contributed,
+/// verified models can be added without reworking the dispatch structure.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BaseusModel {
     Bp1ProAnc,
-    InspireXh1,
-    /// In-ear earbuds — APK-extracted protocol, same 0x0C ANC family as BP1.
-    InspireXp1,
-    /// Clip-on earphones — APK-extracted protocol, same 0x0C ANC family as BP1.
-    InspireXc1,
 }
 
 impl BaseusModel {
     pub fn all() -> &'static [BaseusModel] {
-        &[
-            BaseusModel::Bp1ProAnc,
-            BaseusModel::InspireXh1,
-            BaseusModel::InspireXp1,
-            BaseusModel::InspireXc1,
-        ]
-    }
-
-    pub fn status(self) -> ModelStatus {
-        match self {
-            BaseusModel::Bp1ProAnc => ModelStatus::Verified,
-            BaseusModel::InspireXh1 | BaseusModel::InspireXp1 | BaseusModel::InspireXc1 => {
-                ModelStatus::Experimental
-            }
-        }
+        &[BaseusModel::Bp1ProAnc]
     }
 
     pub fn display_name(self) -> &'static str {
         match self {
             BaseusModel::Bp1ProAnc => "Bass BP1 Pro ANC",
-            BaseusModel::InspireXh1 => "Inspire XH1",
-            BaseusModel::InspireXp1 => "Inspire XP1",
-            BaseusModel::InspireXc1 => "Inspire XC1",
         }
     }
 
@@ -159,30 +112,14 @@ impl BaseusModel {
     pub fn advertising_names(self) -> &'static [&'static str] {
         match self {
             BaseusModel::Bp1ProAnc => &["Bass BP1 Pro"],
-            // APK-EXTRACTED: exact string keys from EarFunctionManager2 dispatch.
-            // Short aliases cover devices that advertise without trailing model number.
-            BaseusModel::InspireXh1 => &["Baseus Inspire XH1", "Baseus Inspire XH"],
-            BaseusModel::InspireXp1 => &["Baseus Inspire XP1", "Baseus Inspire XP"],
-            BaseusModel::InspireXc1 => &["Baseus Inspire XC1", "Baseus Inspire XC"],
         }
     }
 
     /// GATT (notify_uuid, write_uuid) for BLE control.
-    /// BP1 values confirmed via nRF Connect. Inspire values APK-extracted, unverified.
+    /// Confirmed via nRF Connect on a physical unit.
     pub fn gatt_uuids(self) -> (&'static str, &'static str) {
         match self {
-            BaseusModel::Bp1ProAnc => (
-                "654b749c-e37f-ae1f-ebab-40ca133e3690",
-                "ee684b1a-1e9b-ed3e-ee55-f894667e92ac",
-            ),
-            // APK-EXTRACTED, UNVERIFIED — Bluetrum CCSDK (com.bluetrum.ccsdk) from classes4.dex.
-            // Service UUID: 0000fae0-0000-1000-8000-00805f9b34fb.
-            // fae1=TX/notify (device→host), fae2=RX/write (host→device).
-            // The ae01/ae02 UUIDs (JieLi BT OTA SDK, classes6.dex) are for firmware OTA only.
-            BaseusModel::InspireXh1 | BaseusModel::InspireXp1 | BaseusModel::InspireXc1 => (
-                "0000fae1-0000-1000-8000-00805f9b34fb",
-                "0000fae2-0000-1000-8000-00805f9b34fb",
-            ),
+            BaseusModel::Bp1ProAnc => (ble_uuids::NOTIFY, ble_uuids::WRITE),
         }
     }
 

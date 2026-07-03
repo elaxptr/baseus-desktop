@@ -2,17 +2,16 @@
 
 Post-v1 features, intentionally deferred.
 
-## Experimental model work (Inspire XH1 pilot)
+## Protocol capture tooling (in-app Capture Studio)
 
-- [ ] **Verify XH1 BLE UUIDs** — candidate UUIDs from APK analysis (`0000ae0x` family); confirm with nRF Connect on real hardware
-- [ ] **Verify XH1 ANC wire format** — opcode 0x68 candidate from APK; confirm mode bytes (0x08/0x09/0x0A for Commute/Outdoor/Indoor) via Frida hook
-- [ ] **Implement XH1 ANC SET** — once wire format confirmed, wire `execute_command` for adaptive modes
-- [ ] **XH1 HomeTab** — show single headphone battery card instead of L/R/case grid
-- [ ] **Promote XH1 from Experimental → Verified** — after ANC + battery confirmed by an owner
+The APK-derived Inspire XH1/XP1/XC1 models were removed (never hardware-verified). The
+replacement is tooling that lets real owners capture and contribute *verified* support:
 
-## Other Baseus models
+- [ ] **In-app Capture Studio** — a dev mode in the desktop app: scan any BLE device, auto-detect notify/write chars, live hex log, guided "toggle ANC now → captured N frames", export a shareable capture bundle. (Owns its own design spec.)
+- [ ] **Declarative model format** — define models as data (UUIDs, opcode→event map, frame layout) read by a generic decoder, so adding a device is data + a golden test, not a Rust module. The Capture Studio can auto-draft it.
+- [ ] Re-add community-contributed models through the above, each verified on real hardware.
 
-- [ ] Add more models using `tools/extract_apk_model.py` — the workflow is now established; any contributor can add a model as a draft PR
+## BP1 Pro ANC remaining work
 
 ## BP1 Pro ANC remaining work
 

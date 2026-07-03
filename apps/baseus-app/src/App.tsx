@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { createMemo, createSignal, onCleanup, onMount } from 'solid-js';
 import Sidebar, { type Tab } from './components/Sidebar';
 import HomeTab from './components/HomeTab';
 import AncTab from './components/AncTab';
@@ -24,7 +24,6 @@ import { startTimer, stopTimer, useElapsed } from './lib/timer';
 type ConnStatus = 'connected' | 'connecting' | 'disconnected';
 
 const BP1_ANC_MODES: AncMode[] = ['off', 'anc', 'transparency'];
-const XH1_ANC_MODES: AncMode[] = ['adaptive_self', 'adaptive_indoor', 'adaptive_outdoor', 'adaptive_commute'];
 
 export default function App() {
   const [status, setStatus] = createSignal<ConnStatus>('connecting');
@@ -41,16 +40,8 @@ export default function App() {
   const [eqPreset, setEqPresetSignal] = createSignal<EqPreset>('balanced');
   const [updateVersion, setUpdateVersion] = createSignal<string | null>(null);
 
-  const isExperimental = createMemo(() => modelInfo()?.status === 'experimental');
   const connectedModelName = createMemo(() => modelInfo()?.name ?? 'Bass BP1 Pro ANC');
-  const supportedAncModes = createMemo<AncMode[]>(() => {
-    const info = modelInfo();
-    if (!info) return BP1_ANC_MODES;
-    if (info.name === 'Inspire XH1') return XH1_ANC_MODES;
-    return BP1_ANC_MODES;
-  });
-  // Game mode is verified for the BP1 family; XH1 wire format is unknown.
-  const supportsGameMode = createMemo(() => modelInfo()?.name !== 'Inspire XH1');
+  const supportedAncModes = createMemo<AncMode[]>(() => BP1_ANC_MODES);
 
   onMount(async () => {
     const unlisteners: Array<() => void> = [];
@@ -64,10 +55,6 @@ export default function App() {
         pushRight(e.data.right_pct);
         setLeftCharging(e.data.left_charging);
         setRightCharging(e.data.right_charging);
-      } else if (e.type === 'headphone_battery_update') {
-        // XH1: single battery — display in left slot; right/case stay at 0.
-        pushLeft(e.data.pct);
-        setLeftCharging(e.data.charging);
       } else if (e.type === 'case_update') {
         pushCase(e.data.case_pct);
         setCaseCharging(e.data.case_charging);
@@ -89,12 +76,7 @@ export default function App() {
 
     onModelInfo((info) => {
       setModelInfo(info);
-      // Reset mode to a sensible default for the newly connected model.
-      if (info.name === 'Inspire XH1') {
-        setAncModeSignal('adaptive_self');
-      } else {
-        setAncModeSignal('off');
-      }
+      setAncModeSignal('off');
     }).then((fn) => unlisteners.push(fn));
 
     onUpdateAvailable((version) => setUpdateVersion(version))
@@ -191,37 +173,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Experimental model warning */}
-      <Show when={isExperimental()}>
-        <div
-          style={{
-            background: 'rgba(234,179,8,0.08)',
-            border: '1px solid rgba(234,179,8,0.25)',
-            'border-radius': '0',
-            padding: '7px 16px',
-            'font-size': '11px',
-            color: '#ca8a04',
-            display: 'flex',
-            gap: '6px',
-            'align-items': 'center',
-            'flex-shrink': '0',
-          }}
-        >
-          <span>⚠</span>
-          <span>
-            Experimental — APK-derived protocol, untested on real hardware.{' '}
-            <a
-              href="https://github.com/elaxptr/baseus-desktop/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: '#eab308', 'text-decoration': 'underline' }}
-            >
-              Report what works
-            </a>
-          </span>
-        </div>
-      </Show>
-
       {/* Body: sidebar + content */}
       <div style={{ display: 'flex', flex: '1' }}>
         <Sidebar active={activeTab()} onSwitch={setActiveTab} updateAvailable={updateVersion() !== null} />
@@ -252,7 +203,7 @@ export default function App() {
               level={ancLevel()}
               supportedModes={supportedAncModes()}
               gameMode={gameMode()}
-              showGameMode={supportsGameMode()}
+              showGameMode={true}
               onMode={handleAnc}
               onLevel={handleLevel}
               onLevelCommit={handleLevelCommit}
