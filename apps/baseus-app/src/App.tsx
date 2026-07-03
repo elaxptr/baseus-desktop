@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onCleanup, onMount } from 'solid-js';
+import { createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import Sidebar, { type Tab } from './components/Sidebar';
 import HomeTab from './components/HomeTab';
 import AncTab from './components/AncTab';
@@ -124,8 +124,6 @@ export default function App() {
   const statusText = () =>
     status() === 'connected' ? 'Connected' : status() === 'connecting' ? 'Connecting…' : 'Disconnected';
 
-  const tab = (id: Tab) => ({ display: activeTab() === id ? 'block' : 'none' });
-
   return (
     <div
       style={{
@@ -141,6 +139,7 @@ export default function App() {
     >
       {/* Title bar */}
       <div
+        class="titlebar-glow"
         style={{
           display: 'flex',
           'align-items': 'center',
@@ -168,7 +167,7 @@ export default function App() {
           {connectedModelName()}
         </div>
         <div style={{ display: 'flex', 'align-items': 'center', gap: '5px', 'font-size': '11px', color: statusColor(), 'font-weight': '500' }}>
-          <div style={{ width: '6px', height: '6px', background: statusColor(), 'border-radius': '50%' }} />
+          <div class={status() === 'connected' ? 'status-dot' : undefined} style={{ width: '6px', height: '6px', background: statusColor(), 'border-radius': '50%' }} />
           {statusText()}
         </div>
       </div>
@@ -178,46 +177,54 @@ export default function App() {
         <Sidebar active={activeTab()} onSwitch={setActiveTab} updateAvailable={updateVersion() !== null} />
 
         <div style={{ flex: '1', padding: '16px', 'overflow-y': 'auto' }}>
-          <div style={tab('home')}>
-            <HomeTab
-              leftPct={left()[left().length - 1]?.pct ?? 0}
-              rightPct={right()[right().length - 1]?.pct ?? 0}
-              casePct={caseData()[caseData().length - 1]?.pct ?? 0}
-              leftCharging={leftCharging()}
-              rightCharging={rightCharging()}
-              caseCharging={caseCharging()}
-              leftInEar={wear()?.left_in_ear ?? false}
-              rightInEar={wear()?.right_in_ear ?? false}
-              wearKnown={wear() !== null}
-              leftHistory={left().map((r) => r.pct)}
-              rightHistory={right().map((r) => r.pct)}
-              elapsed={useElapsed()()}
-              showTimer={getSettingsStore().show_session_timer}
-            />
-          </div>
+          <Show when={activeTab() === 'home'}>
+            <div class="panel-in">
+              <HomeTab
+                leftPct={left()[left().length - 1]?.pct ?? 0}
+                rightPct={right()[right().length - 1]?.pct ?? 0}
+                casePct={caseData()[caseData().length - 1]?.pct ?? 0}
+                leftCharging={leftCharging()}
+                rightCharging={rightCharging()}
+                caseCharging={caseCharging()}
+                leftInEar={wear()?.left_in_ear ?? false}
+                rightInEar={wear()?.right_in_ear ?? false}
+                wearKnown={wear() !== null}
+                leftHistory={left().map((r) => r.pct)}
+                rightHistory={right().map((r) => r.pct)}
+                elapsed={useElapsed()()}
+                showTimer={getSettingsStore().show_session_timer}
+              />
+            </div>
+          </Show>
 
-          <div style={tab('anc')}>
-            <AncTab
-              mode={ancMode()}
-              loading={ancLoading()}
-              level={ancLevel()}
-              supportedModes={supportedAncModes()}
-              gameMode={gameMode()}
-              showGameMode={true}
-              onMode={handleAnc}
-              onLevel={handleLevel}
-              onLevelCommit={handleLevelCommit}
-              onGameMode={handleGameMode}
-            />
-          </div>
+          <Show when={activeTab() === 'anc'}>
+            <div class="panel-in">
+              <AncTab
+                mode={ancMode()}
+                loading={ancLoading()}
+                level={ancLevel()}
+                supportedModes={supportedAncModes()}
+                gameMode={gameMode()}
+                showGameMode={true}
+                onMode={handleAnc}
+                onLevel={handleLevel}
+                onLevelCommit={handleLevelCommit}
+                onGameMode={handleGameMode}
+              />
+            </div>
+          </Show>
 
-          <div style={tab('eq')}>
-            <EqTab preset={eqPreset()} onPreset={handleEqPreset} />
-          </div>
+          <Show when={activeTab() === 'eq'}>
+            <div class="panel-in">
+              <EqTab preset={eqPreset()} onPreset={handleEqPreset} />
+            </div>
+          </Show>
 
-          <div style={tab('settings')}>
-            <SettingsTab initialUpdateVersion={updateVersion()} onUpdateInstalled={() => setUpdateVersion(null)} />
-          </div>
+          <Show when={activeTab() === 'settings'}>
+            <div class="panel-in">
+              <SettingsTab initialUpdateVersion={updateVersion()} onUpdateInstalled={() => setUpdateVersion(null)} />
+            </div>
+          </Show>
         </div>
       </div>
     </div>

@@ -8,7 +8,118 @@ html, body, #root {
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+/* ---- Motion system (UX glow-up) ----
+   The app window is committed-dark; these tokens/classes layer motion on top of
+   the existing inline-styled components. Numbers use a monospace stack. */
+:root {
+  --accent: #6366f1;
+  --accent-soft: #818cf8;
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-out-soft: cubic-bezier(.22, .61, .36, 1);
+  --mono-num: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", Menlo, monospace;
+}
+
+.num-mono { font-family: var(--mono-num); font-variant-numeric: tabular-nums; }
+
+@keyframes pulse      { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes flash      { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes spin       { to { transform: rotate(360deg); } }
+@keyframes panelIn    { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ripple     { to { transform: translate(-50%, -50%) scale(9); opacity: 0; } }
+
+/* Panel entrance on tab switch */
+.panel-in { animation: panelIn 0.34s var(--ease-out-soft); }
+
+/* Hover lift + press — use transform/box-shadow only, so they layer cleanly
+   over the components' inline border/background without specificity fights. */
+.lift { transition: transform 0.16s, box-shadow 0.16s; }
+.lift:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.6); }
+.press:active { transform: scale(0.97); }
+
+/* Header ambient glow that breathes behind the title bar.
+   Inset box-shadow renders above the background but below content, so the title
+   text stays crisp — no z-index juggling with the existing inline-styled children. */
+.titlebar-glow { animation: hdrbreathe 5s ease-in-out infinite; }
+@keyframes hdrbreathe {
+  0%, 100% { box-shadow: inset 0 9px 22px -14px rgba(99, 102, 241, 0.35); }
+  50%      { box-shadow: inset 0 11px 28px -12px rgba(99, 102, 241, 0.75); }
+}
+.status-dot { animation: pulse 2.4s ease-in-out infinite; }
+.bolt-flash { animation: flash 1.6s ease-in-out infinite; }
+
+/* Sidebar sliding active-indicator */
+.rail-marker {
+  transition: top 0.34s var(--ease-spring);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 80%, transparent);
+}
+.rail-btn { transition: color 0.18s, background 0.18s, transform 0.18s; }
+.rail-btn:hover { transform: translateY(-1px); }
+
+/* ANC mode checkmark pop-in */
+.anc-check { transform: scale(0); transition: transform 0.28s var(--ease-spring); }
+.anc-check.on { transform: scale(1); }
+.mode-glow.on { box-shadow: 0 0 24px -10px var(--accent); }
+
+/* Strength slider expand/collapse */
+.strength { overflow: hidden; transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease; }
+.strength.hidden { max-height: 0; opacity: 0; margin-top: 0; }
+.strength.shown { max-height: 160px; opacity: 1; }
+
+/* Find-button ripple */
+.ripple-host { position: relative; overflow: hidden; }
+.ripple {
+  position: absolute; border-radius: 50%; width: 10px; height: 10px;
+  background: rgba(99, 102, 241, 0.35); transform: translate(-50%, -50%) scale(0);
+  animation: ripple 0.55s ease-out; pointer-events: none;
+}
+
+/* ★ Game / low-latency mode — the hero interaction */
+.game-wrap { position: relative; border-radius: 13px; padding: 1px; }
+.game-wrap.on::before {
+  content: ""; position: absolute; inset: -1px; border-radius: 14px; z-index: 0;
+  background: conic-gradient(from 0deg, transparent, var(--accent), #22d3ee, var(--accent), transparent);
+  animation: spin 3.2s linear infinite; opacity: 0.9; padding: 1.5px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.game-card {
+  position: relative; z-index: 1;
+  background: #111113; border: 1px solid #1a1a1e; border-radius: 12px;
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; width: 100%; text-align: left; color: inherit;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.3s;
+}
+.game-wrap.on .game-card {
+  background: rgba(99, 102, 241, 0.08); border-color: transparent;
+  box-shadow: 0 0 30px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.game-ic { font-size: 20px; width: 28px; text-align: center; transition: transform 0.4s var(--ease-spring); }
+.game-wrap.on .game-ic { transform: scale(1.12) rotate(-6deg); }
+.game-title { font-size: 13px; font-weight: 600; color: #aaa; transition: color 0.2s; }
+.game-wrap.on .game-title { color: #c7d2fe; }
+.game-desc { font-size: 10px; color: #444; margin-top: 2px; }
+.game-switch {
+  width: 44px; height: 24px; border-radius: 99px; background: #1c1c22;
+  border: 1px solid #26262e; position: relative; flex-shrink: 0;
+  transition: background 0.28s, border-color 0.28s;
+}
+.game-wrap.on .game-switch { background: color-mix(in srgb, var(--accent) 40%, #1c1c22); border-color: var(--accent); }
+.game-knob {
+  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+  background: #6b6b78; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s var(--ease-spring), background 0.28s;
+}
+.game-wrap.on .game-knob { transform: translateX(20px); background: #fff; box-shadow: 0 0 10px rgba(255, 255, 255, 0.6); }
+.game-state {
+  position: absolute; right: 52px; top: 50%; transform: translateY(-50%);
+  font-family: var(--mono-num); font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  color: #444; transition: color 0.2s; white-space: nowrap;
+}
+.game-wrap.on .game-state { color: var(--accent-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  .titlebar-glow, .status-dot, .bolt-flash, .game-wrap.on::before { animation: none !important; }
+  .panel-in { animation: none; }
+  .lift, .press, .rail-marker, .rail-btn, .anc-check, .strength,
+  .game-card, .game-ic, .game-switch, .game-knob { transition-duration: 0.01ms !important; }
 }

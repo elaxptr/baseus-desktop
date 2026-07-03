@@ -1,3 +1,4 @@
+import { createSignal, createEffect, onCleanup, untrack } from 'solid-js';
 import SparkLine from './SparkLine';
 import { findEarbud } from '../lib/tauri';
 import { formatElapsed } from '../lib/timer';
@@ -20,6 +21,38 @@ interface Props {
 
 const CIRC = 2 * Math.PI * 28;
 
+function reduceMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/// Smoothly tween a displayed value toward `target`, re-running whenever it
+/// changes (so rings sweep + count up on mount and on each new battery reading).
+function useCountUp(target: () => number): () => number {
+  const [shown, setShown] = createSignal(0);
+  let raf = 0;
+  createEffect(() => {
+    const to = target();
+    if (reduceMotion()) {
+      setShown(to);
+      return;
+    }
+    cancelAnimationFrame(raf);
+    const from = untrack(shown);
+    let startTs = 0;
+    const dur = 900;
+    const tick = (now: number) => {
+      if (!startTs) startTs = now;
+      const t = Math.min((now - startTs) / dur, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setShown(Math.round(from + (to - from) * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  });
+  onCleanup(() => cancelAnimationFrame(raf));
+  return shown;
+}
+
 function BudRing(p: {
   pct: number;
   charging: boolean;
@@ -28,14 +61,16 @@ function BudRing(p: {
   label: string;
   history: number[];
 }) {
+  const shown = useCountUp(() => p.pct);
   const isLow = () => p.pct > 0 && p.pct < 20;
   const color = () => (isLow() ? '#ef4444' : '#22c55e');
-  const offset = () => CIRC * (1 - p.pct / 100);
+  const offset = () => CIRC * (1 - shown() / 100);
   const wearColor = () =>
     !p.wearKnown ? '#2a2a2a' : p.inEar ? '#22c55e' : '#3f3f3f';
 
   return (
     <div
+      class="lift"
       style={{
         flex: '1',
         background: '#111113',
@@ -74,7 +109,7 @@ function BudRing(p: {
             stroke-dasharray={String(CIRC)}
             stroke-dashoffset={String(offset())}
             stroke-linecap="round"
-            style={{ transition: 'stroke-dashoffset 0.5s ease, stroke 0.3s ease' }}
+            style={{ transition: 'stroke 0.3s ease', filter: `drop-shadow(0 0 4px ${color()}99)` }}
           />
         </svg>
         <div
@@ -84,8 +119,8 @@ function BudRing(p: {
             'align-items': 'center', 'justify-content': 'center',
           }}
         >
-          <span style={{ 'font-size': '20px', 'font-weight': '800', color: '#fff', 'line-height': '1' }}>
-            {p.pct}
+          <span class="num-mono" style={{ 'font-size': '20px', 'font-weight': '800', color: '#fff', 'line-height': '1' }}>
+            {shown()}
           </span>
           <span style={{ 'font-size': '9px', color: '#404040', 'font-weight': '500' }}>%</span>
         </div>
@@ -98,7 +133,7 @@ function BudRing(p: {
           {p.label}
         </span>
         {p.charging && (
-          <span style={{ 'font-size': '10px', color: '#eab308' }}>⚡</span>
+          <span class="bolt-flash" style={{ 'font-size': '10px', color: '#eab308' }}>⚡</span>
         )}
       </div>
     </div>
@@ -106,6 +141,7 @@ function BudRing(p: {
 }
 
 export default function HomeTab(props: Props) {
+  const caseShown = useCountUp(() => props.casePct);
   const caseColor = () =>
     props.casePct > 0 && props.casePct < 20 ? '#ef4444' : '#eab308';
 
@@ -132,6 +168,7 @@ export default function HomeTab(props: Props) {
       <div style={{ 'margin-bottom': '14px' }}>
         <div style={labelStyle}>Case <Divider /></div>
         <div
+          class="lift"
           style={{
             background: '#111113',
             border: '1px solid #1a1a1e',
@@ -146,24 +183,23 @@ export default function HomeTab(props: Props) {
           <div style={{ flex: '1' }}>
             <div style={{ display: 'flex', 'justify-content': 'space-between', 'margin-bottom': '6px' }}>
               <span style={{ 'font-size': '11px', color: '#555' }}>Case</span>
-              <span style={{ 'font-size': '13px', 'font-weight': '800', color: caseColor() }}>
-                {props.casePct}%
+              <span class="num-mono" style={{ 'font-size': '13px', 'font-weight': '800', color: caseColor() }}>
+                {caseShown()}%
               </span>
             </div>
             <div style={{ height: '4px', background: '#1a1a1e', 'border-radius': '99px', overflow: 'hidden' }}>
               <div
                 style={{
                   height: '100%',
-                  width: `${props.casePct}%`,
+                  width: `${caseShown()}%`,
                   background: `linear-gradient(90deg, ${caseColor()}, ${caseColor()}aa)`,
                   'border-radius': '99px',
-                  transition: 'width 0.5s ease',
                 }}
               />
             </div>
           </div>
           {props.caseCharging && (
-            <span style={{ 'font-size': '16px', color: '#eab308' }}>⚡</span>
+            <span class="bolt-flash" style={{ 'font-size': '16px', color: '#eab308' }}>⚡</span>
           )}
         </div>
       </div>
@@ -182,6 +218,7 @@ export default function HomeTab(props: Props) {
         <div style={{ 'margin-bottom': '4px' }}>
           <div style={labelStyle}>Today <Divider /></div>
           <div
+            class="lift"
             style={{
               background: '#111113',
               border: '1px solid #1a1a1e',
@@ -194,7 +231,7 @@ export default function HomeTab(props: Props) {
           >
             <span style={{ 'font-size': '16px', opacity: '0.4' }}>⏱</span>
             <div>
-              <div style={{ 'font-size': '17px', 'font-weight': '800', color: '#fff', 'font-variant-numeric': 'tabular-nums' }}>
+              <div class="num-mono" style={{ 'font-size': '17px', 'font-weight': '800', color: '#fff' }}>
                 {formatElapsed(props.elapsed)}
               </div>
               <div style={{ 'font-size': '10px', color: '#444', 'margin-top': '1px' }}>Current session</div>
@@ -211,9 +248,24 @@ function Divider() {
 }
 
 function FindBtn(p: { label: string; onClick: () => void }) {
+  function handleClick(e: MouseEvent) {
+    const btn = e.currentTarget as HTMLElement;
+    if (!reduceMotion()) {
+      const rect = btn.getBoundingClientRect();
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      r.style.left = `${e.clientX - rect.left}px`;
+      r.style.top = `${e.clientY - rect.top}px`;
+      btn.appendChild(r);
+      setTimeout(() => r.remove(), 600);
+    }
+    p.onClick();
+  }
+
   return (
     <button
-      onClick={p.onClick}
+      class="lift press ripple-host"
+      onClick={handleClick}
       style={{
         flex: '1',
         background: '#111113',
@@ -224,7 +276,7 @@ function FindBtn(p: { label: string; onClick: () => void }) {
         'font-size': '12px',
         'font-weight': '500',
         cursor: 'pointer',
-        transition: 'background 0.12s, border-color 0.12s',
+        transition: 'background 0.12s, border-color 0.12s, transform 0.16s, box-shadow 0.16s',
       }}
     >
       {p.label}
