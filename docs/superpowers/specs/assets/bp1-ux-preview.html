@@ -1,0 +1,642 @@
+<title>BP1 Pro — UX Glow-Up Preview</title>
+<style>
+  :root {
+    /* Page ground — cool neutral with a faint indigo bias, theme-aware. */
+    --page-bg: #ececf2;
+    --page-bg-2: #f6f6fb;
+    --page-ink: #1b1b24;
+    --page-ink-soft: #5c5c6e;
+    --page-line: #d8d8e2;
+    --accent: #6366f1;
+    --accent-soft: #818cf8;
+
+    /* Device tokens — lifted verbatim from the real app, never theme-flipped. */
+    --dev-bg: #0d0d0f;
+    --dev-rail: #0a0a0c;
+    --dev-card: #111113;
+    --dev-line: #1a1a1e;
+    --dev-divider: #161618;
+    --dev-ink: #ffffff;
+    --good: #22c55e;
+    --low: #ef4444;
+    --charge: #eab308;
+
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-bg: #08080a;
+      --page-bg-2: #101014;
+      --page-ink: #e9e9f2;
+      --page-ink-soft: #8a8a9c;
+      --page-line: #202028;
+    }
+  }
+  :root[data-theme="light"] {
+    --page-bg: #ececf2; --page-bg-2: #f6f6fb; --page-ink: #1b1b24;
+    --page-ink-soft: #5c5c6e; --page-line: #d8d8e2;
+  }
+  :root[data-theme="dark"] {
+    --page-bg: #08080a; --page-bg-2: #101014; --page-ink: #e9e9f2;
+    --page-ink-soft: #8a8a9c; --page-line: #202028;
+  }
+
+  * { box-sizing: border-box; }
+
+  .page {
+    min-height: 100vh;
+    margin: 0;
+    font-family: var(--sans);
+    color: var(--page-ink);
+    background:
+      radial-gradient(1100px 600px at 80% -5%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+      linear-gradient(180deg, var(--page-bg-2), var(--page-bg));
+    padding: 40px 24px 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .intro { max-width: 640px; text-align: center; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+  .intro h1 {
+    font-size: clamp(24px, 4vw, 34px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0 0 12px;
+    font-weight: 700;
+  }
+  .intro p {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--page-ink-soft);
+    margin: 0 auto;
+    max-width: 52ch;
+  }
+  .intro .hint {
+    display: inline-flex; align-items: center; gap: 7px;
+    margin-top: 16px; padding: 7px 14px;
+    border: 1px solid var(--page-line);
+    border-radius: 99px;
+    font-size: 12.5px; color: var(--page-ink-soft);
+    background: color-mix(in srgb, var(--page-bg-2) 60%, transparent);
+  }
+  .hint .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+  .stage {
+    display: flex; flex-wrap: wrap; gap: 40px;
+    align-items: flex-start; justify-content: center;
+    width: 100%; max-width: 900px;
+  }
+
+  /* ---------- DEVICE WINDOW ---------- */
+  .device-wrap { position: relative; }
+  .device-shadow {
+    position: absolute; inset: 8px 8px -14px; z-index: 0;
+    border-radius: 20px;
+    background: radial-gradient(60% 60% at 50% 40%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%);
+    filter: blur(30px); opacity: 0.55;
+    animation: aura 6s ease-in-out infinite;
+  }
+  @keyframes aura { 0%,100% { opacity: 0.4; transform: scale(0.98); } 50% { opacity: 0.7; transform: scale(1.02); } }
+
+  .device {
+    position: relative; z-index: 1;
+    width: 480px; max-width: 92vw;
+    min-height: 620px;
+    background: var(--dev-bg);
+    color: var(--dev-ink);
+    border-radius: 16px;
+    border: 1px solid #202024;
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02) inset;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    font-size: 13px;
+  }
+
+  /* Title bar */
+  .titlebar {
+    position: relative;
+    display: flex; align-items: center; gap: 6px;
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid var(--dev-divider);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .titlebar::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(120px 40px at 50% -10px, color-mix(in srgb, var(--accent) 30%, transparent), transparent 70%);
+    opacity: 0.6; animation: breathe 5s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100% { opacity: 0.35; } 50% { opacity: 0.75; } }
+  .lights { display: flex; gap: 5px; z-index: 1; }
+  .lights i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+  .l1 { background: #ff5f57; } .l2 { background: #ffbd2e; } .l3 { background: #28c840; }
+  .title {
+    flex: 1; text-align: center; font-size: 12px; font-weight: 600;
+    color: #6a6a76; margin-left: -40px; z-index: 1;
+  }
+  .status { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--good); font-weight: 500; z-index: 1; }
+  .status .s { width: 6px; height: 6px; border-radius: 50%; background: var(--good); box-shadow: 0 0 6px var(--good); animation: pulseDot 2.4s ease-in-out infinite; }
+  @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  .body { display: flex; flex: 1; }
+
+  /* Sidebar rail */
+  .rail {
+    position: relative;
+    width: 52px; background: var(--dev-rail);
+    border-right: 1px solid var(--dev-divider);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0; gap: 2px; flex-shrink: 0;
+  }
+  .rail .nav { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .rail .spacer { flex: 1; }
+  .navbtn {
+    width: 36px; height: 36px; border-radius: 9px; border: none;
+    background: transparent; color: #444; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.18s, transform 0.18s, background 0.18s;
+  }
+  .navbtn:hover { color: #7c7c8a; transform: translateY(-1px); }
+  .navbtn.on { color: #a5b4fc; background: rgba(99,102,241,0.16); }
+  /* Sliding active indicator */
+  .rail .marker {
+    position: absolute; left: 0; width: 3px; height: 18px;
+    background: var(--accent); border-radius: 0 3px 3px 0;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 80%, transparent);
+    transition: top 0.34s cubic-bezier(.34,1.56,.64,1);
+    z-index: 2;
+  }
+
+  .content { flex: 1; padding: 16px; overflow-y: auto; position: relative; }
+
+  .panel { display: none; animation: panelIn 0.34s cubic-bezier(.22,.61,.36,1); }
+  .panel.on { display: block; }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .label {
+    font-size: 9px; font-weight: 700; color: #3a3a44; letter-spacing: 0.12em;
+    text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
+  .label .div { flex: 1; height: 1px; background: var(--dev-divider); }
+  .group { margin-bottom: 14px; }
+
+  .card {
+    background: var(--dev-card); border: 1px solid var(--dev-line);
+    border-radius: 12px; padding: 12px 14px;
+    transition: border-color 0.16s, transform 0.16s, box-shadow 0.16s;
+  }
+  .card.hoverable:hover { transform: translateY(-1px); border-color: #2a2a34; box-shadow: 0 6px 18px -8px rgba(0,0,0,0.6); }
+
+  /* Battery rings */
+  .rings { display: flex; gap: 10px; }
+  .ring {
+    flex: 1; background: var(--dev-card); border: 1px solid var(--dev-line);
+    border-radius: 14px; padding: 14px 10px 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    position: relative; transition: border-color 0.16s, transform 0.16s;
+  }
+  .ring:hover { transform: translateY(-1px); border-color: #2a2a34; }
+  .weardot { position: absolute; top: 10px; right: 10px; width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 6px var(--good); }
+  .dial { position: relative; width: 72px; height: 72px; }
+  .dial svg { transform: rotate(-90deg); }
+  .dial .num {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .dial .num b { font-family: var(--mono); font-size: 20px; font-weight: 700; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
+  .dial .num s { font-size: 9px; color: #404050; text-decoration: none; }
+  .spark { width: 80px; height: 22px; display: block; }
+  .ringlabel { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #4a4a56; font-weight: 600; letter-spacing: 0.05em; }
+  .bolt { color: var(--charge); animation: flash 1.6s ease-in-out infinite; }
+  @keyframes flash { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .caserow { display: flex; align-items: center; gap: 12px; }
+  .caseicon { font-size: 20px; opacity: 0.5; }
+  .casebar-track { height: 4px; background: var(--dev-line); border-radius: 99px; overflow: hidden; }
+  .casebar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--charge), #eab30899); transition: width 0.9s cubic-bezier(.22,.61,.36,1); }
+
+  .finds { display: flex; gap: 8px; }
+  .findbtn {
+    flex: 1; background: var(--dev-card); border: 1px solid var(--dev-line);
+    border-radius: 10px; padding: 10px; color: #888; font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: background 0.14s, border-color 0.14s, transform 0.1s; position: relative; overflow: hidden;
+  }
+  .findbtn:hover { border-color: #2a2a34; color: #aaa; }
+  .findbtn:active { transform: scale(0.97); }
+  .findbtn .rip { position: absolute; border-radius: 50%; background: rgba(99,102,241,0.35); transform: translate(-50%,-50%) scale(0); animation: rip 0.55s ease-out; pointer-events: none; }
+  @keyframes rip { to { transform: translate(-50%,-50%) scale(9); opacity: 0; } }
+
+  /* ANC mode cards */
+  .modes { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .mode {
+    background: var(--dev-card); border: 1px solid var(--dev-line); border-radius: 12px;
+    padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+    width: 100%; text-align: left; color: inherit;
+    transition: border-color 0.16s, background 0.16s, transform 0.12s;
+  }
+  .mode:hover { transform: translateY(-1px); border-color: #2a2a34; }
+  .mode.sel { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.4); box-shadow: 0 0 24px -10px var(--accent); }
+  .mode .ic { font-size: 20px; width: 28px; text-align: center; }
+  .mode .txt { flex: 1; }
+  .mode .txt .t { font-size: 13px; font-weight: 600; color: #aaa; transition: color 0.16s; }
+  .mode.sel .txt .t { color: #c7d2fe; }
+  .mode .txt .d { font-size: 10px; color: #444; margin-top: 2px; }
+  .mode .chk {
+    width: 16px; height: 16px; border-radius: 50%; background: var(--accent);
+    display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff;
+    flex-shrink: 0; transform: scale(0); transition: transform 0.28s cubic-bezier(.34,1.56,.64,1);
+  }
+  .mode.sel .chk { transform: scale(1); }
+
+  /* Strength slider */
+  .strength { overflow: hidden; transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease; }
+  .strength.hidden { max-height: 0; opacity: 0; margin: 0; }
+  .strength.shown { max-height: 140px; opacity: 1; }
+  .slidercard { background: var(--dev-card); border: 1px solid var(--dev-line); border-radius: 12px; padding: 14px 16px; }
+  .sliderhead { display: flex; justify-content: space-between; margin-bottom: 12px; }
+  .sliderhead .k { font-size: 12px; color: #888; }
+  .sliderhead .v { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent-soft); font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; height: 4px; accent-color: var(--accent); cursor: pointer; }
+  .sliderfoot { display: flex; justify-content: space-between; margin-top: 6px; font-size: 9px; color: #333; }
+
+  /* ★ GAME MODE — the hero interaction */
+  .gamecard-wrap { position: relative; border-radius: 13px; padding: 1px; }
+  .gamecard-wrap.on::before {
+    content: ""; position: absolute; inset: -1px; border-radius: 14px; z-index: 0;
+    background: conic-gradient(from 0deg, transparent, var(--accent), #22d3ee, var(--accent), transparent);
+    animation: spin 3.2s linear infinite; opacity: 0.9;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude; padding: 1.5px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .gamecard {
+    position: relative; z-index: 1;
+    background: var(--dev-card); border: 1px solid var(--dev-line); border-radius: 12px;
+    padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.3s;
+  }
+  .gamecard-wrap.on .gamecard {
+    background: rgba(99,102,241,0.08); border-color: transparent;
+    box-shadow: 0 0 30px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+  .gamecard .ic { font-size: 20px; width: 28px; text-align: center; transition: transform 0.4s cubic-bezier(.34,1.56,.64,1); }
+  .gamecard-wrap.on .gamecard .ic { transform: scale(1.12) rotate(-6deg); }
+  .gamecard .txt { flex: 1; }
+  .gamecard .txt .t { font-size: 13px; font-weight: 600; color: #aaa; transition: color 0.2s; }
+  .gamecard-wrap.on .txt .t { color: #c7d2fe; }
+  .gamecard .txt .d { font-size: 10px; color: #444; margin-top: 2px; }
+
+  .switch {
+    width: 44px; height: 24px; border-radius: 99px; background: #1c1c22;
+    border: 1px solid #26262e; position: relative; flex-shrink: 0;
+    transition: background 0.28s, border-color 0.28s;
+  }
+  .gamecard-wrap.on .switch { background: color-mix(in srgb, var(--accent) 40%, #1c1c22); border-color: var(--accent); }
+  .switch .knob {
+    position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+    background: #6b6b78; box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), background 0.28s;
+  }
+  .gamecard-wrap.on .switch .knob { transform: translateX(20px); background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.6); }
+  .switch .state {
+    position: absolute; right: 52px; top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    color: #444; transition: color 0.2s; white-space: nowrap;
+  }
+  .gamecard-wrap.on .switch .state { color: var(--accent-soft); }
+
+  /* EQ bars */
+  .eqrow { display: flex; flex-direction: column; gap: 8px; }
+  .eqbtn {
+    background: var(--dev-card); border: 1px solid var(--dev-line); border-radius: 12px;
+    padding: 13px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: inherit; text-align: left;
+    transition: border-color 0.16s, background 0.16s, transform 0.12s;
+  }
+  .eqbtn:hover { transform: translateY(-1px); border-color: #2a2a34; }
+  .eqbtn.sel { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.4); }
+  .eqviz { display: flex; align-items: flex-end; gap: 2px; height: 22px; width: 34px; }
+  .eqviz i { flex: 1; background: #3a3a46; border-radius: 2px; transition: background 0.2s; }
+  .eqbtn.sel .eqviz i { background: var(--accent-soft); }
+  .eqbtn .t { font-size: 13px; font-weight: 600; color: #aaa; }
+  .eqbtn.sel .t { color: #c7d2fe; }
+
+  /* ---------- ANNOTATION PANEL ---------- */
+  .notes { width: 300px; max-width: 92vw; }
+  .notes h2 { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--page-ink-soft); font-family: var(--mono); margin: 4px 0 16px; font-weight: 600; }
+  .note { display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid var(--page-line); }
+  .note:last-child { border-bottom: 1px solid var(--page-line); }
+  .note .n { font-family: var(--mono); font-size: 12px; color: var(--accent); font-weight: 700; flex-shrink: 0; width: 20px; }
+  .note .body h3 { margin: 0 0 4px; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+  .note .body p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--page-ink-soft); }
+
+  .footer { font-size: 12.5px; color: var(--page-ink-soft); text-align: center; max-width: 560px; line-height: 1.5; }
+  .footer code { font-family: var(--mono); font-size: 11.5px; background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 1px 6px; border-radius: 5px; color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .device-shadow, .titlebar::after, .status .s, .bolt, .gamecard-wrap.on::before { animation: none !important; }
+    * { transition-duration: 0.01ms !important; }
+  }
+</style>
+
+<div class="page">
+  <header class="intro">
+    <p class="eyebrow">Baseus Desktop · UX Glow-Up</p>
+    <h1>A cooler BP1 Pro — same identity, more life</h1>
+    <p>This is a live, clickable preview of the proposed motion pass. Nothing here changes the app's dark/indigo look — it adds the delight: a real animated game-mode toggle, battery rings that count up and breathe, spring-loaded tab transitions, and micro-interactions throughout.</p>
+    <span class="hint"><span class="dot"></span> It's interactive — switch tabs, flip Low Latency on, pick an ANC mode</span>
+  </header>
+
+  <div class="stage">
+    <div class="device-wrap">
+      <div class="device-shadow"></div>
+      <div class="device">
+        <!-- Title bar -->
+        <div class="titlebar">
+          <div class="lights"><i class="l1"></i><i class="l2"></i><i class="l3"></i></div>
+          <div class="title">Bass BP1 Pro ANC</div>
+          <div class="status"><span class="s"></span>Connected</div>
+        </div>
+
+        <div class="body">
+          <!-- Rail -->
+          <div class="rail">
+            <div class="marker" id="marker"></div>
+            <div class="nav">
+              <button class="navbtn on" data-tab="home" title="Battery">⊙</button>
+              <button class="navbtn" data-tab="anc" title="Noise Control">◎</button>
+              <button class="navbtn" data-tab="eq" title="EQ">≋</button>
+            </div>
+            <div class="spacer"></div>
+            <button class="navbtn" data-tab="settings" title="Settings" style="margin-bottom:2px">⚙</button>
+          </div>
+
+          <!-- Content -->
+          <div class="content">
+            <!-- HOME -->
+            <section class="panel on" id="p-home">
+              <div class="group">
+                <div class="label">Earbuds <span class="div"></span></div>
+                <div class="rings">
+                  <div class="ring" data-target="87">
+                    <span class="weardot"></span>
+                    <div class="dial">
+                      <svg width="72" height="72" viewBox="0 0 72 72">
+                        <circle cx="36" cy="36" r="28" fill="none" stroke="#1a1a1e" stroke-width="5"></circle>
+                        <circle class="prog" cx="36" cy="36" r="28" fill="none" stroke="#22c55e" stroke-width="5" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9" style="filter:drop-shadow(0 0 4px rgba(34,197,94,0.6))"></circle>
+                      </svg>
+                      <div class="num"><b>0</b><s>%</s></div>
+                    </div>
+                    <svg class="spark" viewBox="0 0 80 22" preserveAspectRatio="none"><polyline fill="none" stroke="#22c55e" stroke-width="1.5" points="0,16 13,14 26,15 40,9 53,11 66,6 80,7" opacity="0.8"></polyline></svg>
+                    <div class="ringlabel">LEFT</div>
+                  </div>
+                  <div class="ring" data-target="91">
+                    <span class="weardot"></span>
+                    <div class="dial">
+                      <svg width="72" height="72" viewBox="0 0 72 72">
+                        <circle cx="36" cy="36" r="28" fill="none" stroke="#1a1a1e" stroke-width="5"></circle>
+                        <circle class="prog" cx="36" cy="36" r="28" fill="none" stroke="#22c55e" stroke-width="5" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9" style="filter:drop-shadow(0 0 4px rgba(34,197,94,0.6))"></circle>
+                      </svg>
+                      <div class="num"><b>0</b><s>%</s></div>
+                    </div>
+                    <svg class="spark" viewBox="0 0 80 22" preserveAspectRatio="none"><polyline fill="none" stroke="#22c55e" stroke-width="1.5" points="0,10 13,12 26,8 40,10 53,7 66,9 80,5" opacity="0.8"></polyline></svg>
+                    <div class="ringlabel">RIGHT <span class="bolt">⚡</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="group">
+                <div class="label">Case <span class="div"></span></div>
+                <div class="card hoverable">
+                  <div class="caserow">
+                    <span class="caseicon">🗃️</span>
+                    <div style="flex:1">
+                      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                        <span style="font-size:11px;color:#555">Case</span>
+                        <span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--charge)" class="casepct">62%</span>
+                      </div>
+                      <div class="casebar-track"><div class="casebar-fill" style="width:0%"></div></div>
+                    </div>
+                    <span class="bolt" style="font-size:16px">⚡</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="group">
+                <div class="label">Find Earbuds <span class="div"></span></div>
+                <div class="finds">
+                  <button class="findbtn">Play Left</button>
+                  <button class="findbtn">Play Right</button>
+                </div>
+              </div>
+
+              <div class="group" style="margin-bottom:4px">
+                <div class="label">Today <span class="div"></span></div>
+                <div class="card hoverable" style="display:flex;align-items:center;gap:10px">
+                  <span style="font-size:16px;opacity:0.4">⏱</span>
+                  <div>
+                    <div style="font-family:var(--mono);font-size:17px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums">1:24:07</div>
+                    <div style="font-size:10px;color:#444;margin-top:1px">Current session</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ANC -->
+            <section class="panel" id="p-anc">
+              <div class="label">Noise Control <span class="div"></span></div>
+              <div class="modes" id="modes">
+                <button class="mode" data-mode="off" data-level="0">
+                  <span class="ic">🔇</span>
+                  <div class="txt"><div class="t">Off</div><div class="d">Passthrough — no processing</div></div>
+                  <span class="chk">✓</span>
+                </button>
+                <button class="mode sel" data-mode="anc" data-level="1">
+                  <span class="ic">🎧</span>
+                  <div class="txt"><div class="t">Active Noise Cancellation</div><div class="d">Blocks ambient sound</div></div>
+                  <span class="chk">✓</span>
+                </button>
+                <button class="mode" data-mode="transparency" data-level="1">
+                  <span class="ic">🌬️</span>
+                  <div class="txt"><div class="t">Transparency</div><div class="d">Lets ambient sound in</div></div>
+                  <span class="chk">✓</span>
+                </button>
+              </div>
+
+              <div class="strength shown" id="strength">
+                <div class="label">Strength <span class="div"></span></div>
+                <div class="slidercard">
+                  <div class="sliderhead"><span class="k">Level</span><span class="v"><span id="lvlnum">7</span> / 10</span></div>
+                  <input type="range" min="1" max="10" value="7" id="lvl">
+                  <div class="sliderfoot"><span>Low</span><span>High</span></div>
+                </div>
+              </div>
+
+              <div class="label" style="margin-top:16px">Game Mode <span class="div"></span></div>
+              <div class="gamecard-wrap" id="gamewrap">
+                <div class="gamecard" id="gamecard">
+                  <span class="ic">🎮</span>
+                  <div class="txt"><div class="t">Low Latency</div><div class="d">Reduces audio delay for gaming</div></div>
+                  <div class="switch"><span class="state" id="gamestate">OFF</span><span class="knob"></span></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- EQ -->
+            <section class="panel" id="p-eq">
+              <div class="label">Equalizer <span class="div"></span></div>
+              <div class="eqrow" id="eqrow">
+                <button class="eqbtn sel" data-eq="balanced"><span class="eqviz"><i style="height:40%"></i><i style="height:60%"></i><i style="height:55%"></i><i style="height:65%"></i><i style="height:45%"></i></span><span class="t">Balanced</span></button>
+                <button class="eqbtn" data-eq="bass"><span class="eqviz"><i style="height:90%"></i><i style="height:75%"></i><i style="height:50%"></i><i style="height:35%"></i><i style="height:25%"></i></span><span class="t">Bass Boost</span></button>
+                <button class="eqbtn" data-eq="voice"><span class="eqviz"><i style="height:30%"></i><i style="height:55%"></i><i style="height:85%"></i><i style="height:60%"></i><i style="height:35%"></i></span><span class="t">Voice</span></button>
+                <button class="eqbtn" data-eq="clear"><span class="eqviz"><i style="height:35%"></i><i style="height:45%"></i><i style="height:60%"></i><i style="height:80%"></i><i style="height:95%"></i></span><span class="t">Clear</span></button>
+              </div>
+            </section>
+
+            <!-- SETTINGS -->
+            <section class="panel" id="p-settings">
+              <div class="label">Settings <span class="div"></span></div>
+              <div class="card" style="color:#666;font-size:12px;line-height:1.6">Launch at login · Low-battery alerts · Session timer — unchanged in this pass.</div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Annotations -->
+    <aside class="notes">
+      <h2>What's new</h2>
+      <div class="note"><span class="n">01</span><div class="body"><h3>Animated game toggle</h3><p>The plain ON/OFF text becomes a sliding pill switch with a rotating accent halo when active — reads as "live / low-latency" at a glance. Flip it on the ANC tab.</p></div></div>
+      <div class="note"><span class="n">02</span><div class="body"><h3>Living battery rings</h3><p>Rings sweep and count up from zero on load, carry a soft glow, and the charging bolt pulses. Re-runs each time you open Battery.</p></div></div>
+      <div class="note"><span class="n">03</span><div class="body"><h3>Spring tab transitions</h3><p>The active-tab marker glides between icons with a spring curve; panels fade-and-lift in instead of hard-cutting.</p></div></div>
+      <div class="note"><span class="n">04</span><div class="body"><h3>Micro-interactions</h3><p>Cards lift on hover, buttons ripple and press, the ANC checkmark pops in, the strength slider expands only when it applies. Ambient accent glow breathes behind the header.</p></div></div>
+    </aside>
+  </div>
+
+  <p class="footer">All motion respects <code>prefers-reduced-motion</code>. This is a mockup — the real build ships as SolidJS matching your existing <code>AncTab</code>/<code>HomeTab</code> components. Tell me what to dial up or down.</p>
+</div>
+
+<script>
+  (function () {
+    var C = 2 * Math.PI * 28; // ring circumference ≈ 175.9
+
+    // ---- Tab switching + sliding marker ----
+    var navBtns = Array.prototype.slice.call(document.querySelectorAll('.navbtn'));
+    var marker = document.getElementById('marker');
+    var panels = { home: 'p-home', anc: 'p-anc', eq: 'p-eq', settings: 'p-settings' };
+
+    function placeMarker(btn) {
+      var rail = btn.closest('.rail');
+      var rr = rail.getBoundingClientRect();
+      var br = btn.getBoundingClientRect();
+      marker.style.top = (br.top - rr.top + (br.height - 18) / 2) + 'px';
+    }
+
+    function selectTab(btn) {
+      navBtns.forEach(function (b) { b.classList.toggle('on', b === btn); });
+      var tab = btn.getAttribute('data-tab');
+      Object.keys(panels).forEach(function (k) {
+        document.getElementById(panels[k]).classList.toggle('on', k === tab);
+      });
+      placeMarker(btn);
+      if (tab === 'home') animateRings();
+    }
+    navBtns.forEach(function (b) { b.addEventListener('click', function () { selectTab(b); }); });
+
+    // ---- Battery ring count-up ----
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function animateRings() {
+      document.querySelectorAll('#p-home .ring').forEach(function (ring) {
+        var target = +ring.getAttribute('data-target');
+        var prog = ring.querySelector('.prog');
+        var numEl = ring.querySelector('.num b');
+        if (reduce) { prog.style.strokeDashoffset = C * (1 - target / 100); numEl.textContent = target; return; }
+        prog.style.transition = 'none';
+        prog.style.strokeDashoffset = C;
+        numEl.textContent = '0';
+        // force reflow
+        void prog.getBoundingClientRect();
+        prog.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(.22,.61,.36,1)';
+        prog.style.strokeDashoffset = C * (1 - target / 100);
+        var start = null, dur = 1100;
+        function step(ts) {
+          if (start === null) start = ts;
+          var p = Math.min((ts - start) / dur, 1);
+          var eased = 1 - Math.pow(1 - p, 3);
+          numEl.textContent = Math.round(target * eased);
+          if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+      // case bar
+      var fill = document.querySelector('.casebar-fill');
+      if (fill) { fill.style.width = '0%'; void fill.getBoundingClientRect(); fill.style.width = '62%'; }
+    }
+
+    // ---- ANC mode selection ----
+    var strength = document.getElementById('strength');
+    document.querySelectorAll('#modes .mode').forEach(function (m) {
+      m.addEventListener('click', function () {
+        document.querySelectorAll('#modes .mode').forEach(function (x) { x.classList.remove('sel'); });
+        m.classList.add('sel');
+        var hasLevel = m.getAttribute('data-level') === '1';
+        strength.classList.toggle('shown', hasLevel);
+        strength.classList.toggle('hidden', !hasLevel);
+      });
+    });
+
+    // ---- Strength slider ----
+    var lvl = document.getElementById('lvl'), lvlnum = document.getElementById('lvlnum');
+    if (lvl) lvl.addEventListener('input', function () { lvlnum.textContent = lvl.value; });
+
+    // ---- Game mode toggle (the hero) ----
+    var wrap = document.getElementById('gamewrap');
+    var card = document.getElementById('gamecard');
+    var stateEl = document.getElementById('gamestate');
+    card.addEventListener('click', function () {
+      var on = wrap.classList.toggle('on');
+      stateEl.textContent = on ? 'ON' : 'OFF';
+      if (!reduce) { card.animate([{ transform: 'scale(1)' }, { transform: 'scale(0.98)' }, { transform: 'scale(1)' }], { duration: 240, easing: 'ease-out' }); }
+    });
+
+    // ---- EQ selection ----
+    document.querySelectorAll('#eqrow .eqbtn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('#eqrow .eqbtn').forEach(function (x) { x.classList.remove('sel'); });
+        b.classList.add('sel');
+      });
+    });
+
+    // ---- Find button ripple ----
+    document.querySelectorAll('.findbtn').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        if (reduce) return;
+        var r = document.createElement('span'); r.className = 'rip';
+        var rect = b.getBoundingClientRect();
+        r.style.left = (e.clientX - rect.left) + 'px';
+        r.style.top = (e.clientY - rect.top) + 'px';
+        r.style.width = r.style.height = '10px';
+        b.appendChild(r);
+        setTimeout(function () { r.remove(); }, 600);
+      });
+    });
+
+    // Initial placement + first ring animation
+    requestAnimationFrame(function () {
+      placeMarker(document.querySelector('.navbtn.on'));
+      animateRings();
+    });
+    window.addEventListener('resize', function () { placeMarker(document.querySelector('.navbtn.on')); });
+  })();
+</script>
