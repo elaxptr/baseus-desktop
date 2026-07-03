@@ -14,13 +14,9 @@ interface Props {
 }
 
 const MODE_META: Record<AncMode, { icon: string; name: string; desc: string }> = {
-  off:               { icon: '🔇', name: 'Off',                      desc: 'Passthrough — no processing' },
-  anc:               { icon: '🎧', name: 'Active Noise Cancellation', desc: 'Blocks ambient sound' },
-  transparency:      { icon: '🌬️', name: 'Transparency',              desc: 'Lets ambient sound in' },
-  adaptive_self:     { icon: '👤', name: 'Adaptive — Self',           desc: 'Calibrated to your hearing profile' },
-  adaptive_indoor:   { icon: '🏠', name: 'Adaptive — Indoor',         desc: 'Optimised for indoor environments' },
-  adaptive_outdoor:  { icon: '🌳', name: 'Adaptive — Outdoor',        desc: 'Handles wind and open spaces' },
-  adaptive_commute:  { icon: '🚇', name: 'Adaptive — Commute',        desc: 'Transit noise suppression' },
+  off:          { icon: '🔇', name: 'Off',                       desc: 'Passthrough — no processing' },
+  anc:          { icon: '🎧', name: 'Active Noise Cancellation', desc: 'Blocks ambient sound' },
+  transparency: { icon: '🌬️', name: 'Transparency',              desc: 'Lets ambient sound in' },
 };
 
 // Level slider only applies to BP1 ANC/Transparency modes.

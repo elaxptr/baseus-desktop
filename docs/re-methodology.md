@@ -56,59 +56,41 @@ Open in Wireshark. Filter: `btrfcomm || avctp || a2dp`
 ```
 
 ## What to look for
-- **Bluetooth profile**: The BP1 Pro ANC uses **BLE GATT** (not RFCOMM) for all runtime
-  control. Filter Wireshark for `btatt` and look for ATT writes to the Bluetrum CCSDK
-  service `02F00000-0000-0000-0000-00000000FE00`.
-- **Write characteristic**: `02F00000-0000-0000-0000-00000000FF01` (app → device commands)
-- **Notify characteristic**: `02F00000-0000-0000-0000-00000000FF02` (device → app events)
-- **Auth handshake**: Look for the challenge-response exchange immediately after GATT
-  service discovery. The pattern involves a DevAuthChallenge and DevAuthResponse.
-- **Battery command**: Triggered by opening the case lid; look for notify on `FF02` with
-  three power level bytes (left, right, case) and three charging-state bytes.
-- **ANC command**: Toggling ANC from the UI causes a write to `FF01`; command byte appears
-  to be `0x0C` based on `BleCommandUtil.resolveModify0C` method name in the APK.
-- **Frida note**: Java bridge does not work on x86_64 Android 12 emulators with Frida 17.x.
-  Use a **real Android device** for Frida captures, or use Android HCI snoop log only.
+
+> The confirmed BP1 Pro packet table lives in
+> [`docs/protocol/bp1-pro-anc.md`](protocol/bp1-pro-anc.md) — treat that as the source of truth.
+> Note the `02F0…` UUIDs that appear in APK static analysis are a **decoy**: they belong to a
+> different Bluetrum device variant and are *not* what the BP1 Pro actually uses.
+
+- **Bluetooth profile**: The BP1 Pro ANC uses **BLE GATT** for runtime control (and accepts the
+  same command bytes over Classic SPP/RFCOMM — see issue #3). Filter Wireshark for `btatt`.
+- **GATT service (confirmed)**: `53527aa4-29f7-ae11-4e74-997334782568`
+- **Write characteristic**: `ee684b1a-1e9b-ed3e-ee55-f894667e92ac` (app → device commands)
+- **Notify characteristic**: `654b749c-e37f-ae1f-ebab-40ca133e3690` (device → app events)
+- **Frame shape**: `AA <cmd> <payload…>` for notifications, `BA <cmd> <payload…>` for writes —
+  no length field or CRC on the BLE side.
+- **Battery**: opening the case lid triggers a notify; `AA 02 <L%> 00 <R%> 01`.
+- **ANC**: toggling ANC writes `BA 34 <mode> <level>`; the device acks with `AA 34 …`.
+- **Frida note**: the Java bridge does not work on x86_64 Android 12 emulators with Frida 17.x.
+  Use a **real Android device** for Frida captures, or use the Android HCI snoop log only.
 
 ## Adding support for a new model
 
-### Option A: Full RE from scratch (you own the device)
-1. Run the capture procedure above with your device paired.
-2. Create `docs/protocol/<your-model>.md` with the packet table.
-3. Create `crates/baseus-protocol/src/models/<your_model>.rs` implementing `decode_frame`.
-4. Add your model variant to `BaseusModel` in `crates/baseus-protocol/src/types.rs`.
-5. Open a PR with captures committed to `docs/protocol/captures/`.
+**Verified-on-hardware only.** This project deliberately does not ship APK-guessed models
+(the earlier Inspire XH1/XP1/XC1 drafts were removed for exactly this reason). If you own a
+Baseus device that isn't the BP1 Pro:
 
-### Option B: APK-extracted draft (you own the device but skip deep RE)
-1. Run `python tools/extract_apk_model.py --name "Baseus <Your Model>"` and review the output.
-2. Install the app and let it connect to your device.
-3. In nRF Connect, find your device and list its GATT services. Identify the service, write, and
-   notify UUIDs. These override the APK candidates in `types.rs`.
-4. Subscribe to the notify characteristic and interact with the device (open case, toggle ANC,
-   check battery). Capture the raw hex frames.
-5. Update `docs/protocol/<your-model>.md` and `crates/baseus-protocol/src/models/<your_model>.rs`
-   with confirmed values.
-6. Change `ModelStatus` from `Experimental` to `Verified` in `types.rs`.
-7. Open a PR — the review checklist is in `docs/protocol/inspire-xh1.md` under "How to verify".
+1. Run the capture procedure above with your device paired, and confirm every value against
+   real notifications — don't rely on APK candidates alone.
+2. Create `docs/protocol/<your-model>.md` with the packet table and commit sanitised captures
+   to `docs/protocol/captures/`.
+3. Create `crates/baseus-protocol/src/models/<your_model>.rs` implementing `decode_frame`,
+   with golden tests built from your real captures.
+4. Register your model in `BaseusModel` (`crates/baseus-protocol/src/types.rs`) — advertising
+   name(s), `gatt_uuids()`, and command encoding in `execute_command`.
+5. Open a PR titled `feat: add <model> protocol`, with a screenshot of the app showing your
+   device's live battery/ANC.
 
-## Confirming an experimental model (e.g. Inspire XH1)
-
-If the app ships an **experimental** model (yellow banner in the UI), here is how to promote it
-to Verified:
-
-1. **Install the app** and let it attempt to connect to your device.
-2. **Check the logs** (`RUST_LOG=debug` in the environment) for connection attempts — you'll see
-   which advertising name it scanned for and whether the GATT characteristics were found.
-3. **Run nRF Connect** (free, Google Play) on an Android phone with your device paired.
-   List services → note which UUID family is actually present. Update `types.rs::gatt_uuids()`.
-4. **Subscribe to the notify characteristic** in nRF Connect and interact with the device:
-   - Toggle ANC modes in the Baseus app → capture the `0xAA 0x??` notifications.
-   - Open/close case or check battery in the Baseus app → capture battery notifications.
-5. **Update `docs/protocol/<model>.md`** with confirmed byte values and remove ⚠ markers.
-6. **Update `crates/baseus-protocol/src/models/<model>.rs`**:
-   - Replace candidate opcodes with confirmed values.
-   - Remove `// APK-EXTRACTED, UNVERIFIED` comments from confirmed lines.
-   - Remove `#[ignore]` from hardware test placeholders and fill in real captures.
-7. **Change `ModelStatus` to `Verified`** in `types.rs::status()`.
-8. **Open a PR** — title: `feat: verify <model> protocol`. Include a screenshot of the app
-   showing your device's battery/ANC with confirmed data.
+> **Coming soon:** an in-app **Capture Studio** (scan any device, live hex log, guided capture,
+> export a shareable bundle) plus a **declarative model format** so adding a device becomes data
+> + a golden test rather than a hand-written module. See `BACKLOG.md`.

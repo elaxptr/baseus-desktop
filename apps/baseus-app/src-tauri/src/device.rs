@@ -2,8 +2,8 @@ use std::time::Duration;
 
 use baseus_protocol::{
     framing::Frame,
-    models::{bp1_pro_anc::Bp1ProAnc, inspire_xh1::InspireXh1},
-    types::{AncMode, BaseusModel, DeviceEvent, EqPreset, ModelStatus},
+    models::bp1_pro_anc::Bp1ProAnc,
+    types::{AncMode, BaseusModel, DeviceEvent, EqPreset},
 };
 use baseus_transport::win::ble::GattTransport;
 use serde::Serialize;
@@ -45,7 +45,6 @@ pub fn command_channel() -> (CommandSender, CommandReceiver) {
 #[derive(Debug, Clone, Serialize)]
 pub struct ModelInfo {
     pub name: &'static str,
-    pub status: ModelStatus,
 }
 
 pub async fn run_loop(app: AppHandle, mut cmd_rx: CommandReceiver) {
@@ -87,7 +86,6 @@ pub async fn run_loop(app: AppHandle, mut cmd_rx: CommandReceiver) {
                     "model-info",
                     &ModelInfo {
                         name: connected_model.display_name(),
-                        status: connected_model.status(),
                     },
                 );
 
@@ -130,11 +128,7 @@ async fn notification_loop(
                         tracing::debug!("raw notification: {}", hex(&data));
                         if let Ok(frame) = Frame::decode(&data) {
                             let event = match model {
-                                // XP1/XC1 share the same earbud protocol as BP1 (same 0x0C ANC
-                                // family, same battery framing) — APK-extracted, unverified.
-                                BaseusModel::Bp1ProAnc
-                                | BaseusModel::InspireXp1
-                                | BaseusModel::InspireXc1 => {
+                                BaseusModel::Bp1ProAnc => {
                                     if frame.cmd == 0x34 {
                                         // Ack payload semantics vary by firmware (issue #3):
                                         // some units send a flat AA 34 01 for every ANC command,
@@ -150,15 +144,6 @@ async fn notification_loop(
                                                 tracing::debug!("unhandled frame cmd={:#04x}: {e}", frame.cmd);
                                                 None
                                             }
-                                        }
-                                    }
-                                }
-                                BaseusModel::InspireXh1 => {
-                                    match InspireXh1::decode_frame(&frame) {
-                                        Ok(ev) => Some(ev),
-                                        Err(e) => {
-                                            tracing::debug!("unhandled frame cmd={:#04x}: {e}", frame.cmd);
-                                            None
                                         }
                                     }
                                 }
@@ -236,56 +221,28 @@ async fn execute_command(
     model: BaseusModel,
 ) -> Result<(), String> {
     let bytes: Vec<u8> = match (cmd, model) {
-        // BP1 / XP1 / XC1 — verified for BP1; XP1/XC1 assumed same protocol (APK-extracted).
-        (
-            DeviceCommand::SetAncMode(AncMode::Off, _),
-            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
-        ) => vec![0xBA, 0x34, 0x00, 0xFF],
-        (
-            DeviceCommand::SetAncMode(AncMode::Anc, level),
-            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
-        ) => vec![0xBA, 0x34, 0x01, *level],
-        (
-            DeviceCommand::SetAncMode(AncMode::Transparency, level),
-            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
-        ) => vec![0xBA, 0x34, 0x02, *level],
-        (
-            DeviceCommand::SetEqPreset(preset),
-            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
-        ) => vec![0xBA, 0x43, preset.to_byte()],
+        // BP1 Pro ANC — verified on hardware.
+        (DeviceCommand::SetAncMode(AncMode::Off, _), BaseusModel::Bp1ProAnc) => {
+            vec![0xBA, 0x34, 0x00, 0xFF]
+        }
+        (DeviceCommand::SetAncMode(AncMode::Anc, level), BaseusModel::Bp1ProAnc) => {
+            vec![0xBA, 0x34, 0x01, *level]
+        }
+        (DeviceCommand::SetAncMode(AncMode::Transparency, level), BaseusModel::Bp1ProAnc) => {
+            vec![0xBA, 0x34, 0x02, *level]
+        }
+        (DeviceCommand::SetEqPreset(preset), BaseusModel::Bp1ProAnc) => {
+            vec![0xBA, 0x43, preset.to_byte()]
+        }
         // Game/low-latency mode — verified for BP1 over both SPP and BLE (issue #3).
-        (
-            DeviceCommand::SetGameMode(on),
-            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
-        ) => vec![0xBA, 0x24, u8::from(*on)],
-        (
-            DeviceCommand::FindEarbud(Side::Left),
-            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
-        ) => vec![0xBA, 0x10, 0x00, 0x01],
-        (
-            DeviceCommand::FindEarbud(Side::Right),
-            BaseusModel::Bp1ProAnc | BaseusModel::InspireXp1 | BaseusModel::InspireXc1,
-        ) => vec![0xBA, 0x10, 0x01, 0x01],
-        // Inspire XH1 — setting ANC/EQ not yet supported (wire format unverified).
-        (DeviceCommand::SetAncMode(mode, _), BaseusModel::InspireXh1) => {
-            tracing::info!("XH1 ANC set for {mode:?} not yet supported — wire format unverified");
-            return Ok(());
+        (DeviceCommand::SetGameMode(on), BaseusModel::Bp1ProAnc) => {
+            vec![0xBA, 0x24, u8::from(*on)]
         }
-        (DeviceCommand::SetEqPreset(_), BaseusModel::InspireXh1) => {
-            tracing::info!("XH1 EQ preset not yet supported — wire format unverified");
-            return Ok(());
+        (DeviceCommand::FindEarbud(Side::Left), BaseusModel::Bp1ProAnc) => {
+            vec![0xBA, 0x10, 0x00, 0x01]
         }
-        (DeviceCommand::SetGameMode(_), BaseusModel::InspireXh1) => {
-            tracing::info!("XH1 game mode not yet supported — wire format unverified");
-            return Ok(());
-        }
-        (DeviceCommand::FindEarbud(_), BaseusModel::InspireXh1) => {
-            tracing::info!("XH1 find not yet supported");
-            return Ok(());
-        }
-        // Adaptive ANC modes — only used by XH1; unreachable for earbud models.
-        (DeviceCommand::SetAncMode(_, _), _) => {
-            return Err("ANC mode not supported for this model".to_string());
+        (DeviceCommand::FindEarbud(Side::Right), BaseusModel::Bp1ProAnc) => {
+            vec![0xBA, 0x10, 0x01, 0x01]
         }
     };
     transport.send(&bytes).await.map_err(|e| e.to_string())
@@ -324,18 +281,6 @@ fn maybe_alert_battery(app: &AppHandle, event: &DeviceEvent, thresholds: &mut Ba
             }
             thresholds.left_was_ok = left_now_ok;
             thresholds.right_was_ok = right_now_ok;
-        }
-        DeviceEvent::HeadphoneBatteryUpdate(h) => {
-            let now_ok = h.pct >= LOW || h.pct == 0;
-            if thresholds.left_was_ok && !now_ok {
-                let _ = app
-                    .notification()
-                    .builder()
-                    .title("Baseus — Headphone low")
-                    .body(format!("{}% remaining", h.pct))
-                    .show();
-            }
-            thresholds.left_was_ok = now_ok;
         }
         DeviceEvent::CaseUpdate(c) => {
             let case_now_ok = c.case_pct >= LOW || c.case_pct == 0;

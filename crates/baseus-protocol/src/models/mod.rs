@@ -9,7 +9,5 @@ pub enum DecodeError {
 }
 
 pub mod bp1_pro_anc;
-pub mod inspire_xh1;
 
 pub use bp1_pro_anc::Bp1ProAnc;
-pub use inspire_xh1::InspireXh1;
