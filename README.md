@@ -1,9 +1,11 @@
 # baseus-desktop
 
-Open-source Windows desktop client for Baseus earbuds, built by reverse-engineering
+Open-source desktop client for Baseus earbuds, built by reverse-engineering
 the official Baseus Android app.
 
-**Platform:** Windows 10 1903+ (WinRT Bluetooth APIs)
+**Platform:** Windows 10 1903+ and Linux (BlueZ 5.6x). The Bluetooth layer is
+[btleplug](https://github.com/deviceplug/btleplug), so both backends run the same code;
+only the updater is Windows/macOS-only, since Linux installs come from the distro.
 
 ## Supported hardware
 
@@ -45,6 +47,36 @@ Or for development with hot-reload:
 ```
 pnpm tauri dev
 ```
+
+### Linux
+
+Install the Tauri and BlueZ prerequisites first — on Arch:
+
+```
+sudo pacman -S --needed rustup webkit2gtk-4.1 patchelf bluez bluez-utils
+```
+
+Debian/Ubuntu equivalents are `libwebkit2gtk-4.1-dev`, `build-essential`, `patchelf`,
+`libssl-dev`, `libayatana-appindicator3-dev`, `librsvg2-dev` and `bluez`.
+
+`pnpm tauri build` emits a `.deb`/`.rpm`/AppImage. To skip the bundler and just get a
+binary, run `cargo build --release -p baseus-app` and copy `target/release/baseus-app`.
+
+To verify the Bluetooth path without the GUI:
+
+```
+cargo run -p baseus-transport --example connect -- anc:on anc:off
+```
+
+**Note on discovery:** these earbuds put their service UUID in the BLE *scan response*,
+not in the advertisement. A `ScanFilter` with service UUIDs becomes a BlueZ discovery
+filter that matches the advertisement only, so filtering hides the device completely —
+the scan is deliberately unfiltered and the match happens afterwards. The advertised
+name is unreliable on BlueZ for the same reason (`local_name` is frequently `None`),
+which is why the service UUID is the primary match key.
+
+The buds also stop advertising after a while. If the app cannot find them, open the
+charging case to make them advertise again.
 
 ## Protocol documentation
 

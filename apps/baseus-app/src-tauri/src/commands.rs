@@ -3,6 +3,7 @@ use crate::settings::{self, Settings};
 use baseus_protocol::types::{AncMode, BaseusModel, EqPreset};
 use tauri::{AppHandle, Runtime, State};
 use tauri_plugin_autostart::ManagerExt;
+#[cfg(not(target_os = "linux"))]
 use tauri_plugin_updater::UpdaterExt;
 
 #[tauri::command]
@@ -80,10 +81,20 @@ pub fn get_supported_anc_modes(model_name: String) -> Vec<String> {
 }
 
 /// Silent background check — returns version string if an update is available, None otherwise.
+#[cfg(not(target_os = "linux"))]
 pub(crate) async fn check_update_silent(app: &AppHandle) -> Option<String> {
     app.updater().ok()?.check().await.ok()?.map(|u| u.version)
 }
 
+/// Linux builds carry no updater plugin — updates come from the distro package,
+/// so the in-app check reports "up to date" and the install is a no-op.
+#[cfg(target_os = "linux")]
+#[tauri::command]
+pub async fn check_for_update(_app: AppHandle) -> Result<Option<String>, String> {
+    Ok(None)
+}
+
+#[cfg(not(target_os = "linux"))]
 #[tauri::command]
 pub async fn check_for_update(app: AppHandle) -> Result<Option<String>, String> {
     let updater = app.updater().map_err(|e| e.to_string())?;
@@ -94,6 +105,13 @@ pub async fn check_for_update(app: AppHandle) -> Result<Option<String>, String> 
         .map(|u| u.version))
 }
 
+#[cfg(target_os = "linux")]
+#[tauri::command]
+pub async fn install_update(_app: AppHandle) -> Result<(), String> {
+    Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
 #[tauri::command]
 pub async fn install_update(app: AppHandle) -> Result<(), String> {
     let updater = app.updater().map_err(|e| e.to_string())?;

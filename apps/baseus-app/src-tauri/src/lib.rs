@@ -3,7 +3,9 @@ mod device;
 mod settings;
 mod tray;
 
-use tauri::{Emitter, Manager};
+#[cfg(not(target_os = "linux"))]
+use tauri::Emitter;
+use tauri::Manager;
 
 pub fn run() {
     tracing_subscriber::fmt()
@@ -12,13 +14,23 @@ pub fn run() {
 
     let (cmd_tx, cmd_rx) = device::command_channel();
 
-    tauri::Builder::default()
+    #[allow(unused_mut)]
+    let mut builder = tauri::Builder::default();
+
+    // The bundled updater ships Windows/macOS artifacts only; on Linux the app is
+    // installed and updated through the distro, and initialising the plugin without
+    // a `plugins.updater` config aborts startup outright.
+    #[cfg(not(target_os = "linux"))]
+    {
+        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+    }
+
+    builder
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec!["--minimized"]),
         ))
         .plugin(tauri_plugin_notification::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(cmd_tx)
         .setup(|app| {
             tray::setup_tray(app.handle())?;
@@ -29,13 +41,16 @@ pub fn run() {
             tauri::async_runtime::spawn(device::run_loop(handle, cmd_rx));
 
             // Background update check — silent, fires 10s after startup.
-            let handle2 = app.handle().clone();
-            tauri::async_runtime::spawn(async move {
-                tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-                if let Some(version) = commands::check_update_silent(&handle2).await {
-                    let _ = handle2.emit("update-available", version);
-                }
-            });
+            #[cfg(not(target_os = "linux"))]
+            {
+                let handle2 = app.handle().clone();
+                tauri::async_runtime::spawn(async move {
+                    tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+                    if let Some(version) = commands::check_update_silent(&handle2).await {
+                        let _ = handle2.emit("update-available", version);
+                    }
+                });
+            }
 
             Ok(())
         })

@@ -5,7 +5,7 @@ use baseus_protocol::{
     models::bp1_pro_anc::Bp1ProAnc,
     types::{AncMode, BaseusModel, DeviceEvent, EqPreset},
 };
-use baseus_transport::win::ble::GattTransport;
+use baseus_transport::{win::ble::GattTransport, DeviceMatch};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 use tokio::sync::mpsc;
@@ -48,14 +48,18 @@ pub struct ModelInfo {
 }
 
 pub async fn run_loop(app: AppHandle, mut cmd_rx: CommandReceiver) {
-    // Build the device list from the protocol registry — (advertising_name, notify_uuid, write_uuid)
-    let device_entries: Vec<(&str, &str, &str)> = BaseusModel::all()
+    // Build the device list from the protocol registry.
+    let device_entries: Vec<DeviceMatch> = BaseusModel::all()
         .iter()
         .flat_map(|m| {
-            let (notify, write) = m.gatt_uuids();
-            m.advertising_names()
-                .iter()
-                .map(move |&name| (name, notify, write))
+            let (notify_uuid, write_uuid) = m.gatt_uuids();
+            let service_uuid = m.service_uuid();
+            m.advertising_names().iter().map(move |&name| DeviceMatch {
+                name,
+                service_uuid,
+                notify_uuid,
+                write_uuid,
+            })
         })
         .collect();
 

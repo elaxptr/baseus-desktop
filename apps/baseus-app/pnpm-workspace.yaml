@@ -1,5 +1,9 @@
 packages:
   - '.'
 
+# esbuild's postinstall fetches its platform binary; vite cannot build without it.
+allowBuilds:
+  esbuild: true
+
 allowedDeprecatedVersions:
   esbuild: '*'

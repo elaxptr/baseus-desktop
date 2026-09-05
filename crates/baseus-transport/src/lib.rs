@@ -76,4 +76,17 @@ impl BluetoothTransport for MockTransport {
     }
 }
 
+/// How to recognise and talk to one earbud model over BLE.
+///
+/// `service_uuid` is the match key: it is carried in the advertisement itself, so it
+/// is visible on every backend. `name` is only a fallback for devices whose service
+/// UUID is missing from the advertisement, and is compared case-insensitively.
+#[derive(Debug, Clone, Copy)]
+pub struct DeviceMatch<'a> {
+    pub name: &'a str,
+    pub service_uuid: &'a str,
+    pub notify_uuid: &'a str,
+    pub write_uuid: &'a str,
+}
+
 pub mod win;

@@ -109,9 +109,22 @@ impl BaseusModel {
 
     /// BLE advertising name(s) used to identify this device during scan.
     /// Includes short-form aliases for devices that omit the model suffix.
+    ///
+    /// Treat these as a hint, not as the primary key: the name travels in the scan
+    /// response, so BlueZ reports it only intermittently and `local_name` is often
+    /// `None` for a device that is plainly there. Match on `service_uuid` first.
     pub fn advertising_names(self) -> &'static [&'static str] {
         match self {
             BaseusModel::Bp1ProAnc => &["Bass BP1 Pro"],
+        }
+    }
+
+    /// GATT service UUID advertised by this model. Unlike the advertising name,
+    /// this is always present in the advertisement payload, which makes it the only
+    /// reliable way to spot the device on BlueZ (see `advertising_names`).
+    pub fn service_uuid(self) -> &'static str {
+        match self {
+            BaseusModel::Bp1ProAnc => ble_uuids::SERVICE,
         }
     }
 

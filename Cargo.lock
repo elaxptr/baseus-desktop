@@ -277,11 +277,13 @@ dependencies = [
 name = "baseus-transport"
 version = "0.1.0"
 dependencies = [
+ "baseus-protocol",
  "btleplug",
  "futures",
  "thiserror 2.0.18",
  "tokio",
  "tracing",
+ "tracing-subscriber",
  "uuid",
 ]
 

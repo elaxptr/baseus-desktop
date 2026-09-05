@@ -13,3 +13,5 @@ uuid      = { version = "1", features = ["v4"] }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+baseus-protocol = { path = "../baseus-protocol" }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
