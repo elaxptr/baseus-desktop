@@ -212,8 +212,7 @@ async fn poll_for_match(
 /// BlueZ surfaces only intermittently, so it is a fallback rather than the key.
 fn match_index(devices: &[DeviceMatch<'_>], props: &PeripheralProperties) -> Option<usize> {
     if let Some(idx) = devices.iter().position(|d| {
-        Uuid::parse_str(d.service_uuid)
-            .is_ok_and(|want| props.services.contains(&want))
+        Uuid::parse_str(d.service_uuid).is_ok_and(|want| props.services.contains(&want))
     }) {
         return Some(idx);
     }
