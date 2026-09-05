@@ -15,7 +15,19 @@ pub fn run() {
     let (cmd_tx, cmd_rx) = device::command_channel();
 
     #[allow(unused_mut)]
-    let mut builder = tauri::Builder::default();
+    // Single-instance must be registered first. A second launch — a desktop entry, a
+    // keybind — then surfaces the running window instead of starting a rival process
+    // that would open its own GATT connection to the same earbuds. It is also the only
+    // way back to a window hidden with `hide()`: that unmaps it, so the compositor has
+    // nothing left to focus.
+    let mut builder =
+        tauri::Builder::default().plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.unminimize();
+                let _ = window.set_focus();
+            }
+        }));
 
     // The bundled updater ships Windows/macOS artifacts only; on Linux the app is
     // installed and updated through the distro, and initialising the plugin without

@@ -60,7 +60,18 @@ Debian/Ubuntu equivalents are `libwebkit2gtk-4.1-dev`, `build-essential`, `patch
 `libssl-dev`, `libayatana-appindicator3-dev`, `librsvg2-dev` and `bluez`.
 
 `pnpm tauri build` emits a `.deb`/`.rpm`/AppImage. To skip the bundler and just get a
-binary, run `cargo build --release -p baseus-app` and copy `target/release/baseus-app`.
+binary:
+
+```
+pnpm build   # the embedded frontend must exist first
+cargo build --release -p baseus-app --features custom-protocol
+```
+
+`--features custom-protocol` is not optional. `tauri` derives `cfg(dev)` from its
+absence, so a binary built without it ignores the embedded frontend and tries to load
+`build.devUrl` — the window opens showing
+`Could not connect to localhost: Connection refused`. The Tauri CLI passes the feature
+for you; a bare `cargo build` does not.
 
 To verify the Bluetooth path without the GUI:
 
