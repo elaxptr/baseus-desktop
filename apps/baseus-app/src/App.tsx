@@ -87,7 +87,9 @@ export default function App() {
     const seen = new Set<DeviceEvent['type']>();
     unlisteners.push(
       await onDeviceEvent((e) => {
-        seen.add(e.type);
+        // Before the model is known an event may be ignored (EQ) or overwritten by
+        // applyModel (ANC mode), so let the snapshot replay below re-apply that kind.
+        if (modelInfo() !== null) seen.add(e.type);
         handleDeviceEvent(e);
       }),
     );

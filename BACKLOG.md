@@ -22,8 +22,7 @@ replacement is tooling that lets real owners capture and contribute *verified* s
 
 ## BP1 Ultra remaining work
 
-All of these are captured and documented in `docs/protocol/bp1-ultra.md`, just not exposed
-in the UI yet:
+Captured and documented in `docs/protocol/bp1-ultra.md`, just not exposed in the UI yet:
 
 - [ ] Spatial audio toggle (`43` / `42`)
 - [ ] Bass boost level (`54` / `53`)
@@ -32,6 +31,9 @@ in the UI yet:
 - [ ] All 30 EQ presets + custom 8-band EQ (`31`)
 - [ ] Gesture remapping (`8D` / `8C`)
 - [ ] Volume limiter (`94` / `93`)
+
+Not captured yet:
+
 - [ ] Find my earbuds — needs a capture from a logged-in official app
 
 ## Platform + infrastructure

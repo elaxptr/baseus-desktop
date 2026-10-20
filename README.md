@@ -15,9 +15,9 @@ only the updater is Windows/macOS-only, since Linux installs come from the distr
 | Bass BP1 Ultra | ✅ Verified (fw 1.0.26) | ✅ L/R/case | ✅ 3-mode + 5 levels | ✅ 4 presets | ✅ Low-latency toggle |
 
 The BP1 Ultra has no find-my-earbuds support yet: the official app only offers it to
-logged-in accounts, so the command was not captured. Its buds also refuse low-latency mode
-(`24 0B`) while LDAC is in use — the official app gets the same refusal — and the toggle then
-falls back to Off. See [docs/protocol/bp1-ultra.md](docs/protocol/bp1-ultra.md).
+logged-in accounts, so the command was not captured. The buds may also refuse low-latency
+mode (`24 0B`) when LDAC is active — the official app got the same refusal — and the toggle
+then falls back to Off. See [docs/protocol/bp1-ultra.md](docs/protocol/bp1-ultra.md).
 
 Only hardware-verified models are supported. Earlier drafts included Inspire XH1/XP1/XC1
 support extracted from the Baseus Android APK, but since none was ever confirmed on a real
