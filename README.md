@@ -12,6 +12,11 @@ only the updater is Windows/macOS-only, since Linux installs come from the distr
 | Model | Status | Battery | ANC | EQ | Game mode |
 |---|---|---|---|---|---|
 | Bass BP1 Pro ANC | ✅ Verified | ✅ L/R/case | ✅ 3-mode + strength | ✅ 4 presets | ✅ Low-latency toggle |
+| Bass BP1 Ultra | ✅ Verified (fw 1.0.26) | ✅ L/R/case | ✅ 3-mode + 5 levels | ✅ 4 presets | ✅ Low-latency toggle |
+
+The BP1 Ultra has no find-my-earbuds support yet: the official app only offers it to
+logged-in accounts, so the command was not captured. See
+[docs/protocol/bp1-ultra.md](docs/protocol/bp1-ultra.md).
 
 Only hardware-verified models are supported. Earlier drafts included Inspire XH1/XP1/XC1
 support extracted from the Baseus Android APK, but since none was ever confirmed on a real
@@ -79,6 +84,9 @@ To verify the Bluetooth path without the GUI:
 cargo run -p baseus-transport --example connect -- anc:on anc:off
 ```
 
+The example detects the model from the first notification and encodes the commands for
+it. On the BP1 Ultra, `anc:?` also queries the current noise-control state.
+
 **Note on discovery:** these earbuds put their service UUID in the BLE *scan response*,
 not in the advertisement. A `ScanFilter` with service UUIDs becomes a BlueZ discovery
 filter that matches the advertisement only, so filtering hides the device completely —
@@ -88,6 +96,10 @@ which is why the service UUID is the primary match key.
 
 The buds also stop advertising after a while. If the app cannot find them, open the
 charging case to make them advertise again.
+
+The BP1 Ultra only advertises its control service while no other app holds a control
+session: close the official Baseus app on your phone (it connects over Classic SPP) or the
+desktop app will not find the buds.
 
 ## Protocol documentation
 

@@ -1,0 +1,19 @@
+# GATT table of a physical BP1 Ultra (WinRT)
+# time  dir  frame  (decoded opcode)
+
+connected. MTU=256
+SERVICE 53527aa4-29f7-ae11-4e74-997334782568
+  CHAR ee684b1a-1e9b-ed3e-ee55-f894667e92ac  h=0x0002  [write]
+  CHAR 654b749c-e37f-ae1f-ebab-40ca133e3690  h=0x0004  [notify,read]
+      read: 
+SERVICE 0000fe2c-0000-1000-8000-00805f9b34fb
+  CHAR fe2c1233-8366-4814-8eb0-01de32100bea  h=0x0008  [read]
+      read: EB 3F 45
+  CHAR fe2c1234-8366-4814-8eb0-01de32100bea  h=0x000A  [notify,write]
+  CHAR fe2c1235-8366-4814-8eb0-01de32100bea  h=0x000D  [notify,write]
+  CHAR fe2c1236-8366-4814-8eb0-01de32100bea  h=0x0010  [write]
+  CHAR fe2c1237-8366-4814-8eb0-01de32100bea  h=0x0012  [notify,write]
+12:22:17.162  RX  78 9C 00 0E 02 01 05 02 64 00 64 01 2C 56                     op 02
+12:22:17.184  RX  78 9C 00 0C 02 01 03 27 64 00 6D 60                           op 27
+12:22:17.206  RX  78 9C 00 0B 02 01 02 30 00 4C CD                              op 30
+12:22:17.221  RX  78 9C 00 0B 02 01 02 90 02 8D 34                              op 90

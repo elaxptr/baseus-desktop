@@ -3,6 +3,20 @@
 All notable changes to this project are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions match the git tags.
 
+## [Unreleased]
+
+### Added
+- **Bass BP1 Ultra support** (firmware 1.0.26): battery (L/R/case), noise control
+  (Normal / ANC with 5 levels / Transparency), 4 EQ presets and low-latency mode.
+  Captured from the official app's SPP traffic and verified over BLE on a physical unit
+  — see `docs/protocol/bp1-ultra.md`.
+- CRC frame support in `baseus-protocol` (`framing::crc`: `78 9C` envelope with a
+  CRC16/MODBUS trailer) and a `WireFormat` per model.
+- The BP1 Pro and BP1 Ultra share a GATT service, so the connected model is now
+  identified from the first notification's envelope instead of the scan entry.
+- Per-model capabilities in the `model-info` event: discrete ANC levels, which modes take a
+  strength, find-my-earbuds availability, device preset names.
+
 ## [0.3.0] — 2026-07-03
 
 ### Added

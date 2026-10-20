@@ -4,7 +4,7 @@
 
 | Field | Value |
 |---|---|
-| App product name | "BP1 Ultra" (seen in APK strings) |
+| App product name | "Bass BP1 Pro" (the "BP1 Ultra" APK string is a different product — see [bp1-ultra.md](bp1-ultra.md)) |
 | Chip vendor | Bluetrum (蓝特无线), CCSDK v? |
 | Secondary OTA chip | JieLi (杰理) via jl_bt_ota SDK |
 | BT profiles | BLE GATT (control) + Classic SPP (control + OTA — same command bytes on both, see issue #3) |
