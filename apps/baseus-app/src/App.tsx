@@ -5,6 +5,7 @@ import AncTab from './components/AncTab';
 import EqTab from './components/EqTab';
 import SettingsTab from './components/SettingsTab';
 import {
+  getDeviceSnapshot,
   onDeviceEvent,
   onConnectionState,
   onModelInfo,
@@ -13,6 +14,7 @@ import {
   setEqPreset,
   setGameMode,
   type AncMode,
+  type DeviceEvent,
   type EqPreset,
   type ModelInfo,
   type WearState,
@@ -24,6 +26,8 @@ import { startTimer, stopTimer, useElapsed } from './lib/timer';
 type ConnStatus = 'connected' | 'connecting' | 'disconnected';
 
 const BP1_ANC_MODES: AncMode[] = ['off', 'anc', 'transparency'];
+const DEFAULT_STRENGTH_MODES: AncMode[] = ['anc', 'transparency'];
+const CONTINUOUS_LEVEL_MAX = 10;
 
 export default function App() {
   const [status, setStatus] = createSignal<ConnStatus>('connecting');
@@ -42,6 +46,15 @@ export default function App() {
 
   const connectedModelName = createMemo(() => modelInfo()?.name ?? 'Bass BP1 Pro ANC');
   const supportedAncModes = createMemo<AncMode[]>(() => BP1_ANC_MODES);
+  const strengthModes = createMemo<AncMode[]>(() => modelInfo()?.strength_modes ?? DEFAULT_STRENGTH_MODES);
+  const levelMax = createMemo(() => modelInfo()?.anc_levels ?? CONTINUOUS_LEVEL_MAX);
+
+  /// Slider position → level byte. Discrete-level models (BP1 Ultra) take the step
+  /// number itself; the BP1 Pro maps 1–10 onto its 0x10–0xFF strength byte.
+  function levelByte(v: number): number {
+    if (modelInfo()?.anc_levels) return v;
+    return Math.round(((v - 1) / 9) * (0xff - 0x10) + 0x10);
+  }
 
   onMount(async () => {
     const unlisteners: Array<() => void> = [];
@@ -49,7 +62,7 @@ export default function App() {
 
     await loadSettings();
 
-    onDeviceEvent((e) => {
+    const handleDeviceEvent = (e: DeviceEvent) => {
       if (e.type === 'battery_update') {
         pushLeft(e.data.left_pct);
         pushRight(e.data.right_pct);
@@ -61,23 +74,46 @@ export default function App() {
       } else if (e.type === 'anc_mode_update') {
         setAncModeSignal(e.data);
         setAncLoading(null);
+      } else if (e.type === 'anc_level_update') {
+        setAncLevel(Math.min(Math.max(e.data, 1), levelMax()));
       } else if (e.type === 'game_mode_update') {
         setGameModeSignal(e.data);
       } else if (e.type === 'wear_update') {
         setWear(e.data);
+      } else if (e.type === 'eq_preset_update' && modelInfo()?.eq_state) {
+        setEqPresetSignal(e.data);
       }
-    }).then((fn) => unlisteners.push(fn));
+    };
+    const seen = new Set<DeviceEvent['type']>();
+    unlisteners.push(
+      await onDeviceEvent((e) => {
+        seen.add(e.type);
+        handleDeviceEvent(e);
+      }),
+    );
 
-    onConnectionState((s) => {
+    const applyStatus = (s: ConnStatus) => {
       setStatus(s);
       if (s === 'connected') startTimer();
       else stopTimer();
-    }).then((fn) => unlisteners.push(fn));
-
-    onModelInfo((info) => {
+    };
+    const applyModel = (info: ModelInfo) => {
       setModelInfo(info);
       setAncModeSignal('off');
-    }).then((fn) => unlisteners.push(fn));
+      setAncLevel((v) => Math.min(v, info.anc_levels ?? CONTINUOUS_LEVEL_MAX));
+    };
+
+    unlisteners.push(await onConnectionState(applyStatus));
+    unlisteners.push(await onModelInfo(applyModel));
+
+    // The backend may have connected before these listeners existed (the webview loads
+    // in the background); catch up on what was already published. Model first: event
+    // handling depends on its capabilities. Skip event kinds a listener already delivered,
+    // which are newer than the snapshot's.
+    const snapshot = await getDeviceSnapshot().catch(() => null);
+    if (snapshot?.model && modelInfo() === null) applyModel(snapshot.model);
+    if (snapshot && status() === 'connecting') applyStatus(snapshot.state);
+    snapshot?.events.filter((e) => !seen.has(e.type)).forEach(handleDeviceEvent);
 
     onUpdateAvailable((version) => setUpdateVersion(version))
       .then((fn) => unlisteners.push(fn));
@@ -86,9 +122,8 @@ export default function App() {
   async function handleAnc(mode: AncMode) {
     if (ancMode() === mode) return;
     setAncLoading(mode);
-    const byte = Math.round(((ancLevel() - 1) / 9) * (0xff - 0x10) + 0x10);
     try {
-      await setAncMode(mode, mode === 'off' ? undefined : byte);
+      await setAncMode(mode, mode === 'off' ? undefined : levelByte(ancLevel()));
     } catch {
       setAncLoading(null);
     }
@@ -112,9 +147,8 @@ export default function App() {
   async function handleLevelCommit(v: number) {
     setAncLevel(v);
     const mode = ancMode();
-    if (mode !== 'off') {
-      const byte = Math.round(((v - 1) / 9) * (0xff - 0x10) + 0x10);
-      await setAncMode(mode, byte).catch(() => {});
+    if (strengthModes().includes(mode)) {
+      await setAncMode(mode, levelByte(v)).catch(() => {});
     }
   }
 
@@ -193,6 +227,7 @@ export default function App() {
                 rightHistory={right().map((r) => r.pct)}
                 elapsed={useElapsed()()}
                 showTimer={getSettingsStore().show_session_timer}
+                showFind={modelInfo()?.find_earbud ?? true}
               />
             </div>
           </Show>
@@ -203,6 +238,8 @@ export default function App() {
                 mode={ancMode()}
                 loading={ancLoading()}
                 level={ancLevel()}
+                levelMax={levelMax()}
+                strengthModes={strengthModes()}
                 supportedModes={supportedAncModes()}
                 gameMode={gameMode()}
                 showGameMode={true}
@@ -216,7 +253,7 @@ export default function App() {
 
           <Show when={activeTab() === 'eq'}>
             <div class="panel-in">
-              <EqTab preset={eqPreset()} onPreset={handleEqPreset} />
+              <EqTab preset={eqPreset()} labels={modelInfo()?.eq_labels ?? null} onPreset={handleEqPreset} />
             </div>
           </Show>
 

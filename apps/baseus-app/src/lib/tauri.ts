@@ -24,12 +24,22 @@ export type EqPreset = 'balanced' | 'bass_boost' | 'voice' | 'clear';
 
 export interface ModelInfo {
   name: string;
+  /** Discrete ANC strength steps (BP1 Ultra: 5), or null for the continuous 1–10 slider. */
+  anc_levels: number | null;
+  /** Noise-control modes that take a strength value. */
+  strength_modes: AncMode[];
+  find_earbud: boolean;
+  /** Device-side names for the Balanced / Bass Boost / Voice / Clear presets. */
+  eq_labels: [string, string, string, string] | null;
+  /** Whether eq_preset_update events reflect the device's real preset. */
+  eq_state: boolean;
 }
 
 export type DeviceEvent =
   | { type: 'battery_update'; data: BatteryState }
   | { type: 'case_update'; data: CaseState }
   | { type: 'anc_mode_update'; data: AncMode }
+  | { type: 'anc_level_update'; data: number }
   | { type: 'game_mode_update'; data: boolean }
   | { type: 'wear_update'; data: WearState }
   | { type: 'eq_preset_update'; data: EqPreset }
@@ -48,6 +58,18 @@ export function onConnectionState(cb: (s: ConnectionState) => void): Promise<Unl
 
 export function onModelInfo(cb: (info: ModelInfo) => void): Promise<UnlistenFn> {
   return listen<ModelInfo>('model-info', (event) => cb(event.payload));
+}
+
+export interface DeviceSnapshot {
+  state: ConnectionState;
+  model: ModelInfo | null;
+  /** Latest device event of each kind since the connection started. */
+  events: DeviceEvent[];
+}
+
+/** Connection state and model published before this window subscribed to the events. */
+export function getDeviceSnapshot(): Promise<DeviceSnapshot> {
+  return invoke('get_device_snapshot');
 }
 
 export interface Settings {
