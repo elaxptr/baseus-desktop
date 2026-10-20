@@ -170,10 +170,14 @@ bands 65 / 125 / 250 / 500 / 1k / 2k / 5k / 12k Hz, filter type 1, gain = 120 + 
 → 23                                 (read) query state
 ```
 
-Accepted earlier in the same session (`24 01` → `23 01` / `23 00`), later rejected with
-`24 0B` — **including by the official app** — while the phone was on LDAC and the buds were
-connected to two devices. The client always re-reads `23` after a write, so the toggle
-reflects what the device actually did.
+Accepted in the first sessions (`24 01`, then `23 01` / `23 00`) while the LDAC query `74`
+answered `74 00`. Later the same day every write was refused with `24 0B` — **by the
+official app too** — while `74` answered `74 8E` and the phone was streaming LDAC. The
+refusal persisted with the phone's Bluetooth switched off, so the second connection is not
+the cause. Low latency is most likely unavailable while LDAC is in use (the official app
+warns that LDAC disables other features), but LDAC was not toggled to confirm it, since that
+restarts the buds. The client re-reads `23` after every write, so the toggle falls back to
+the device's real state.
 
 ## Other opcodes (captured, not used by the desktop app)
 
@@ -187,7 +191,7 @@ reflects what the device actually did.
 | Ambient-sound cycle | `8F SIDE GESTURE 06 N m1 … mN` (ack `8F 01`) | `8E SIDE GESTURE 06` → same layout |
 | Firmware version | — | `19` → `19 xx 10 1A 10 1A` (1.0.26 / 1.0.26) |
 | Dual connection | — | `3B` → `3B ON CONNECTED`; `3E` → one frame per connected device |
-| LDAC | not toggled (restarts the buds) | `74` → `74 ON` |
+| LDAC | not toggled (restarts the buds) | `74` → `74 00`, or `74 8E` while the phone streamed LDAC (the official app still showed "Hi-Res Audio: OFF") |
 | State dump | `FF` (read) | `23`, `74`, … |
 
 Gestures: SIDE `00` left / `01` right; GESTURE `00` double tap, `01` triple tap,

@@ -1,4 +1,4 @@
-# BLE: low-latency writes rejected with 24 0B (phone on LDAC, two devices connected)
+# BLE: low-latency writes refused with 24 0B while the LDAC query 74 answers 8E (phone streaming LDAC)
 # time  dir  frame  (decoded opcode)
 
 17:44:00.193  RX  78 9C 00 0E 02 01 05 02 5A 00 5A 01 A4 4B                     op 02
