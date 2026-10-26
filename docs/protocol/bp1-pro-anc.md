@@ -183,6 +183,11 @@ firmware revision** ([issue #3](https://github.com/elaxptr/baseus-desktop/issues
   `AA 34 01`, never `AA 32`/`AA 33`. On these units the payload byte carries no
   mode information.
 
+- **Unexplained:** on 2026-10-26 one unit (Linux/BlueZ, one bud worn, the other not
+  reporting) answered every ANC command with `AA 34 0C 00`, and EQ changes with
+  `AA 43 0C 00`, with no audible effect. Probably a rejection status, perhaps
+  single-bud mode; unconfirmed. The decoder currently reads it as success.
+
 Because of this, the client decoder treats a zero ack payload as Off and a
 non-zero payload as confirming the *last commanded* mode (see
 `Bp1ProAnc::resolve_anc_ack`), instead of trusting the ack byte as a mode value.
