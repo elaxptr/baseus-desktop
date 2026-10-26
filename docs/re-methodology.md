@@ -1,5 +1,9 @@
 # Reverse-Engineering Methodology
 
+> Just want your model supported? You don't need any of this — follow
+> [capture-your-model.md](capture-your-model.md) to record a log on your phone and send it
+> in. This page is for decoding a capture yourself.
+
 ## Prerequisites
 - MuMuPlayer (or any Android emulator with Bluetooth passthrough)
 - Frida server (arm64 build matching emulator ABI) pushed to `/data/local/tmp/frida-server`

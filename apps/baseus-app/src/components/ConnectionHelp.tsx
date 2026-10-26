@@ -3,7 +3,7 @@ import { openUrl } from '@tauri-apps/plugin-opener';
 import type { ConnectionIssue } from '../lib/tauri';
 
 const REPO = 'https://github.com/elaxptr/baseus-desktop';
-const ADD_MODEL_URL = `${REPO}/blob/main/docs/re-methodology.md`;
+const ADD_MODEL_URL = `${REPO}/blob/main/docs/capture-your-model.md`;
 const NEW_ISSUE_URL = `${REPO}/issues/new`;
 
 interface Props {

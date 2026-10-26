@@ -23,9 +23,9 @@ Only hardware-verified models are supported. Earlier drafts included Inspire XH1
 support extracted from the Baseus Android APK, but since none was ever confirmed on a real
 device it has been removed rather than ship promises we can't back.
 
-**Own a different Baseus model?** Adding it is the goal — see
-[docs/re-methodology.md](docs/re-methodology.md) for how to capture your device's protocol
-and contribute it back. Protocol capture tooling to make this much easier is on the roadmap.
+**Own a different Baseus model?** Adding it is the goal. With an Android phone you can
+record what the official app sends in about 15 minutes, with no root or PC tools — see
+[docs/capture-your-model.md](docs/capture-your-model.md). That's how the BP1 Ultra was added.
 
 ## Features
 
@@ -49,7 +49,7 @@ and contribute it back. Protocol capture tooling to make this much easier is on 
   The earbuds accept one control connection at a time, so close the Baseus app on your
   phone. In dual-device mode, the other device may be holding that connection.
 - **"Unsupported earbuds found".** Your model is visible but not supported yet. See
-  [docs/re-methodology.md](docs/re-methodology.md) to help add it.
+  [docs/capture-your-model.md](docs/capture-your-model.md) to help add it.
 
 ## Building
 
