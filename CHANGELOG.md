@@ -3,6 +3,17 @@
 All notable changes to this project are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions match the git tags.
 
+## [Unreleased]
+
+### Added
+- **BP1 Ultra extras:** bass boost (Off / 1 / 2 / 3) and spatial audio on the EQ tab,
+  wind-noise reduction on the noise-control tab, and the earbuds' firmware version in
+  Settings. The state is read from the buds on connect and re-read after every change.
+  Every frame matches the official app's byte for byte, CRC included (golden tests against
+  the captures in `docs/protocol/captures/`).
+- The `connect` example takes `spatial:on|off`, `wind:on|off`, `bass:off|1|2|3` and
+  `fw:?` for testing these from the command line.
+
 ## [0.4.0] — 2026-10-26
 
 First public release since 0.2.1: 0.3.0 was never published as a release, so its

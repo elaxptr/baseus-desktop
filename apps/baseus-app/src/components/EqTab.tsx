@@ -1,4 +1,6 @@
-import type { EqPreset } from '../lib/tauri';
+import { Show } from 'solid-js';
+import type { BassBoost, EqPreset } from '../lib/tauri';
+import { Segmented, SwitchRow } from './Controls';
 
 const PRESETS: { id: EqPreset; name: string; bars: number[] }[] = [
   { id: 'balanced',  name: 'Balanced',   bars: [50, 55, 60, 55, 50] },
@@ -12,6 +14,14 @@ interface Props {
   /** Model-specific preset names, in PRESETS order; null keeps the generic names. */
   labels: [string, string, string, string] | null;
   onPreset: (p: EqPreset) => void;
+  /** Bass-boost level count, or null to hide the control. */
+  bassBoostLevels: number | null;
+  bassBoost: BassBoost;
+  onBassBoost: (b: BassBoost) => void;
+  /** Whether the model has spatial audio. */
+  showSpatialAudio: boolean;
+  spatialAudio: boolean;
+  onSpatialAudio: (on: boolean) => void;
 }
 
 export default function EqTab(props: Props) {
@@ -54,6 +64,36 @@ export default function EqTab(props: Props) {
           );
         })}
       </div>
+
+      <Show when={props.bassBoostLevels}>
+        {(levels) => (
+          <>
+            <div style={{ ...labelStyle, 'margin-top': '16px' }}>Bass Boost <Divider /></div>
+            <Segmented
+              options={[
+                { value: 0, label: 'Off' },
+                ...Array.from({ length: levels() }, (_, i) => ({ value: i + 1, label: `${i + 1}` })),
+              ]}
+              value={props.bassBoost.enabled ? props.bassBoost.level : 0}
+              // Off keeps the level, so turning boost back on restores it.
+              onChange={(v) =>
+                props.onBassBoost(v === 0 ? { ...props.bassBoost, enabled: false } : { enabled: true, level: v })
+              }
+            />
+          </>
+        )}
+      </Show>
+
+      <Show when={props.showSpatialAudio}>
+        <div style={{ ...labelStyle, 'margin-top': '16px' }}>Spatial Audio <Divider /></div>
+        <SwitchRow
+          icon="🎧"
+          label="Spatial Audio"
+          desc="Wider, surround-like soundstage"
+          value={props.spatialAudio}
+          onChange={props.onSpatialAudio}
+        />
+      </Show>
     </div>
   );
 }

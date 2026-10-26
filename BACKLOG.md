@@ -22,10 +22,10 @@ replacement is tooling that lets real owners capture and contribute *verified* s
 
 Captured and documented in `docs/protocol/bp1-ultra.md`, just not exposed in the UI yet:
 
-- [ ] Spatial audio toggle (`43` / `42`)
-- [ ] Bass boost level (`54` / `53`)
+- [x] Spatial audio toggle (`43` / `42`)
+- [x] Bass boost level (`54` / `53`)
 - [ ] ANC scenes (indoor / outdoor / commuting / traveling / adaptive) and transparency voice mode
-- [ ] Wind-noise reduction (`52` / `51`)
+- [x] Wind-noise reduction (`52` / `51`)
 - [ ] All 30 EQ presets + custom 8-band EQ (`31`)
 - [ ] Gesture remapping (`8D` / `8C`)
 - [ ] Volume limiter (`94` / `93`)
@@ -36,7 +36,7 @@ Not captured yet:
 
 ## Platform + infrastructure
 
-- [ ] Firmware version display
+- [ ] Firmware version display (done for the BP1 Ultra; BP1 Pro opcode unknown)
 - [ ] Multi-device support
 - [x] Linux support (BlueZ transport)
 - [ ] macOS support (IOBluetooth transport)

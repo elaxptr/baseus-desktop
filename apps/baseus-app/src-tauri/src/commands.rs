@@ -43,6 +43,31 @@ pub fn set_game_mode(enabled: bool, cmd_tx: State<CommandSender>) -> Result<(), 
 }
 
 #[tauri::command]
+pub fn set_spatial_audio(enabled: bool, cmd_tx: State<CommandSender>) -> Result<(), String> {
+    cmd_tx
+        .send(DeviceCommand::SetSpatialAudio(enabled))
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn set_wind_reduction(enabled: bool, cmd_tx: State<CommandSender>) -> Result<(), String> {
+    cmd_tx
+        .send(DeviceCommand::SetWindReduction(enabled))
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn set_bass_boost(
+    enabled: bool,
+    level: u8,
+    cmd_tx: State<CommandSender>,
+) -> Result<(), String> {
+    cmd_tx
+        .send(DeviceCommand::SetBassBoost(enabled, level))
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn find_earbud(side: String, cmd_tx: State<CommandSender>) -> Result<(), String> {
     let s = match side.as_str() {
         "left" => Side::Left,

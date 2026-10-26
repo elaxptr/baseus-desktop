@@ -1,11 +1,13 @@
 import { createSignal, onMount, Show } from 'solid-js';
 import { getSettingsStore, updateSetting } from '../stores/settings';
-import { checkForUpdate, installUpdate } from '../lib/tauri';
+import { checkForUpdate, installUpdate, type FirmwareVersion } from '../lib/tauri';
 import { getVersion } from '@tauri-apps/api/app';
 
 interface Props {
   initialUpdateVersion: string | null;
   onUpdateInstalled: () => void;
+  /** Connected earbuds' firmware, when the model reports it. */
+  firmware: FirmwareVersion | null;
 }
 
 type UpdateState = 'idle' | 'checking' | 'up-to-date' | 'available' | 'installing' | 'error';
@@ -99,6 +101,17 @@ export default function SettingsTab(props: Props) {
                 {appVersion() ? `v${appVersion()}` : '…'}
               </div>
             </div>
+
+            <Show when={props.firmware}>
+              {(fw) => (
+                <div style={{ 'text-align': 'right', 'margin-left': 'auto', 'margin-right': '12px' }}>
+                  <div style={{ 'font-size': '10px', color: '#444' }}>Earbuds firmware</div>
+                  <div class="num-mono" style={{ 'font-size': '11px', color: '#888', 'margin-top': '2px' }}>
+                    {fw().left === fw().right ? fw().left : `L ${fw().left} · R ${fw().right}`}
+                  </div>
+                </div>
+              )}
+            </Show>
 
             <Show when={!showInstall()}>
               <button

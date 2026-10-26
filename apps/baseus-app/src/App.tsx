@@ -15,7 +15,12 @@ import {
   setAncMode,
   setEqPreset,
   setGameMode,
+  setSpatialAudio,
+  setWindReduction,
+  setBassBoost,
   type AncMode,
+  type BassBoost,
+  type FirmwareVersion,
   type ConnectionIssue,
   type DeviceEvent,
   type EqPreset,
@@ -47,6 +52,10 @@ export default function App() {
   const [eqPreset, setEqPresetSignal] = createSignal<EqPreset>('balanced');
   const [updateVersion, setUpdateVersion] = createSignal<string | null>(null);
   const [issue, setIssue] = createSignal<ConnectionIssue | null>(null);
+  const [spatialAudio, setSpatialAudioSignal] = createSignal(false);
+  const [windReduction, setWindReductionSignal] = createSignal(false);
+  const [bassBoost, setBassBoostSignal] = createSignal<BassBoost>({ enabled: false, level: 1 });
+  const [firmware, setFirmware] = createSignal<FirmwareVersion | null>(null);
 
   const connectedModelName = createMemo(() => modelInfo()?.name ?? 'Baseus Desktop');
   const supportedAncModes = createMemo<AncMode[]>(() => BP1_ANC_MODES);
@@ -82,6 +91,14 @@ export default function App() {
         setAncLevel(Math.min(Math.max(e.data, 1), levelMax()));
       } else if (e.type === 'game_mode_update') {
         setGameModeSignal(e.data);
+      } else if (e.type === 'spatial_audio_update') {
+        setSpatialAudioSignal(e.data);
+      } else if (e.type === 'wind_reduction_update') {
+        setWindReductionSignal(e.data);
+      } else if (e.type === 'bass_boost_update') {
+        setBassBoostSignal(e.data);
+      } else if (e.type === 'firmware_update') {
+        setFirmware(e.data);
       } else if (e.type === 'wear_update') {
         setWear(e.data);
       } else if (e.type === 'eq_preset_update' && modelInfo()?.eq_state) {
@@ -106,6 +123,7 @@ export default function App() {
     const applyModel = (info: ModelInfo) => {
       setModelInfo(info);
       setAncModeSignal('off');
+      setFirmware(null);
       setAncLevel((v) => Math.min(v, info.anc_levels ?? CONTINUOUS_LEVEL_MAX));
     };
 
@@ -146,6 +164,23 @@ export default function App() {
   async function handleGameMode(on: boolean) {
     setGameModeSignal(on);
     await setGameMode(on).catch(() => setGameModeSignal(!on));
+  }
+
+  // Optimistic like game mode; the backend re-reads the device's state after each write.
+  async function handleSpatialAudio(on: boolean) {
+    setSpatialAudioSignal(on);
+    await setSpatialAudio(on).catch(() => setSpatialAudioSignal(!on));
+  }
+
+  async function handleWindReduction(on: boolean) {
+    setWindReductionSignal(on);
+    await setWindReduction(on).catch(() => setWindReductionSignal(!on));
+  }
+
+  async function handleBassBoost(next: BassBoost) {
+    const prev = bassBoost();
+    setBassBoostSignal(next);
+    await setBassBoost(next.enabled, next.level).catch(() => setBassBoostSignal(prev));
   }
 
   async function handleEqPreset(preset: EqPreset) {
@@ -260,6 +295,9 @@ export default function App() {
                 supportedModes={supportedAncModes()}
                 gameMode={gameMode()}
                 showGameMode={true}
+                showWindReduction={modelInfo()?.wind_reduction ?? false}
+                windReduction={windReduction()}
+                onWindReduction={handleWindReduction}
                 onMode={handleAnc}
                 onLevel={handleLevel}
                 onLevelCommit={handleLevelCommit}
@@ -270,13 +308,23 @@ export default function App() {
 
           <Show when={activeTab() === 'eq'}>
             <div class="panel-in">
-              <EqTab preset={eqPreset()} labels={modelInfo()?.eq_labels ?? null} onPreset={handleEqPreset} />
+              <EqTab
+                preset={eqPreset()}
+                labels={modelInfo()?.eq_labels ?? null}
+                onPreset={handleEqPreset}
+                bassBoostLevels={modelInfo()?.bass_boost_levels ?? null}
+                bassBoost={bassBoost()}
+                onBassBoost={handleBassBoost}
+                showSpatialAudio={modelInfo()?.spatial_audio ?? false}
+                spatialAudio={spatialAudio()}
+                onSpatialAudio={handleSpatialAudio}
+              />
             </div>
           </Show>
 
           <Show when={activeTab() === 'settings'}>
             <div class="panel-in">
-              <SettingsTab initialUpdateVersion={updateVersion()} onUpdateInstalled={() => setUpdateVersion(null)} />
+              <SettingsTab initialUpdateVersion={updateVersion()} onUpdateInstalled={() => setUpdateVersion(null)} firmware={firmware()} />
             </div>
           </Show>
         </div>

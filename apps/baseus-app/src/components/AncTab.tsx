@@ -1,4 +1,6 @@
+import { Show } from 'solid-js';
 import type { AncMode } from '../lib/tauri';
+import { SwitchRow } from './Controls';
 
 interface Props {
   mode: AncMode;
@@ -9,6 +11,9 @@ interface Props {
   supportedModes: AncMode[];
   gameMode: boolean;
   showGameMode: boolean;
+  showWindReduction: boolean;
+  windReduction: boolean;
+  onWindReduction: (on: boolean) => void;
   onMode: (mode: AncMode) => void;
   onLevel: (level: number) => void;
   onLevelCommit: (level: number) => void;
@@ -132,6 +137,17 @@ export default function AncTab(props: Props) {
           </div>
         </div>
       </div>
+
+      <Show when={props.showWindReduction}>
+        <div style={{ ...labelStyle, 'margin-top': '16px' }}>Wind Noise <Divider /></div>
+        <SwitchRow
+          icon="💨"
+          label="Wind Noise Reduction"
+          desc="Cuts wind rumble outdoors"
+          value={props.windReduction}
+          onChange={props.onWindReduction}
+        />
+      </Show>
 
       {/* Game / low-latency mode — independent toggle, not an ANC state */}
       {props.showGameMode && (
