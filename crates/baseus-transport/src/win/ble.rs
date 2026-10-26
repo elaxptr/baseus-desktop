@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 use std::time::Duration;
 
 use btleplug::api::{
-    Central, Manager as _, Peripheral as _, PeripheralProperties, ScanFilter, WriteType,
+    BDAddr, Central, Manager as _, Peripheral as _, PeripheralProperties, ScanFilter, WriteType,
 };
 use btleplug::platform::{Adapter, Manager, Peripheral};
 use futures::StreamExt;
@@ -34,14 +34,20 @@ impl GattTransport {
         let adapter = get_adapter().await?;
         // Names of non-matching devices seen along the way, reported on failure.
         let mut nearby = BTreeSet::new();
+        // Matching devices that turned out not to carry the control service.
+        let mut rejected = BTreeSet::new();
 
         // Check cached/bonded peripherals first — the device may already be known to the
         // adapter and not actively advertising, so a fresh scan would time out.
         tracing::info!("checking cached peripherals for any known Baseus device…");
-        if let Ok(Some((p, idx))) = find_match(&adapter, devices, &mut nearby).await {
+        let cached = find_matches(&adapter, devices, &mut nearby, &rejected)
+            .await
+            .unwrap_or_default();
+        for (p, idx) in cached {
             tracing::info!("found {} in adapter cache", devices[idx].name);
-            let transport = connect_with_uuids(p, devices[idx]).await?;
-            return Ok((transport, idx));
+            if let Some(transport) = try_candidate(p, devices[idx], &mut rejected).await? {
+                return Ok((transport, idx));
+            }
         }
 
         // Scan unfiltered. A ScanFilter with service UUIDs becomes a BlueZ discovery
@@ -55,19 +61,27 @@ impl GattTransport {
             .await
             .map_err(|e| TransportError::AdapterUnavailable(e.to_string()))?;
 
-        let found =
-            tokio::time::timeout(SCAN_TIMEOUT, poll_for_match(&adapter, devices, &mut nearby))
-                .await;
+        let found = tokio::time::timeout(SCAN_TIMEOUT, async {
+            loop {
+                let candidates = find_matches(&adapter, devices, &mut nearby, &rejected)
+                    .await
+                    .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
+                for (p, idx) in candidates {
+                    adapter.stop_scan().await.ok();
+                    if let Some(transport) = try_candidate(p, devices[idx], &mut rejected).await? {
+                        return Ok((transport, idx));
+                    }
+                    adapter.start_scan(ScanFilter::default()).await.ok();
+                }
+                tokio::time::sleep(SCAN_POLL).await;
+            }
+        })
+        .await;
         adapter.stop_scan().await.ok();
 
-        let (p, idx) = found
-            .map_err(|_| TransportError::DeviceNotFound {
-                nearby: nearby.into_iter().collect(),
-            })?
-            .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
-
-        let transport = connect_with_uuids(p, devices[idx]).await?;
-        Ok((transport, idx))
+        found.map_err(|_| TransportError::DeviceNotFound {
+            nearby: nearby.into_iter().collect(),
+        })?
     }
 
     pub async fn send(&mut self, data: &[u8]) -> Result<(), TransportError> {
@@ -111,6 +125,8 @@ async fn connect_with_uuids(
         ..
     } = device;
     tracing::info!("found {device_name}, opening GATT connection…");
+    #[cfg(target_os = "linux")]
+    let was_connected = peripheral.is_connected().await.unwrap_or(false);
     peripheral
         .connect()
         .await
@@ -150,6 +166,27 @@ async fn connect_with_uuids(
         })?
         .clone();
 
+    // BlueZ keeps the LE link up after the process that opened it exits, and the earbuds
+    // send nothing on a link they already had: no battery report, so no model detection
+    // either. Start a fresh link, now that this is known to be the control device and
+    // not the classic audio one.
+    #[cfg(target_os = "linux")]
+    if was_connected {
+        tracing::info!("link left open by an earlier session, reconnecting…");
+        peripheral
+            .disconnect()
+            .await
+            .map_err(|e| TransportError::ConnectionFailed(format!("disconnect(): {e}")))?;
+        peripheral
+            .connect()
+            .await
+            .map_err(|e| TransportError::ConnectionFailed(format!("connect(): {e}")))?;
+        peripheral
+            .discover_services()
+            .await
+            .map_err(|e| TransportError::ConnectionFailed(format!("discover_services(): {e}")))?;
+    }
+
     tracing::info!("subscribing to notify characteristic…");
     peripheral
         .subscribe(&notify_char)
@@ -179,14 +216,41 @@ async fn connect_with_uuids(
     })
 }
 
-/// Return the first cached peripheral matching any entry, with the entry's index.
-/// Names of the peripherals that did not match are added to `nearby`.
-async fn find_match(
+/// Connect to one matching peripheral. `Ok(None)` means it has no control service: a
+/// name match can be the earbuds' classic audio device, which BlueZ lists beside the LE
+/// one. It is remembered in `rejected` and left connected, since it carries the audio.
+async fn try_candidate(
+    peripheral: Peripheral,
+    device: DeviceMatch<'_>,
+    rejected: &mut BTreeSet<BDAddr>,
+) -> Result<Option<GattTransport>, TransportError> {
+    let address = peripheral.address();
+    match connect_with_uuids(peripheral, device).await {
+        Ok(transport) => Ok(Some(transport)),
+        Err(TransportError::ServiceNotFound) => {
+            tracing::info!("{address} has no control service, trying the next match");
+            rejected.insert(address);
+            Ok(None)
+        }
+        Err(e) => Err(e),
+    }
+}
+
+/// Cached peripherals matching any entry, with the entry's index: those advertising the
+/// control service first, then name-only matches. Names of the peripherals that did not
+/// match are added to `nearby`.
+async fn find_matches(
     adapter: &Adapter,
     devices: &[DeviceMatch<'_>],
     nearby: &mut BTreeSet<String>,
-) -> btleplug::Result<Option<(Peripheral, usize)>> {
+    rejected: &BTreeSet<BDAddr>,
+) -> btleplug::Result<Vec<(Peripheral, usize)>> {
+    let mut by_service = Vec::new();
+    let mut by_name = Vec::new();
     for p in adapter.peripherals().await? {
+        if rejected.contains(&p.address()) {
+            continue;
+        }
         let Ok(Some(props)) = p.properties().await else {
             continue;
         };
@@ -196,29 +260,20 @@ async fn find_match(
             props.local_name,
             props.services
         );
-        if let Some(idx) = match_index(devices, &props) {
-            return Ok(Some((p, idx)));
-        }
-        if let Some(name) = props.local_name.map(|n| n.trim().to_string()) {
-            if !name.is_empty() {
-                nearby.insert(name);
+        match match_index(devices, &props) {
+            Some((idx, true)) => by_service.push((p, idx)),
+            Some((idx, false)) => by_name.push((p, idx)),
+            None => {
+                if let Some(name) = props.local_name.map(|n| n.trim().to_string()) {
+                    if !name.is_empty() {
+                        nearby.insert(name);
+                    }
+                }
             }
         }
     }
-    Ok(None)
-}
-
-async fn poll_for_match(
-    adapter: &Adapter,
-    devices: &[DeviceMatch<'_>],
-    nearby: &mut BTreeSet<String>,
-) -> btleplug::Result<(Peripheral, usize)> {
-    loop {
-        if let Some(hit) = find_match(adapter, devices, nearby).await? {
-            return Ok(hit);
-        }
-        tokio::time::sleep(SCAN_POLL).await;
-    }
+    by_service.extend(by_name);
+    Ok(by_service)
 }
 
 /// Match a peripheral against the known-device table.
@@ -226,14 +281,16 @@ async fn poll_for_match(
 /// The advertised service UUID is checked first: it is part of the advertisement
 /// proper, so every backend sees it. The name lives in the scan response, which
 /// BlueZ surfaces only intermittently, so it is a fallback rather than the key.
-fn match_index(devices: &[DeviceMatch<'_>], props: &PeripheralProperties) -> Option<usize> {
+/// Returns the entry's index and whether the service UUID (rather than the name) matched.
+fn match_index(devices: &[DeviceMatch<'_>], props: &PeripheralProperties) -> Option<(usize, bool)> {
     if let Some(idx) = devices.iter().position(|d| {
         Uuid::parse_str(d.service_uuid).is_ok_and(|want| props.services.contains(&want))
     }) {
-        return Some(idx);
+        return Some((idx, true));
     }
     let local = props.local_name.as_deref()?.trim();
     devices
         .iter()
         .position(|d| d.name.eq_ignore_ascii_case(local))
+        .map(|idx| (idx, false))
 }

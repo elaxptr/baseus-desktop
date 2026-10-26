@@ -27,6 +27,11 @@ All notable changes to this project are documented here. Format loosely follows
 - Changes made while the earbuds were disconnected were queued and replayed on the next
   connection. They're now refused, and the controls are disabled until the earbuds connect.
 - Batteries no longer show 0 % while disconnected.
+- Linux: the app could lock onto the earbuds' classic audio device, which has the same
+  name but no control service, and fail every retry. It now tries each match, the ones
+  advertising the control service first.
+- Linux: after restarting the app, the earbuds sent nothing (no battery, model guessed),
+  because BlueZ kept the old link open. The app now starts a fresh link in that case.
 - When the earbuds drop the connection, the next failed change now ends the session and
   reconnects. Before, every change failed with an error until the link check caught up,
   which could take a while if you kept clicking.
