@@ -123,6 +123,16 @@ export function getSupportedAncModes(modelName: string): Promise<AncMode[]> {
   return invoke('get_supported_anc_modes', { modelName });
 }
 
+/** A command the earbuds didn't take: the write itself failed. */
+export interface CommandError {
+  command: 'anc' | 'eq' | 'game' | 'find';
+  message: string;
+}
+
+export function onCommandError(cb: (e: CommandError) => void): Promise<UnlistenFn> {
+  return listen<CommandError>('command-error', (event) => cb(event.payload));
+}
+
 export function onUpdateAvailable(cb: (version: string) => void): Promise<UnlistenFn> {
   return listen<string>('update-available', (event) => cb(event.payload));
 }

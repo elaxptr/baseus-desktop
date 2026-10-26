@@ -3,6 +3,20 @@
 All notable changes to this project are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions match the git tags.
 
+## [Unreleased]
+
+### Added
+- Tray menu shows the connected model and battery levels and switches noise control
+  (Off / Noise cancellation / Transparency); the tray tooltip shows the same summary.
+
+### Fixed
+- Changes made while the earbuds were disconnected were queued and replayed on the next
+  connection. They're now refused, and the controls are disabled until the earbuds connect.
+- The Home tab no longer shows 0 % batteries while disconnected.
+- A change the earbuds didn't take now shows an error and reverts the control instead of
+  failing silently.
+- Removed the decorative macOS-style window buttons from the title bar.
+
 ## [0.4.1] — 2026-10-26
 
 ### Fixed

@@ -38,6 +38,25 @@ pub enum DeviceCommand {
     FindEarbud(Side),
 }
 
+impl DeviceCommand {
+    /// Which control a `command-error` belongs to, so the frontend can revert it.
+    fn kind(&self) -> &'static str {
+        match self {
+            Self::SetAncMode(..) => "anc",
+            Self::SetEqPreset(_) => "eq",
+            Self::SetGameMode(_) => "game",
+            Self::FindEarbud(_) => "find",
+        }
+    }
+}
+
+/// A command the transport failed to write, emitted as `command-error`.
+#[derive(Debug, Clone, Serialize)]
+struct CommandError {
+    command: &'static str,
+    message: String,
+}
+
 #[derive(Debug, Clone)]
 pub enum Side {
     Left,
@@ -49,6 +68,21 @@ type CommandReceiver = mpsc::UnboundedReceiver<DeviceCommand>;
 
 pub fn command_channel() -> (CommandSender, CommandReceiver) {
     mpsc::unbounded_channel()
+}
+
+/// Queue a command for the connected earbuds. Refused while disconnected: nothing reads
+/// the queue then, so the command would sit there and replay on the next connection.
+pub fn send_command(app: &AppHandle, cmd: DeviceCommand) -> Result<(), String> {
+    let connected = app
+        .state::<SharedSnapshot>()
+        .lock()
+        .is_ok_and(|s| s.state == "connected");
+    if !connected {
+        return Err("Earbuds aren't connected".into());
+    }
+    app.state::<CommandSender>()
+        .send(cmd)
+        .map_err(|e| e.to_string())
 }
 
 /// Model identity and capabilities emitted to the frontend after a successful connection.
@@ -80,6 +114,9 @@ pub struct DeviceSnapshot {
     pub events: Vec<DeviceEvent>,
     /// Why the last attempt failed; kept across retries, cleared on connect.
     pub issue: Option<ConnectionIssue>,
+    /// Last ANC strength byte commanded or reported, reused by the tray's mode toggles.
+    #[serde(skip)]
+    pub anc_level: Option<u8>,
 }
 
 /// Why the last connection attempt failed. Shown while the app keeps retrying, so a
@@ -129,6 +166,7 @@ impl Default for DeviceSnapshot {
             model: None,
             events: Vec::new(),
             issue: None,
+            anc_level: None,
         }
     }
 }
@@ -141,9 +179,11 @@ fn publish_state(app: &AppHandle, state: &'static str) {
         if state == "connecting" {
             snapshot.model = None;
             snapshot.events.clear();
+            snapshot.anc_level = None;
         }
     }
     let _ = app.emit("connection-state", state);
+    crate::tray::refresh(app);
 }
 
 /// Emit a device event and remember it as the latest of its kind.
@@ -154,8 +194,12 @@ fn emit_event(app: &AppHandle, event: &DeviceEvent) {
             .events
             .retain(|e| std::mem::discriminant(e) != kind);
         snapshot.events.push(event.clone());
+        if let DeviceEvent::AncLevelUpdate(level) = event {
+            snapshot.anc_level = Some(*level);
+        }
     }
     let _ = app.emit("device-event", event);
+    crate::tray::refresh(app);
 }
 
 fn publish_issue(app: &AppHandle, issue: Option<ConnectionIssue>) {
@@ -170,6 +214,7 @@ fn publish_model(app: &AppHandle, info: ModelInfo) {
         snapshot.model = Some(info.clone());
     }
     let _ = app.emit("model-info", &info);
+    crate::tray::refresh(app);
 }
 
 impl ModelInfo {
@@ -244,6 +289,9 @@ pub async fn run_loop(app: AppHandle, mut cmd_rx: CommandReceiver) {
                     connected_model,
                     connected_model.display_name()
                 );
+                // Drop anything queued as the previous connection went down, so an old
+                // click doesn't replay on these earbuds.
+                while cmd_rx.try_recv().is_ok() {}
                 // Model first: the UI must know the model's capabilities before it
                 // starts sending commands to a "connected" device.
                 publish_model(&app, ModelInfo::of(connected_model));
@@ -402,6 +450,11 @@ async fn notification_loop(
                                 // with AA 34 01, and resolve_anc_ack needs to know Off was
                                 // the last commanded mode to not misreport it as Anc.
                                 last_anc_mode = Some((*mode, *level));
+                                if *mode != AncMode::Off {
+                                    if let Ok(mut snapshot) = app.state::<SharedSnapshot>().lock() {
+                                        snapshot.anc_level = Some(*level);
+                                    }
+                                }
                                 emit_event(app, &DeviceEvent::AncModeUpdate(*mode));
                                 schedule_recheck(bp1_ultra::op::ANC_STATE);
                             }
@@ -423,7 +476,13 @@ async fn notification_loop(
                             }
                         }
                     }
-                    Err(e) => tracing::warn!("command error: {e}"),
+                    Err(e) => {
+                        tracing::warn!("command error: {e}");
+                        let _ = app.emit(
+                            "command-error",
+                            CommandError { command: cmd.kind(), message: e },
+                        );
+                    }
                 }
             }
             Some(opcode) = recheck_rx.recv() => {

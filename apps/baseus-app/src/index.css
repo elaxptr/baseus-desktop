@@ -123,3 +123,19 @@ html, body, #root {
   .lift, .press, .rail-marker, .rail-btn, .anc-check, .strength,
   .game-card, .game-ic, .game-switch, .game-knob { transition-duration: 0.01ms !important; }
 }
+
+/* Device controls while no earbuds are connected (made inert in App) */
+.device-controls { transition: opacity 0.2s, filter 0.2s; }
+.device-controls.offline { opacity: 0.35; filter: grayscale(1); }
+.offline-note { font-size: 11px; color: #777; margin-bottom: 12px; }
+
+/* Command errors */
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.toast {
+  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%);
+  max-width: 400px; padding: 10px 14px; border-radius: 10px;
+  background: #1c1215; border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5;
+  font-size: 12px; line-height: 1.4; box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.7);
+  animation: toastIn 0.2s var(--ease-out-soft);
+}
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }

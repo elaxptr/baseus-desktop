@@ -11,11 +11,13 @@ import {
   onConnectionState,
   onConnectionIssue,
   onModelInfo,
+  onCommandError,
   onUpdateAvailable,
   setAncMode,
   setEqPreset,
   setGameMode,
   type AncMode,
+  type CommandError,
   type ConnectionIssue,
   type DeviceEvent,
   type EqPreset,
@@ -25,8 +27,16 @@ import {
 import { pushLeft, pushRight, pushCase, left, right, caseData } from './stores/batteryHistory';
 import { loadSettings, getSettingsStore } from './stores/settings';
 import { startTimer, stopTimer, useElapsed } from './lib/timer';
+import { showError, toastMessage } from './lib/toast';
 
 type ConnStatus = 'connected' | 'connecting' | 'disconnected';
+
+const COMMAND_VERB: Record<CommandError['command'], string> = {
+  anc: 'change noise control',
+  eq: 'change the sound preset',
+  game: 'switch game mode',
+  find: 'play the sound',
+};
 
 const BP1_ANC_MODES: AncMode[] = ['off', 'anc', 'transparency'];
 const DEFAULT_STRENGTH_MODES: AncMode[] = ['anc', 'transparency'];
@@ -48,7 +58,14 @@ export default function App() {
   const [updateVersion, setUpdateVersion] = createSignal<string | null>(null);
   const [issue, setIssue] = createSignal<ConnectionIssue | null>(null);
 
+  const connected = () => status() === 'connected';
   const connectedModelName = createMemo(() => modelInfo()?.name ?? 'Baseus Desktop');
+  /// Undo the optimistic UI change of the latest command of each kind, should it fail.
+  const reverts: Partial<Record<CommandError['command'], () => void>> = {};
+  const failed = (kind: CommandError['command']) => (e: unknown) => {
+    reverts[kind]?.();
+    showError(e);
+  };
   const supportedAncModes = createMemo<AncMode[]>(() => BP1_ANC_MODES);
   const strengthModes = createMemo<AncMode[]>(() => modelInfo()?.strength_modes ?? DEFAULT_STRENGTH_MODES);
   const levelMax = createMemo(() => modelInfo()?.anc_levels ?? CONTINUOUS_LEVEL_MAX);
@@ -131,27 +148,31 @@ export default function App() {
 
     onUpdateAvailable((version) => setUpdateVersion(version))
       .then((fn) => unlisteners.push(fn));
+    // The command was queued but the write to the earbuds failed.
+    unlisteners.push(
+      await onCommandError((e) => failed(e.command)(`Couldn't ${COMMAND_VERB[e.command]}: ${e.message}`)),
+    );
   });
 
   async function handleAnc(mode: AncMode) {
     if (ancMode() === mode) return;
     setAncLoading(mode);
-    try {
-      await setAncMode(mode, mode === 'off' ? undefined : levelByte(ancLevel()));
-    } catch {
-      setAncLoading(null);
-    }
+    reverts.anc = () => setAncLoading(null);
+    await setAncMode(mode, mode === 'off' ? undefined : levelByte(ancLevel())).catch(failed('anc'));
   }
 
   async function handleGameMode(on: boolean) {
     setGameModeSignal(on);
-    await setGameMode(on).catch(() => setGameModeSignal(!on));
+    reverts.game = () => setGameModeSignal(!on);
+    await setGameMode(on).catch(failed('game'));
   }
 
   async function handleEqPreset(preset: EqPreset) {
-    if (eqPreset() === preset) return;
+    const previous = eqPreset();
+    if (previous === preset) return;
     setEqPresetSignal(preset);
-    await setEqPreset(preset).catch(() => {});
+    reverts.eq = () => setEqPresetSignal(previous);
+    await setEqPreset(preset).catch(failed('eq'));
   }
 
   function handleLevel(v: number) {
@@ -162,7 +183,8 @@ export default function App() {
     setAncLevel(v);
     const mode = ancMode();
     if (strengthModes().includes(mode)) {
-      await setAncMode(mode, levelByte(v)).catch(() => {});
+      reverts.anc = undefined;
+      await setAncMode(mode, levelByte(v)).catch(failed('anc'));
     }
   }
 
@@ -197,19 +219,12 @@ export default function App() {
           'flex-shrink': '0',
         }}
       >
-        <div style={{ display: 'flex', gap: '5px' }}>
-          {(['#ff5f57', '#ffbd2e', '#28c840'] as const).map((c) => (
-            <div style={{ width: '11px', height: '11px', 'border-radius': '50%', background: c }} />
-          ))}
-        </div>
         <div
           style={{
             flex: '1',
-            'text-align': 'center',
             'font-size': '12px',
             'font-weight': '600',
             color: '#444',
-            'margin-left': '-40px',
           }}
         >
           {connectedModelName()}
@@ -227,50 +242,59 @@ export default function App() {
         <div style={{ flex: '1', padding: '16px', 'overflow-y': 'auto' }}>
           <Show when={activeTab() === 'home'}>
             <div class="panel-in">
-              <Show when={status() !== 'connected'}>
+              <Show when={!connected()}>
                 <ConnectionHelp connecting={status() === 'connecting'} issue={issue()} />
               </Show>
-              <HomeTab
-                leftPct={left()[left().length - 1]?.pct ?? 0}
-                rightPct={right()[right().length - 1]?.pct ?? 0}
-                casePct={caseData()[caseData().length - 1]?.pct ?? 0}
-                leftCharging={leftCharging()}
-                rightCharging={rightCharging()}
-                caseCharging={caseCharging()}
-                leftInEar={wear()?.left_in_ear ?? false}
-                rightInEar={wear()?.right_in_ear ?? false}
-                wearKnown={wear() !== null}
-                leftHistory={left().map((r) => r.pct)}
-                rightHistory={right().map((r) => r.pct)}
-                elapsed={useElapsed()()}
-                showTimer={getSettingsStore().show_session_timer}
-                showFind={modelInfo()?.find_earbud ?? true}
-              />
+              {/* Battery and wear readings belong to a live connection; hide them rather than show 0 %. */}
+              <Show when={connected()}>
+                <HomeTab
+                  leftPct={left()[left().length - 1]?.pct ?? 0}
+                  rightPct={right()[right().length - 1]?.pct ?? 0}
+                  casePct={caseData()[caseData().length - 1]?.pct ?? 0}
+                  leftCharging={leftCharging()}
+                  rightCharging={rightCharging()}
+                  caseCharging={caseCharging()}
+                  leftInEar={wear()?.left_in_ear ?? false}
+                  rightInEar={wear()?.right_in_ear ?? false}
+                  wearKnown={wear() !== null}
+                  leftHistory={left().map((r) => r.pct)}
+                  rightHistory={right().map((r) => r.pct)}
+                  elapsed={useElapsed()()}
+                  showTimer={getSettingsStore().show_session_timer}
+                  showFind={modelInfo()?.find_earbud ?? true}
+                />
+              </Show>
             </div>
           </Show>
 
           <Show when={activeTab() === 'anc'}>
             <div class="panel-in">
-              <AncTab
-                mode={ancMode()}
-                loading={ancLoading()}
-                level={ancLevel()}
-                levelMax={levelMax()}
-                strengthModes={strengthModes()}
-                supportedModes={supportedAncModes()}
-                gameMode={gameMode()}
-                showGameMode={true}
-                onMode={handleAnc}
-                onLevel={handleLevel}
-                onLevelCommit={handleLevelCommit}
-                onGameMode={handleGameMode}
-              />
+              <Offline when={!connected()} />
+              <div class="device-controls" inert={!connected()} classList={{ offline: !connected() }}>
+                <AncTab
+                  mode={ancMode()}
+                  loading={ancLoading()}
+                  level={ancLevel()}
+                  levelMax={levelMax()}
+                  strengthModes={strengthModes()}
+                  supportedModes={supportedAncModes()}
+                  gameMode={gameMode()}
+                  showGameMode={true}
+                  onMode={handleAnc}
+                  onLevel={handleLevel}
+                  onLevelCommit={handleLevelCommit}
+                  onGameMode={handleGameMode}
+                />
+              </div>
             </div>
           </Show>
 
           <Show when={activeTab() === 'eq'}>
             <div class="panel-in">
-              <EqTab preset={eqPreset()} labels={modelInfo()?.eq_labels ?? null} onPreset={handleEqPreset} />
+              <Offline when={!connected()} />
+              <div class="device-controls" inert={!connected()} classList={{ offline: !connected() }}>
+                <EqTab preset={eqPreset()} labels={modelInfo()?.eq_labels ?? null} onPreset={handleEqPreset} />
+              </div>
             </div>
           </Show>
 
@@ -281,6 +305,22 @@ export default function App() {
           </Show>
         </div>
       </div>
+
+      <Show when={toastMessage()}>
+        {(message) => (
+          <div class="toast" role="alert">
+            {message()}
+          </div>
+        )}
+      </Show>
     </div>
+  );
+}
+
+function Offline(p: { when: boolean }) {
+  return (
+    <Show when={p.when}>
+      <div class="offline-note">Connect your earbuds to change these settings.</div>
+    </Show>
   );
 }

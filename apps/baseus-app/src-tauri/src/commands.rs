@@ -1,4 +1,4 @@
-use crate::device::{CommandSender, DeviceCommand, DeviceSnapshot, SharedSnapshot, Side};
+use crate::device::{send_command, DeviceCommand, DeviceSnapshot, SharedSnapshot, Side};
 use crate::settings::{self, Settings};
 use baseus_protocol::types::{AncMode, BaseusModel, EqPreset};
 use tauri::{AppHandle, Runtime, State};
@@ -7,11 +7,7 @@ use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_updater::UpdaterExt;
 
 #[tauri::command]
-pub fn set_anc_mode(
-    mode: String,
-    level: Option<u8>,
-    cmd_tx: State<CommandSender>,
-) -> Result<(), String> {
+pub fn set_anc_mode(mode: String, level: Option<u8>, app: AppHandle) -> Result<(), String> {
     let anc_mode = match mode.as_str() {
         "off" => AncMode::Off,
         "anc" => AncMode::Anc,
@@ -22,36 +18,28 @@ pub fn set_anc_mode(
     // discrete 1–5 step on the BP1 Ultra (clamped by its encoder). The frontend
     // sends the right scale for the connected model.
     let byte = level.unwrap_or(0x68);
-    cmd_tx
-        .send(DeviceCommand::SetAncMode(anc_mode, byte))
-        .map_err(|e| e.to_string())
+    send_command(&app, DeviceCommand::SetAncMode(anc_mode, byte))
 }
 
 #[tauri::command]
-pub fn set_eq_preset(preset: u8, cmd_tx: State<CommandSender>) -> Result<(), String> {
+pub fn set_eq_preset(preset: u8, app: AppHandle) -> Result<(), String> {
     let eq = EqPreset::from_byte(preset).ok_or_else(|| format!("unknown EQ preset: {preset}"))?;
-    cmd_tx
-        .send(DeviceCommand::SetEqPreset(eq))
-        .map_err(|e| e.to_string())
+    send_command(&app, DeviceCommand::SetEqPreset(eq))
 }
 
 #[tauri::command]
-pub fn set_game_mode(enabled: bool, cmd_tx: State<CommandSender>) -> Result<(), String> {
-    cmd_tx
-        .send(DeviceCommand::SetGameMode(enabled))
-        .map_err(|e| e.to_string())
+pub fn set_game_mode(enabled: bool, app: AppHandle) -> Result<(), String> {
+    send_command(&app, DeviceCommand::SetGameMode(enabled))
 }
 
 #[tauri::command]
-pub fn find_earbud(side: String, cmd_tx: State<CommandSender>) -> Result<(), String> {
+pub fn find_earbud(side: String, app: AppHandle) -> Result<(), String> {
     let s = match side.as_str() {
         "left" => Side::Left,
         "right" => Side::Right,
         other => return Err(format!("unknown side: {other}")),
     };
-    cmd_tx
-        .send(DeviceCommand::FindEarbud(s))
-        .map_err(|e| e.to_string())
+    send_command(&app, DeviceCommand::FindEarbud(s))
 }
 
 /// Current connection state and connected model, for a frontend that subscribed to the

@@ -1,6 +1,7 @@
 import { createSignal, createEffect, onCleanup, untrack } from 'solid-js';
 import SparkLine from './SparkLine';
 import { findEarbud } from '../lib/tauri';
+import { showError } from '../lib/toast';
 import { formatElapsed } from '../lib/timer';
 
 interface Props {
@@ -210,8 +211,8 @@ export default function HomeTab(props: Props) {
         <div style={{ 'margin-bottom': '14px' }}>
           <div style={labelStyle}>Find Earbuds <Divider /></div>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <FindBtn label="Play Left"  onClick={() => findEarbud('left').catch(() => {})} />
-            <FindBtn label="Play Right" onClick={() => findEarbud('right').catch(() => {})} />
+            <FindBtn label="Play Left"  onClick={() => findEarbud('left').catch(showError)} />
+            <FindBtn label="Play Right" onClick={() => findEarbud('right').catch(showError)} />
           </div>
         </div>
       )}
