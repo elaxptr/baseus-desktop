@@ -33,6 +33,21 @@ pub fn set_game_mode(enabled: bool, app: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub fn set_spatial_audio(enabled: bool, app: AppHandle) -> Result<(), String> {
+    send_command(&app, DeviceCommand::SetSpatialAudio(enabled))
+}
+
+#[tauri::command]
+pub fn set_wind_reduction(enabled: bool, app: AppHandle) -> Result<(), String> {
+    send_command(&app, DeviceCommand::SetWindReduction(enabled))
+}
+
+#[tauri::command]
+pub fn set_bass_boost(enabled: bool, level: u8, app: AppHandle) -> Result<(), String> {
+    send_command(&app, DeviceCommand::SetBassBoost(enabled, level))
+}
+
+#[tauri::command]
 pub fn find_earbud(side: String, app: AppHandle) -> Result<(), String> {
     let s = match side.as_str() {
         "left" => Side::Left,

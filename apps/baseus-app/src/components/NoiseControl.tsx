@@ -2,6 +2,8 @@ import { For, Show, type JSX } from 'solid-js';
 import Ear from 'lucide-solid/icons/ear';
 import Headphones from 'lucide-solid/icons/headphones';
 import VolumeX from 'lucide-solid/icons/volume-x';
+import Wind from 'lucide-solid/icons/wind';
+import Switch from './Switch';
 import type { AncMode } from '../lib/tauri';
 
 interface Props {
@@ -14,6 +16,9 @@ interface Props {
   onMode: (mode: AncMode) => void;
   onLevel: (level: number) => void;
   onLevelCommit: (level: number) => void;
+  showWindReduction: boolean;
+  windReduction: boolean;
+  onWindReduction: (on: boolean) => void;
 }
 
 const MODE_META: Record<AncMode, { name: string; icon: () => JSX.Element }> = {
@@ -65,6 +70,19 @@ export default function NoiseControl(props: Props) {
               onInput={(e) => props.onLevel(value(e))}
               onChange={(e) => props.onLevelCommit(value(e))}
             />
+          </div>
+        </Show>
+
+        <Show when={props.showWindReduction}>
+          <div class="row nested">
+            <div class="row-icon" classList={{ on: props.windReduction }}>
+              <Wind size={18} />
+            </div>
+            <div class="row-text">
+              <div class="row-title">Wind-noise reduction</div>
+              <div class="row-desc">Cuts wind rumble outdoors</div>
+            </div>
+            <Switch on={props.windReduction} label="Wind-noise reduction" onChange={props.onWindReduction} />
           </div>
         </Show>
       </div>

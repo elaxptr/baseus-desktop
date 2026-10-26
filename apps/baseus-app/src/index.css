@@ -125,6 +125,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .segment.active { background: var(--accent-soft); color: var(--accent); }
 .segment.pending { animation: pulse 0.9s ease-in-out infinite; }
 .strength { padding: 10px 12px 10px; margin-top: 4px; border-top: 1px solid var(--border); }
+.noise .row.nested { margin: 0 -4px -4px; padding: 12px 16px 12px 14px; border-top: 1px solid var(--border); }
 .strength-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); margin-bottom: 8px; }
 .strength-row .num { color: var(--text); font-weight: 600; }
 
@@ -153,6 +154,17 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
 .preset.active .preset-bars span { background: var(--accent); }
 .preset-name { font-size: 12px; font-weight: 500; line-height: 1.25; color: var(--text-2); }
 .preset.active .preset-name { color: var(--text); }
+
+.sound-extras { margin-top: 8px; }
+
+/* Off / 1 / 2 / 3 style choice inside a row */
+.choice { display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--surface-2); }
+.choice button {
+  border: 0; background: transparent; border-radius: 7px; min-width: 34px; padding: 5px 8px;
+  font-size: 12px; font-weight: 500; color: var(--text-2); transition: background 0.15s, color 0.15s;
+}
+.choice button:hover { color: var(--text); }
+.choice button.active { background: var(--raised); color: var(--accent); box-shadow: var(--shadow); }
 
 /* ---- Rows (toggles, actions) ---- */
 .rows > * + * { border-top: 1px solid var(--border); }

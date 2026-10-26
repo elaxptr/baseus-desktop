@@ -6,7 +6,7 @@ use baseus_protocol::{
         bp1_pro_anc::Bp1ProAnc,
         bp1_ultra::{self, Bp1Ultra},
     },
-    types::{looks_like_baseus, AncMode, BaseusModel, DeviceEvent, EqPreset},
+    types::{looks_like_baseus, AncMode, BaseusModel, BassBoost, DeviceEvent, EqPreset},
 };
 use baseus_transport::{win::ble::GattTransport, DeviceMatch, TransportError};
 use serde::Serialize;
@@ -35,6 +35,10 @@ pub enum DeviceCommand {
     SetAncMode(AncMode, u8),
     SetEqPreset(EqPreset),
     SetGameMode(bool),
+    SetSpatialAudio(bool),
+    SetWindReduction(bool),
+    /// Bass boost on/off and level (1–3); the level is kept while off.
+    SetBassBoost(bool, u8),
     FindEarbud(Side),
 }
 
@@ -45,6 +49,9 @@ impl DeviceCommand {
             Self::SetAncMode(..) => "anc",
             Self::SetEqPreset(_) => "eq",
             Self::SetGameMode(_) => "game",
+            Self::SetSpatialAudio(_) => "spatial",
+            Self::SetWindReduction(_) => "wind",
+            Self::SetBassBoost(..) => "bass",
             Self::FindEarbud(_) => "find",
         }
     }
@@ -94,6 +101,10 @@ pub struct ModelInfo {
     /// Noise-control modes that take a strength value.
     pub strength_modes: &'static [AncMode],
     pub find_earbud: bool,
+    pub spatial_audio: bool,
+    pub wind_reduction: bool,
+    /// Bass-boost level count, or `None` when the model has no bass boost.
+    pub bass_boost_levels: Option<u8>,
     /// Device-side names of the four EQ presets (Balanced, Bass Boost, Voice, Clear).
     pub eq_labels: Option<[&'static str; 4]>,
     /// Whether `eq_preset_update` events reflect the device's actual preset and should
@@ -231,6 +242,9 @@ impl ModelInfo {
             anc_levels: model.anc_levels(),
             strength_modes: model.strength_modes(),
             find_earbud: model.supports_find_earbud(),
+            spatial_audio: model.supports_spatial_audio(),
+            wind_reduction: model.supports_wind_reduction(),
+            bass_boost_levels: model.bass_boost_levels(),
             eq_labels,
             eq_state,
         }
@@ -466,6 +480,24 @@ async fn notification_loop(
                                 emit_event(app, &DeviceEvent::GameModeUpdate(*on));
                                 schedule_recheck(bp1_ultra::op::LOW_LATENCY_STATE);
                             }
+                            DeviceCommand::SetSpatialAudio(on) => {
+                                emit_event(app, &DeviceEvent::SpatialAudioUpdate(*on));
+                                schedule_recheck(bp1_ultra::op::SPATIAL_STATE);
+                            }
+                            DeviceCommand::SetWindReduction(on) => {
+                                emit_event(app, &DeviceEvent::WindReductionUpdate(*on));
+                                schedule_recheck(bp1_ultra::op::WIND_STATE);
+                            }
+                            DeviceCommand::SetBassBoost(enabled, level) => {
+                                emit_event(
+                                    app,
+                                    &DeviceEvent::BassBoostUpdate(BassBoost {
+                                        enabled: *enabled,
+                                        level: *level,
+                                    }),
+                                );
+                                schedule_recheck(bp1_ultra::op::BASS_STATE);
+                            }
                             DeviceCommand::FindEarbud(side) => {
                                 let tx = find_stop_tx.clone();
                                 let side = side.clone();
@@ -535,6 +567,12 @@ async fn execute_command(
         (DeviceCommand::FindEarbud(Side::Right), BaseusModel::Bp1ProAnc) => {
             vec![0xBA, 0x10, 0x01, 0x01]
         }
+        (
+            DeviceCommand::SetSpatialAudio(_)
+            | DeviceCommand::SetWindReduction(_)
+            | DeviceCommand::SetBassBoost(..),
+            BaseusModel::Bp1ProAnc,
+        ) => return Err("not supported on the BP1 Pro ANC".into()),
         // BP1 Ultra — captured from the official app and replayed over BLE on hardware.
         (DeviceCommand::SetAncMode(mode, level), BaseusModel::Bp1Ultra) => {
             Bp1Ultra::encode_anc(*mode, *level)
@@ -542,6 +580,15 @@ async fn execute_command(
         (DeviceCommand::SetEqPreset(preset), BaseusModel::Bp1Ultra) => Bp1Ultra::encode_eq(*preset),
         (DeviceCommand::SetGameMode(on), BaseusModel::Bp1Ultra) => {
             Bp1Ultra::encode_low_latency(*on)
+        }
+        (DeviceCommand::SetSpatialAudio(on), BaseusModel::Bp1Ultra) => {
+            Bp1Ultra::encode_spatial_audio(*on)
+        }
+        (DeviceCommand::SetWindReduction(on), BaseusModel::Bp1Ultra) => {
+            Bp1Ultra::encode_wind_reduction(*on)
+        }
+        (DeviceCommand::SetBassBoost(on, level), BaseusModel::Bp1Ultra) => {
+            Bp1Ultra::encode_bass_boost(*on, *level)
         }
         (DeviceCommand::FindEarbud(_), BaseusModel::Bp1Ultra) => {
             return Err("find-my-earbuds is not supported on the BP1 Ultra yet".into());

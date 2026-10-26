@@ -9,7 +9,7 @@
 use crate::{
     framing::crc::{self, Kind},
     models::DecodeError,
-    types::{AncMode, BatteryState, CaseState, DeviceEvent, EqPreset},
+    types::{AncMode, BassBoost, BatteryState, CaseState, DeviceEvent, EqPreset, FirmwareVersion},
     Frame,
 };
 
@@ -33,6 +33,20 @@ pub mod op {
     pub const ANC_STATE: u8 = 0x33;
     /// Set noise control: `34 MODE PARAM`, acked with a flat `34 01`.
     pub const ANC_SET: u8 = 0x34;
+    /// Firmware versions: `19 ?? L_MAJOR_MINOR L_PATCH R_MAJOR_MINOR R_PATCH`.
+    pub const FIRMWARE: u8 = 0x19;
+    /// Spatial audio state: `42 ON 01`.
+    pub const SPATIAL_STATE: u8 = 0x42;
+    /// Set spatial audio: `43 ON`, acked with `43 01`.
+    pub const SPATIAL_SET: u8 = 0x43;
+    /// Wind-noise reduction state: `51 ON`.
+    pub const WIND_STATE: u8 = 0x51;
+    /// Set wind-noise reduction: `52 ON`, acked with `52 01`.
+    pub const WIND_SET: u8 = 0x52;
+    /// Bass boost state: `53 ON LEVEL`.
+    pub const BASS_STATE: u8 = 0x53;
+    /// Set bass boost: `54 ON LEVEL`, acked with `54 01`.
+    pub const BASS_SET: u8 = 0x54;
 }
 
 /// `MODE` byte of the noise-control opcodes.
@@ -49,6 +63,9 @@ const TRANSPARENCY_FULL: u8 = 0x01;
 /// `0x6C` traveling, `0x68` adaptive).
 pub const ANC_LEVEL_MIN: u8 = 1;
 pub const ANC_LEVEL_MAX: u8 = 5;
+/// Bass boost levels offered by the official app.
+pub const BASS_LEVEL_MIN: u8 = 1;
+pub const BASS_LEVEL_MAX: u8 = 3;
 
 /// EQ curves for the presets the desktop app exposes, byte for byte as the official
 /// app sends them after the `31` opcode: the preset index, then 8 filters of four
@@ -106,6 +123,20 @@ impl Bp1Ultra {
             op::CASE => Self::decode_case(&frame.payload),
             op::EQ_STATE => Self::decode_eq_state(&frame.payload),
             op::ANC_STATE => Self::decode_anc_state(&frame.payload),
+            op::SPATIAL_STATE => Ok(DeviceEvent::SpatialAudioUpdate(
+                Self::require(op::SPATIAL_STATE, &frame.payload, 1)?[0] != 0,
+            )),
+            op::WIND_STATE => Ok(DeviceEvent::WindReductionUpdate(
+                Self::require(op::WIND_STATE, &frame.payload, 1)?[0] != 0,
+            )),
+            op::BASS_STATE => {
+                let p = Self::require(op::BASS_STATE, &frame.payload, 2)?;
+                Ok(DeviceEvent::BassBoostUpdate(BassBoost {
+                    enabled: p[0] != 0,
+                    level: p[1],
+                }))
+            }
+            op::FIRMWARE => Self::decode_firmware(&frame.payload),
             other => Err(DecodeError::UnknownOpcode(other)),
         }
     }
@@ -142,13 +173,35 @@ impl Bp1Ultra {
         crc::encode(Kind::Write, op::LOW_LATENCY_SET, &[u8::from(on)])
     }
 
+    /// Encode a spatial-audio change.
+    pub fn encode_spatial_audio(on: bool) -> Vec<u8> {
+        crc::encode(Kind::Write, op::SPATIAL_SET, &[u8::from(on)])
+    }
+
+    /// Encode a wind-noise-reduction change.
+    pub fn encode_wind_reduction(on: bool) -> Vec<u8> {
+        crc::encode(Kind::Write, op::WIND_SET, &[u8::from(on)])
+    }
+
+    /// Encode a bass-boost change. `level` is clamped to 1–3 and is sent with Off too,
+    /// as the official app does, so the device remembers it.
+    pub fn encode_bass_boost(on: bool, level: u8) -> Vec<u8> {
+        let level = level.clamp(BASS_LEVEL_MIN, BASS_LEVEL_MAX);
+        crc::encode(Kind::Write, op::BASS_SET, &[u8::from(on), level])
+    }
+
     /// Queries sent after connecting so the UI shows the real state straight away.
     /// The device pushes battery, case and EQ unprompted, but not these.
-    pub fn initial_queries() -> [Vec<u8>; 2] {
+    pub fn initial_queries() -> [Vec<u8>; 6] {
         [
-            Self::encode_query(op::ANC_STATE),
-            Self::encode_query(op::LOW_LATENCY_STATE),
+            op::ANC_STATE,
+            op::LOW_LATENCY_STATE,
+            op::SPATIAL_STATE,
+            op::WIND_STATE,
+            op::BASS_STATE,
+            op::FIRMWARE,
         ]
+        .map(Self::encode_query)
     }
 
     fn require(opcode: u8, payload: &[u8], need: usize) -> Result<&[u8], DecodeError> {
@@ -205,6 +258,20 @@ impl Bp1Ultra {
             .get(3)
             .copied()
             .filter(|level| (ANC_LEVEL_MIN..=ANC_LEVEL_MAX).contains(level))
+    }
+
+    /// `19 01 10 1A 10 1A` is 1.0.26 on both buds: a major/minor nibble byte, then the
+    /// patch number. The meaning of the leading `01` is unknown, and which half belongs
+    /// to which bud is assumed (left first); the captured unit ran the same version on both.
+    fn decode_firmware(payload: &[u8]) -> Result<DeviceEvent, DecodeError> {
+        let p = Self::require(op::FIRMWARE, payload, 5)?;
+        let version = |major_minor: u8, patch: u8| {
+            format!("{}.{}.{}", major_minor >> 4, major_minor & 0x0F, patch)
+        };
+        Ok(DeviceEvent::FirmwareUpdate(FirmwareVersion {
+            left: version(p[1], p[2]),
+            right: version(p[3], p[4]),
+        }))
     }
 
     fn decode_eq_state(payload: &[u8]) -> Result<DeviceEvent, DecodeError> {
@@ -454,7 +521,7 @@ mod tests {
 
     #[test]
     fn initial_queries_are_well_formed() {
-        let [anc, low_latency] = Bp1Ultra::initial_queries();
+        let [anc, low_latency, spatial, wind, bass, firmware] = Bp1Ultra::initial_queries();
         assert_eq!(
             anc,
             [0x78, 0x9C, 0x00, 0x0A, 0x02, 0x01, 0x01, 0x33, 0x7C, 0x93]
@@ -462,6 +529,125 @@ mod tests {
         assert_eq!(
             low_latency,
             [0x78, 0x9C, 0x00, 0x0A, 0x02, 0x01, 0x01, 0x23, 0xB0, 0x92]
+        );
+        // The rest are the official app's own reads, byte for byte.
+        assert_eq!(
+            spatial,
+            [0x78, 0x9C, 0x00, 0x0A, 0x02, 0x01, 0x01, 0x42, 0x58, 0x53]
+        );
+        assert_eq!(
+            wind,
+            [0x78, 0x9C, 0x00, 0x0A, 0x02, 0x01, 0x01, 0x51, 0x95, 0x12]
+        );
+        assert_eq!(bass[7], op::BASS_STATE);
+        assert_eq!(
+            firmware,
+            [0x78, 0x9C, 0x00, 0x0A, 0x02, 0x01, 0x01, 0x19, 0xA3, 0x12]
+        );
+    }
+
+    #[test]
+    fn spatial_audio_matches_official_app() {
+        assert_eq!(
+            Bp1Ultra::encode_spatial_audio(true),
+            [0x78, 0x9C, 0x00, 0x0B, 0x02, 0x03, 0x02, 0x43, 0x01, 0x04, 0x28]
+        );
+        assert_eq!(
+            Bp1Ultra::encode_spatial_audio(false),
+            [0x78, 0x9C, 0x00, 0x0B, 0x02, 0x03, 0x02, 0x43, 0x00, 0xC4, 0xE9]
+        );
+        assert_eq!(
+            decode(&[0x78, 0x9C, 0x00, 0x0C, 0x02, 0x01, 0x03, 0x42, 0x01, 0x01, 0xE2, 0x9A])
+                .unwrap(),
+            DeviceEvent::SpatialAudioUpdate(true)
+        );
+        assert_eq!(
+            decode(&[0x78, 0x9C, 0x00, 0x0C, 0x02, 0x01, 0x03, 0x42, 0x00, 0x01, 0x72, 0x9B])
+                .unwrap(),
+            DeviceEvent::SpatialAudioUpdate(false)
+        );
+    }
+
+    #[test]
+    fn wind_reduction_matches_official_app() {
+        assert_eq!(
+            Bp1Ultra::encode_wind_reduction(true),
+            [0x78, 0x9C, 0x00, 0x0B, 0x02, 0x03, 0x02, 0x52, 0x01, 0x54, 0x24]
+        );
+        assert_eq!(
+            Bp1Ultra::encode_wind_reduction(false),
+            [0x78, 0x9C, 0x00, 0x0B, 0x02, 0x03, 0x02, 0x52, 0x00, 0x94, 0xE5]
+        );
+        assert_eq!(
+            decode(&[0x78, 0x9C, 0x00, 0x0B, 0x02, 0x01, 0x02, 0x51, 0x01, 0x1C, 0x25]).unwrap(),
+            DeviceEvent::WindReductionUpdate(true)
+        );
+        assert_eq!(
+            decode(&[0x78, 0x9C, 0x00, 0x0B, 0x02, 0x01, 0x02, 0x51, 0x00, 0xDC, 0xE4]).unwrap(),
+            DeviceEvent::WindReductionUpdate(false)
+        );
+    }
+
+    #[test]
+    fn bass_boost_matches_official_app() {
+        for (on, level, crc) in [
+            (true, 1, [0xE6, 0x02]),
+            (true, 2, [0xE7, 0x42]),
+            (true, 3, [0x27, 0x83]),
+            (false, 2, [0x77, 0x43]),
+        ] {
+            assert_eq!(
+                Bp1Ultra::encode_bass_boost(on, level),
+                [
+                    0x78,
+                    0x9C,
+                    0x00,
+                    0x0C,
+                    0x02,
+                    0x03,
+                    0x03,
+                    0x54,
+                    u8::from(on),
+                    level,
+                    crc[0],
+                    crc[1]
+                ]
+            );
+        }
+        assert_eq!(
+            Bp1Ultra::encode_bass_boost(true, 9),
+            Bp1Ultra::encode_bass_boost(true, 3)
+        );
+        assert_eq!(
+            decode(&[0x78, 0x9C, 0x00, 0x0C, 0x02, 0x01, 0x03, 0x53, 0x01, 0x03, 0x26, 0x4B])
+                .unwrap(),
+            DeviceEvent::BassBoostUpdate(BassBoost {
+                enabled: true,
+                level: 3
+            })
+        );
+        assert_eq!(
+            decode(&[0x78, 0x9C, 0x00, 0x0C, 0x02, 0x01, 0x03, 0x53, 0x00, 0x02, 0x76, 0x8B])
+                .unwrap(),
+            DeviceEvent::BassBoostUpdate(BassBoost {
+                enabled: false,
+                level: 2
+            })
+        );
+    }
+
+    #[test]
+    fn firmware_version_decodes() {
+        assert_eq!(
+            decode(&[
+                0x78, 0x9C, 0x00, 0x0F, 0x02, 0x01, 0x06, 0x19, 0x01, 0x10, 0x1A, 0x10, 0x1A, 0x5B,
+                0x68
+            ])
+            .unwrap(),
+            DeviceEvent::FirmwareUpdate(FirmwareVersion {
+                left: "1.0.26".into(),
+                right: "1.0.26".into(),
+            })
         );
     }
 

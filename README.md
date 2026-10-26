@@ -12,7 +12,7 @@ only the updater is Windows/macOS-only, since Linux installs come from the distr
 | Model | Status | Battery | ANC | EQ | Game mode |
 |---|---|---|---|---|---|
 | Bass BP1 Pro ANC | ✅ Verified | ✅ L/R/case | ✅ 3-mode + strength | ✅ 4 presets | ✅ Low-latency toggle |
-| Bass BP1 Ultra | ✅ Verified (fw 1.0.26) | ✅ L/R/case | ✅ 3-mode + 5 levels | ✅ 4 presets | ✅ Low-latency toggle |
+| Bass BP1 Ultra | ✅ Verified (fw 1.0.26) | ✅ L/R/case | ✅ 3-mode + 5 levels, wind reduction | ✅ 4 presets, bass boost, spatial audio | ✅ Low-latency toggle |
 
 The BP1 Ultra has no find-my-earbuds support yet: the official app only offers it to
 logged-in accounts, so the command was not captured. The buds may also refuse low-latency

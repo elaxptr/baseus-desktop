@@ -8,13 +8,15 @@ import Power from 'lucide-solid/icons/power';
 import Switch from './Switch';
 import logo from '../assets/logo.svg';
 import { getSettingsStore, updateSetting } from '../stores/settings';
-import { checkForUpdate, installUpdate, type Settings as SettingsData } from '../lib/tauri';
+import { checkForUpdate, installUpdate, type FirmwareVersion, type Settings as SettingsData } from '../lib/tauri';
 
 const REPO = 'https://github.com/elaxptr/baseus-desktop';
 
 interface Props {
   initialUpdateVersion: string | null;
   onUpdateInstalled: () => void;
+  /** The connected earbuds' firmware, when the model reports it. */
+  firmware: FirmwareVersion | null;
 }
 
 type UpdateState = 'idle' | 'checking' | 'up-to-date' | 'available' | 'installing' | 'error';
@@ -67,6 +69,12 @@ export default function Settings(props: Props) {
     }
   }
 
+  const firmwareText = () => {
+    const fw = props.firmware;
+    if (!fw) return null;
+    return fw.left === fw.right ? fw.left : `L ${fw.left} · R ${fw.right}`;
+  };
+
   // The install panel stays up while installing; the check button only replaces it after.
   const showInstall = () => updateState() === 'available' || updateState() === 'installing';
 
@@ -98,6 +106,9 @@ export default function Settings(props: Props) {
             <div class="row-text">
               <div class="row-title">Baseus Desktop</div>
               <div class="row-desc num">{appVersion() ? `Version ${appVersion()}` : '…'}</div>
+              <Show when={firmwareText()}>
+                <div class="row-desc num">Earbuds firmware {firmwareText()}</div>
+              </Show>
             </div>
             <Show when={!showInstall()}>
               <button class="btn" onClick={handleCheck} disabled={updateState() === 'checking'}>

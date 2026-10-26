@@ -12,13 +12,21 @@ All notable changes to this project are documented here. Format loosely follows
 - **New app icon** in place of the default Tauri one; the window is 60 px taller.
 
 ### Added
+- **BP1 Ultra extras:** bass boost (Off / 1 / 2 / 3) and spatial audio under Sound,
+  wind-noise reduction under Noise control, and the earbuds' firmware version in
+  Settings. The state is read from the buds on connect and re-read after every change.
+  Every frame matches the official app's byte for byte, CRC included (golden tests against
+  the captures in `docs/protocol/captures/`). Tested on a BP1 Ultra (firmware 1.0.26) by
+  [@maiconatz](https://github.com/maiconatz).
+- The `connect` example takes `spatial:on|off`, `wind:on|off`, `bass:off|1|2|3` and
+  `fw:?` for testing these from the command line.
 - Tray menu shows the connected model and battery levels and switches noise control
   (Off / Noise cancellation / Transparency); the tray tooltip shows the same summary.
 
 ### Fixed
 - Changes made while the earbuds were disconnected were queued and replayed on the next
   connection. They're now refused, and the controls are disabled until the earbuds connect.
-- The Home tab no longer shows 0 % batteries while disconnected.
+- Batteries no longer show 0 % while disconnected.
 - A change the earbuds didn't take now shows an error and reverts the control instead of
   failing silently.
 - Removed the decorative macOS-style window buttons from the title bar.

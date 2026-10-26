@@ -17,13 +17,18 @@ import {
   setAncMode,
   setEqPreset,
   setGameMode,
+  setSpatialAudio,
+  setWindReduction,
+  setBassBoost,
   type AncMode,
+  type BassBoost,
   type BatteryState,
   type CaseState,
   type CommandError,
   type ConnectionIssue,
   type DeviceEvent,
   type EqPreset,
+  type FirmwareVersion,
   type ModelInfo,
   type WearState,
 } from './lib/tauri';
@@ -36,7 +41,10 @@ type ConnStatus = 'connected' | 'connecting' | 'disconnected';
 const COMMAND_VERB: Record<CommandError['command'], string> = {
   anc: 'change noise control',
   eq: 'change the sound preset',
-  game: 'switch game mode',
+  game: 'switch low latency',
+  spatial: 'switch spatial audio',
+  wind: 'switch wind-noise reduction',
+  bass: 'change bass boost',
   find: 'play the sound',
 };
 
@@ -58,6 +66,10 @@ export default function App() {
   const [eqPreset, setEqPresetSignal] = createSignal<EqPreset>('balanced');
   const [updateVersion, setUpdateVersion] = createSignal<string | null>(null);
   const [issue, setIssue] = createSignal<ConnectionIssue | null>(null);
+  const [spatialAudio, setSpatialAudioSignal] = createSignal(false);
+  const [windReduction, setWindReductionSignal] = createSignal(false);
+  const [bassBoost, setBassBoostSignal] = createSignal<BassBoost>({ enabled: false, level: 1 });
+  const [firmware, setFirmware] = createSignal<FirmwareVersion | null>(null);
 
   const connected = () => status() === 'connected';
   const connectedModelName = createMemo(() => modelInfo()?.name ?? 'Baseus Desktop');
@@ -96,6 +108,14 @@ export default function App() {
         setAncLevel(Math.min(Math.max(e.data, 1), levelMax()));
       } else if (e.type === 'game_mode_update') {
         setGameModeSignal(e.data);
+      } else if (e.type === 'spatial_audio_update') {
+        setSpatialAudioSignal(e.data);
+      } else if (e.type === 'wind_reduction_update') {
+        setWindReductionSignal(e.data);
+      } else if (e.type === 'bass_boost_update') {
+        setBassBoostSignal(e.data);
+      } else if (e.type === 'firmware_update') {
+        setFirmware(e.data);
       } else if (e.type === 'wear_update') {
         setWear(e.data);
       } else if (e.type === 'eq_preset_update' && modelInfo()?.eq_state) {
@@ -123,6 +143,7 @@ export default function App() {
       setBattery(null);
       setCaseState(null);
       setWear(null);
+      setFirmware(null);
       setAncModeSignal('off');
       setAncLevel((v) => Math.min(v, info.anc_levels ?? CONTINUOUS_LEVEL_MAX));
     };
@@ -166,6 +187,26 @@ export default function App() {
     setGameModeSignal(on);
     reverts.game = () => setGameModeSignal(!on);
     await setGameMode(on).catch(failed('game'));
+  }
+
+  // Optimistic like low latency; the backend re-reads the device's state after each write.
+  async function handleSpatialAudio(on: boolean) {
+    setSpatialAudioSignal(on);
+    reverts.spatial = () => setSpatialAudioSignal(!on);
+    await setSpatialAudio(on).catch(failed('spatial'));
+  }
+
+  async function handleWindReduction(on: boolean) {
+    setWindReductionSignal(on);
+    reverts.wind = () => setWindReductionSignal(!on);
+    await setWindReduction(on).catch(failed('wind'));
+  }
+
+  async function handleBassBoost(next: BassBoost) {
+    const previous = bassBoost();
+    setBassBoostSignal(next);
+    reverts.bass = () => setBassBoostSignal(previous);
+    await setBassBoost(next.enabled, next.level).catch(failed('bass'));
   }
 
   async function handleEqPreset(preset: EqPreset) {
@@ -232,8 +273,21 @@ export default function App() {
                   onMode={handleAnc}
                   onLevel={handleLevel}
                   onLevelCommit={handleLevelCommit}
+                  showWindReduction={modelInfo()?.wind_reduction ?? false}
+                  windReduction={windReduction()}
+                  onWindReduction={handleWindReduction}
                 />
-                <SoundPresets preset={eqPreset()} labels={modelInfo()?.eq_labels ?? null} onPreset={handleEqPreset} />
+                <SoundPresets
+                  preset={eqPreset()}
+                  labels={modelInfo()?.eq_labels ?? null}
+                  onPreset={handleEqPreset}
+                  bassBoostLevels={modelInfo()?.bass_boost_levels ?? null}
+                  bassBoost={bassBoost()}
+                  onBassBoost={handleBassBoost}
+                  showSpatialAudio={modelInfo()?.spatial_audio ?? false}
+                  spatialAudio={spatialAudio()}
+                  onSpatialAudio={handleSpatialAudio}
+                />
                 <Extras
                   lowLatency={gameMode()}
                   onLowLatency={handleGameMode}
@@ -244,7 +298,11 @@ export default function App() {
           }
         >
           <div class="view-in content-stack">
-            <Settings initialUpdateVersion={updateVersion()} onUpdateInstalled={() => setUpdateVersion(null)} />
+            <Settings
+              initialUpdateVersion={updateVersion()}
+              onUpdateInstalled={() => setUpdateVersion(null)}
+              firmware={connected() ? firmware() : null}
+            />
           </div>
         </Show>
       </main>

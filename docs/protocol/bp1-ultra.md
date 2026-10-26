@@ -136,8 +136,8 @@ Example writes (byte-exact with the official app):
 78 9C 00 0C 02 03 03 34 00 FF E8 82   Normal
 ```
 
-Wind-noise reduction: `52 00/01` (write, acked `52 01`), state `51 ON`. Not exposed in the
-desktop app.
+Wind-noise reduction: `52 00/01` (write, acked `52 01`), state `51 ON`. Exposed in the
+desktop app as an on/off switch.
 
 ### EQ
 
@@ -179,17 +179,24 @@ warns that LDAC disables other features), but LDAC was not toggled to confirm it
 restarts the buds. The client re-reads `23` after every write, so the toggle falls back to
 the device's real state.
 
-## Other opcodes (captured, not used by the desktop app)
+### Spatial audio, bass boost, firmware version
+
+Also used by the desktop app, each queried on connect and re-read after a write:
 
 | Function | Write → | ← State |
 |---|---|---|
 | Spatial audio | `43 00/01` (ack `43 01`) | `42 ON 01` |
-| Bass boost | `54 ON LEVEL` (ack `54 01`), level 1–3 | `53 ON LEVEL` |
+| Bass boost | `54 ON LEVEL` (ack `54 01`), level 1–3; Off keeps the level (`54 00 02`) | `53 ON LEVEL` |
+| Firmware version | — | `19` → `19 01 10 1A 10 1A`: 1.0.26 / 1.0.26 (major/minor nibbles, then patch; left first is assumed) |
+
+## Other opcodes (captured, not used by the desktop app)
+
+| Function | Write → | ← State |
+|---|---|---|
 | Volume limiter | `94 ON DB` (ack `94 01`), dB as decimal (`4B` = 75 … `64` = 100) | `93 ON DB` |
 | Sleep mode | `79 ON SOUND` (ack `79 01`) | `78 ON SOUND` |
 | Gestures | `8D SIDE GESTURE FUNCTION` (ack `8D 01`) | `8C SIDE FF` → `8C SIDE g f g f g f g f` |
 | Ambient-sound cycle | `8F SIDE GESTURE 06 N m1 … mN` (ack `8F 01`) | `8E SIDE GESTURE 06` → same layout |
-| Firmware version | — | `19` → `19 xx 10 1A 10 1A` (1.0.26 / 1.0.26) |
 | Dual connection | — | `3B` → `3B ON CONNECTED`; `3E` → one frame per connected device |
 | LDAC | not toggled (restarts the buds) | `74` → `74 00`, or `74 8E` while the phone streamed LDAC (the official app still showed "Hi-Res Audio: OFF") |
 | State dump | `FF` (read) | `23`, `74`, … |

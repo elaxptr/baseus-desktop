@@ -81,10 +81,29 @@ pub enum DeviceEvent {
     AncLevelUpdate(u8),
     /// Game/low-latency mode — independent toggle, not a mutually-exclusive ANC state.
     GameModeUpdate(bool),
+    SpatialAudioUpdate(bool),
+    WindReductionUpdate(bool),
+    BassBoostUpdate(BassBoost),
+    FirmwareUpdate(FirmwareVersion),
     WearUpdate(WearState),
     EqPresetUpdate(EqPreset),
     Connected,
     Disconnected,
+}
+
+/// Bass boost state. The device keeps `level` while boost is off, so turning it back
+/// on restores the previous level.
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct BassBoost {
+    pub enabled: bool,
+    pub level: u8,
+}
+
+/// Firmware version of each bud, e.g. `"1.0.26"`.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FirmwareVersion {
+    pub left: String,
+    pub right: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -197,6 +216,24 @@ impl BaseusModel {
             BaseusModel::Bp1ProAnc => &[AncMode::Anc, AncMode::Transparency],
             BaseusModel::Bp1Ultra => &[AncMode::Anc],
         }
+    }
+
+    /// Selectable bass-boost levels, or `None` when the model has no bass boost.
+    pub fn bass_boost_levels(self) -> Option<u8> {
+        match self {
+            BaseusModel::Bp1ProAnc => None,
+            BaseusModel::Bp1Ultra => Some(3),
+        }
+    }
+
+    /// Whether the model has a spatial-audio toggle the app knows how to drive.
+    pub fn supports_spatial_audio(self) -> bool {
+        self == BaseusModel::Bp1Ultra
+    }
+
+    /// Whether the model has a wind-noise-reduction toggle the app knows how to drive.
+    pub fn supports_wind_reduction(self) -> bool {
+        self == BaseusModel::Bp1Ultra
     }
 
     /// Whether the find-my-earbuds command is known for this model. The BP1 Ultra

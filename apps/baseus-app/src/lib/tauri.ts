@@ -20,6 +20,17 @@ export interface WearState {
 
 export type AncMode = 'off' | 'anc' | 'transparency';
 
+export interface BassBoost {
+  enabled: boolean;
+  /** 1–ModelInfo.bass_boost_levels; kept while boost is off. */
+  level: number;
+}
+
+export interface FirmwareVersion {
+  left: string;
+  right: string;
+}
+
 export type EqPreset = 'balanced' | 'bass_boost' | 'voice' | 'clear';
 
 export interface ModelInfo {
@@ -29,6 +40,10 @@ export interface ModelInfo {
   /** Noise-control modes that take a strength value. */
   strength_modes: AncMode[];
   find_earbud: boolean;
+  spatial_audio: boolean;
+  wind_reduction: boolean;
+  /** Bass-boost level count, or null when the model has no bass boost. */
+  bass_boost_levels: number | null;
   /** Device-side names for the Balanced / Bass Boost / Voice / Clear presets. */
   eq_labels: [string, string, string, string] | null;
   /** Whether eq_preset_update events reflect the device's real preset. */
@@ -41,6 +56,10 @@ export type DeviceEvent =
   | { type: 'anc_mode_update'; data: AncMode }
   | { type: 'anc_level_update'; data: number }
   | { type: 'game_mode_update'; data: boolean }
+  | { type: 'spatial_audio_update'; data: boolean }
+  | { type: 'wind_reduction_update'; data: boolean }
+  | { type: 'bass_boost_update'; data: BassBoost }
+  | { type: 'firmware_update'; data: FirmwareVersion }
   | { type: 'wear_update'; data: WearState }
   | { type: 'eq_preset_update'; data: EqPreset }
   | { type: 'connected' }
@@ -102,6 +121,18 @@ export function setGameMode(enabled: boolean): Promise<void> {
   return invoke('set_game_mode', { enabled });
 }
 
+export function setSpatialAudio(enabled: boolean): Promise<void> {
+  return invoke('set_spatial_audio', { enabled });
+}
+
+export function setWindReduction(enabled: boolean): Promise<void> {
+  return invoke('set_wind_reduction', { enabled });
+}
+
+export function setBassBoost(enabled: boolean, level: number): Promise<void> {
+  return invoke('set_bass_boost', { enabled, level });
+}
+
 export function findEarbud(side: 'left' | 'right'): Promise<void> {
   return invoke('find_earbud', { side });
 }
@@ -125,7 +156,7 @@ export function getSupportedAncModes(modelName: string): Promise<AncMode[]> {
 
 /** A command the earbuds didn't take: the write itself failed. */
 export interface CommandError {
-  command: 'anc' | 'eq' | 'game' | 'find';
+  command: 'anc' | 'eq' | 'game' | 'spatial' | 'wind' | 'bass' | 'find';
   message: string;
 }
 
