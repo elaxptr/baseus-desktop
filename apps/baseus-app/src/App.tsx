@@ -1,9 +1,10 @@
 import { createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
-import Sidebar, { type Tab } from './components/Sidebar';
-import HomeTab from './components/HomeTab';
-import AncTab from './components/AncTab';
-import EqTab from './components/EqTab';
-import SettingsTab from './components/SettingsTab';
+import Header from './components/Header';
+import Batteries from './components/Batteries';
+import NoiseControl from './components/NoiseControl';
+import SoundPresets from './components/SoundPresets';
+import Extras from './components/Extras';
+import Settings from './components/Settings';
 import ConnectionHelp from './components/ConnectionHelp';
 import {
   getDeviceSnapshot,
@@ -17,6 +18,8 @@ import {
   setEqPreset,
   setGameMode,
   type AncMode,
+  type BatteryState,
+  type CaseState,
   type CommandError,
   type ConnectionIssue,
   type DeviceEvent,
@@ -24,9 +27,8 @@ import {
   type ModelInfo,
   type WearState,
 } from './lib/tauri';
-import { pushLeft, pushRight, pushCase, left, right, caseData } from './stores/batteryHistory';
 import { loadSettings, getSettingsStore } from './stores/settings';
-import { startTimer, stopTimer, useElapsed } from './lib/timer';
+import { formatElapsed, startTimer, stopTimer, useElapsed } from './lib/timer';
 import { showError, toastMessage } from './lib/toast';
 
 type ConnStatus = 'connected' | 'connecting' | 'disconnected';
@@ -49,10 +51,9 @@ export default function App() {
   const [ancLoading, setAncLoading] = createSignal<AncMode | null>(null);
   const [ancLevel, setAncLevel] = createSignal(7);
   const [gameMode, setGameModeSignal] = createSignal(false);
-  const [activeTab, setActiveTab] = createSignal<Tab>('home');
-  const [leftCharging, setLeftCharging] = createSignal(false);
-  const [rightCharging, setRightCharging] = createSignal(false);
-  const [caseCharging, setCaseCharging] = createSignal(false);
+  const [settingsOpen, setSettingsOpen] = createSignal(false);
+  const [battery, setBattery] = createSignal<BatteryState | null>(null);
+  const [caseState, setCaseState] = createSignal<CaseState | null>(null);
   const [wear, setWear] = createSignal<WearState | null>(null);
   const [eqPreset, setEqPresetSignal] = createSignal<EqPreset>('balanced');
   const [updateVersion, setUpdateVersion] = createSignal<string | null>(null);
@@ -85,13 +86,9 @@ export default function App() {
 
     const handleDeviceEvent = (e: DeviceEvent) => {
       if (e.type === 'battery_update') {
-        pushLeft(e.data.left_pct);
-        pushRight(e.data.right_pct);
-        setLeftCharging(e.data.left_charging);
-        setRightCharging(e.data.right_charging);
+        setBattery(e.data);
       } else if (e.type === 'case_update') {
-        pushCase(e.data.case_pct);
-        setCaseCharging(e.data.case_charging);
+        setCaseState(e.data);
       } else if (e.type === 'anc_mode_update') {
         setAncModeSignal(e.data);
         setAncLoading(null);
@@ -122,6 +119,10 @@ export default function App() {
     };
     const applyModel = (info: ModelInfo) => {
       setModelInfo(info);
+      // Readings from the previous connection don't belong to these earbuds.
+      setBattery(null);
+      setCaseState(null);
+      setWear(null);
       setAncModeSignal('off');
       setAncLevel((v) => Math.min(v, info.anc_levels ?? CONTINUOUS_LEVEL_MAX));
     };
@@ -188,123 +189,65 @@ export default function App() {
     }
   }
 
-  const statusColor = () =>
-    status() === 'connected' ? '#22c55e' : status() === 'connecting' ? '#eab308' : '#525252';
-
-  const statusText = () =>
-    status() === 'connected' ? 'Connected' : status() === 'connecting' ? 'Connecting…' : 'Disconnected';
+  const statusText = () => {
+    if (!connected()) return 'Not connected';
+    const elapsed = useElapsed()();
+    return getSettingsStore().show_session_timer && elapsed > 0
+      ? `Connected · ${formatElapsed(elapsed)}`
+      : 'Connected';
+  };
 
   return (
-    <div
-      style={{
-        width: '480px',
-        'min-height': '620px',
-        background: '#0d0d0f',
-        color: '#fff',
-        'font-family': "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        'box-sizing': 'border-box',
-        display: 'flex',
-        'flex-direction': 'column',
-      }}
-    >
-      {/* Title bar */}
-      <div
-        class="titlebar-glow"
-        style={{
-          display: 'flex',
-          'align-items': 'center',
-          gap: '6px',
-          padding: '12px 16px 10px',
-          'border-bottom': '1px solid #161618',
-          'flex-shrink': '0',
-        }}
-      >
-        <div
-          style={{
-            flex: '1',
-            'font-size': '12px',
-            'font-weight': '600',
-            color: '#444',
-          }}
-        >
-          {connectedModelName()}
-        </div>
-        <div style={{ display: 'flex', 'align-items': 'center', gap: '5px', 'font-size': '11px', color: statusColor(), 'font-weight': '500' }}>
-          <div class={status() === 'connected' ? 'status-dot' : undefined} style={{ width: '6px', height: '6px', background: statusColor(), 'border-radius': '50%' }} />
-          {statusText()}
-        </div>
-      </div>
+    <div class="app">
+      <Header
+        title={connectedModelName()}
+        status={statusText()}
+        connected={connected()}
+        settingsOpen={settingsOpen()}
+        updateAvailable={updateVersion() !== null}
+        onSettings={() => setSettingsOpen(true)}
+        onBack={() => setSettingsOpen(false)}
+      />
 
-      {/* Body: sidebar + content */}
-      <div style={{ display: 'flex', flex: '1' }}>
-        <Sidebar active={activeTab()} onSwitch={setActiveTab} updateAvailable={updateVersion() !== null} />
-
-        <div style={{ flex: '1', padding: '16px', 'overflow-y': 'auto' }}>
-          <Show when={activeTab() === 'home'}>
-            <div class="panel-in">
-              <Show when={!connected()}>
-                <ConnectionHelp connecting={status() === 'connecting'} issue={issue()} />
+      <main class="content">
+        <Show
+          when={settingsOpen()}
+          fallback={
+            <div class="view-in content-stack">
+              <Show
+                when={connected()}
+                fallback={<ConnectionHelp issue={issue()} />}
+              >
+                <Batteries battery={battery()} case={caseState()} wear={wear()} />
               </Show>
-              {/* Battery and wear readings belong to a live connection; hide them rather than show 0 %. */}
-              <Show when={connected()}>
-                <HomeTab
-                  leftPct={left()[left().length - 1]?.pct ?? 0}
-                  rightPct={right()[right().length - 1]?.pct ?? 0}
-                  casePct={caseData()[caseData().length - 1]?.pct ?? 0}
-                  leftCharging={leftCharging()}
-                  rightCharging={rightCharging()}
-                  caseCharging={caseCharging()}
-                  leftInEar={wear()?.left_in_ear ?? false}
-                  rightInEar={wear()?.right_in_ear ?? false}
-                  wearKnown={wear() !== null}
-                  leftHistory={left().map((r) => r.pct)}
-                  rightHistory={right().map((r) => r.pct)}
-                  elapsed={useElapsed()()}
-                  showTimer={getSettingsStore().show_session_timer}
-                  showFind={modelInfo()?.find_earbud ?? true}
-                />
-              </Show>
-            </div>
-          </Show>
 
-          <Show when={activeTab() === 'anc'}>
-            <div class="panel-in">
-              <Offline when={!connected()} />
               <div class="device-controls" inert={!connected()} classList={{ offline: !connected() }}>
-                <AncTab
+                <NoiseControl
                   mode={ancMode()}
-                  loading={ancLoading()}
+                  pending={ancLoading()}
+                  modes={supportedAncModes()}
                   level={ancLevel()}
                   levelMax={levelMax()}
-                  strengthModes={strengthModes()}
-                  supportedModes={supportedAncModes()}
-                  gameMode={gameMode()}
-                  showGameMode={true}
+                  showStrength={strengthModes().includes(ancMode())}
                   onMode={handleAnc}
                   onLevel={handleLevel}
                   onLevelCommit={handleLevelCommit}
-                  onGameMode={handleGameMode}
+                />
+                <SoundPresets preset={eqPreset()} labels={modelInfo()?.eq_labels ?? null} onPreset={handleEqPreset} />
+                <Extras
+                  lowLatency={gameMode()}
+                  onLowLatency={handleGameMode}
+                  showFind={modelInfo()?.find_earbud ?? true}
                 />
               </div>
             </div>
-          </Show>
-
-          <Show when={activeTab() === 'eq'}>
-            <div class="panel-in">
-              <Offline when={!connected()} />
-              <div class="device-controls" inert={!connected()} classList={{ offline: !connected() }}>
-                <EqTab preset={eqPreset()} labels={modelInfo()?.eq_labels ?? null} onPreset={handleEqPreset} />
-              </div>
-            </div>
-          </Show>
-
-          <Show when={activeTab() === 'settings'}>
-            <div class="panel-in">
-              <SettingsTab initialUpdateVersion={updateVersion()} onUpdateInstalled={() => setUpdateVersion(null)} />
-            </div>
-          </Show>
-        </div>
-      </div>
+          }
+        >
+          <div class="view-in content-stack">
+            <Settings initialUpdateVersion={updateVersion()} onUpdateInstalled={() => setUpdateVersion(null)} />
+          </div>
+        </Show>
+      </main>
 
       <Show when={toastMessage()}>
         {(message) => (
@@ -314,13 +257,5 @@ export default function App() {
         )}
       </Show>
     </div>
-  );
-}
-
-function Offline(p: { when: boolean }) {
-  return (
-    <Show when={p.when}>
-      <div class="offline-note">Connect your earbuds to change these settings.</div>
-    </Show>
   );
 }

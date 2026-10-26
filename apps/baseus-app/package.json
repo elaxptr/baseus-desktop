@@ -15,6 +15,7 @@
     "@tauri-apps/plugin-autostart": "^2.5.1",
     "@tauri-apps/plugin-notification": "^2.3.3",
     "@tauri-apps/plugin-opener": "^2",
+    "lucide-solid": "^1.61.0",
     "solid-js": "^1.9.3"
   },
   "devDependencies": {

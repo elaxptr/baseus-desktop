@@ -5,6 +5,12 @@ All notable changes to this project are documented here. Format loosely follows
 
 ## [Unreleased]
 
+### Changed
+- **Redesigned interface.** One page instead of tabs: batteries, noise control, sound
+  presets, low latency and find-my-earbuds are all visible at once, with settings behind
+  the gear. Follows the system light/dark theme. The battery history graphs are gone.
+- **New app icon** in place of the default Tauri one; the window is 60 px taller.
+
 ### Added
 - Tray menu shows the connected model and battery levels and switches noise control
   (Off / Noise cancellation / Transparency); the tray tooltip shows the same summary.
