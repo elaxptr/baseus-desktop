@@ -232,7 +232,7 @@ fn match_index(devices: &[DeviceMatch<'_>], props: &PeripheralProperties) -> Opt
     }) {
         return Some(idx);
     }
-    let local = props.local_name.as_deref()?;
+    let local = props.local_name.as_deref()?.trim();
     devices
         .iter()
         .position(|d| d.name.eq_ignore_ascii_case(local))

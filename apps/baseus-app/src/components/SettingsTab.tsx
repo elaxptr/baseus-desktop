@@ -8,12 +8,14 @@ interface Props {
   onUpdateInstalled: () => void;
 }
 
-type UpdateState = 'idle' | 'checking' | 'up-to-date' | 'available' | 'installing';
+type UpdateState = 'idle' | 'checking' | 'up-to-date' | 'available' | 'installing' | 'error';
 
 export default function SettingsTab(props: Props) {
   const [appVersion, setAppVersion] = createSignal('');
   const [updateState, setUpdateState] = createSignal<UpdateState>('idle');
   const [availableVersion, setAvailableVersion] = createSignal<string | null>(props.initialUpdateVersion);
+  // Last check/install failure. Shown until the next attempt so a failure isn't silent.
+  const [updateError, setUpdateError] = createSignal<string | null>(null);
 
   onMount(async () => {
     setAppVersion(await getVersion());
@@ -23,6 +25,7 @@ export default function SettingsTab(props: Props) {
 
   async function handleCheck() {
     setUpdateState('checking');
+    setUpdateError(null);
     try {
       const version = await checkForUpdate();
       if (version) {
@@ -31,22 +34,27 @@ export default function SettingsTab(props: Props) {
       } else {
         setUpdateState('up-to-date');
       }
-    } catch {
-      setUpdateState('idle');
+    } catch (e) {
+      setUpdateError(`Couldn't check for updates: ${e}`);
+      setUpdateState('error');
     }
   }
 
   async function handleInstall() {
     setUpdateState('installing');
+    setUpdateError(null);
     try {
       await installUpdate();
       props.onUpdateInstalled();
-    } catch {
+    } catch (e) {
+      setUpdateError(`Couldn't install the update: ${e}`);
       setUpdateState('available');
     }
   }
 
   const busy = () => updateState() === 'checking' || updateState() === 'installing';
+  // The install panel stays up while installing; the check button only replaces it after.
+  const showInstall = () => updateState() === 'available' || updateState() === 'installing';
 
   return (
     <div>
@@ -92,7 +100,7 @@ export default function SettingsTab(props: Props) {
               </div>
             </div>
 
-            <Show when={updateState() !== 'available'}>
+            <Show when={!showInstall()}>
               <button
                 onClick={handleCheck}
                 disabled={busy()}
@@ -107,12 +115,13 @@ export default function SettingsTab(props: Props) {
                 }}
               >
                 {updateState() === 'checking' ? 'Checking…' :
-                 updateState() === 'up-to-date' ? '✓ Up to date' : 'Check for updates'}
+                 updateState() === 'up-to-date' ? '✓ Up to date' :
+                 updateState() === 'error' ? 'Retry' : 'Check for updates'}
               </button>
             </Show>
           </div>
 
-          <Show when={updateState() === 'available'}>
+          <Show when={showInstall()}>
             <div
               style={{
                 'margin-top': '12px',
@@ -151,6 +160,12 @@ export default function SettingsTab(props: Props) {
               >
                 {updateState() === 'installing' ? 'Installing…' : 'Install & Restart'}
               </button>
+            </div>
+          </Show>
+
+          <Show when={updateError()}>
+            <div style={{ 'margin-top': '10px', 'font-size': '11px', color: '#f87171', 'word-break': 'break-word' }}>
+              {updateError()}
             </div>
           </Show>
         </div>

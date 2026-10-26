@@ -36,6 +36,12 @@ All notable changes to this project are documented here. Format loosely follows
 - Closing the window hides it to the tray instead of quitting, so the BLE link and
   low-battery alerts keep running; use the tray menu's **Quit** to exit.
 - The title bar no longer claims "Bass BP1 Pro ANC" before any earbuds are connected.
+- Update check and install failures are now shown in Settings, with a retry button.
+  Before, a failed check silently reset the panel. The install panel also stays visible
+  while installing instead of disappearing as soon as you click Install
+  ([#7](https://github.com/elaxptr/baseus-desktop/pull/7)).
+- More BP1 Pro name variants are recognized ("Baseus Bass BP1 Pro", "… ANC"), and name
+  matching ignores surrounding whitespace ([#7]).
 
 ## [0.3.0] — 2026-07-03
 

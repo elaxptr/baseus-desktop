@@ -124,7 +124,13 @@ impl BaseusModel {
     /// `None` for a device that is plainly there. Match on `service_uuid` first.
     pub fn advertising_names(self) -> &'static [&'static str] {
         match self {
-            BaseusModel::Bp1ProAnc => &["Bass BP1 Pro"],
+            // Firmware/region variants of the same name, reported in #7.
+            BaseusModel::Bp1ProAnc => &[
+                "Bass BP1 Pro",
+                "Bass BP1 Pro ANC",
+                "Baseus Bass BP1 Pro",
+                "Baseus Bass BP1 Pro ANC",
+            ],
             // Deliberately empty. The BP1 Ultra earbuds also advertise a Google Fast
             // Pair identity under the same "BP1 Ultra" name, without the control
             // service, so a name match could latch onto the wrong peripheral. The
@@ -203,8 +209,9 @@ impl BaseusModel {
     }
 
     /// Look up the model from a BLE advertising name seen during a scan.
-    /// Matching is case-insensitive to handle firmware variations.
+    /// Matching is case-insensitive and ignores surrounding whitespace.
     pub fn from_advertising_name(name: &str) -> Option<Self> {
+        let name = name.trim();
         Self::all()
             .iter()
             .find(|m| {
@@ -262,6 +269,24 @@ mod tests {
         ] {
             assert!(!looks_like_baseus(name), "{name}");
         }
+    }
+
+    #[test]
+    fn bp1_pro_name_variants_resolve() {
+        for name in [
+            "Bass BP1 Pro",
+            "BASS BP1 PRO",
+            " Bass BP1 Pro ANC ",
+            "Baseus Bass BP1 Pro",
+            "baseus bass bp1 pro anc",
+        ] {
+            assert_eq!(
+                BaseusModel::from_advertising_name(name),
+                Some(BaseusModel::Bp1ProAnc),
+                "{name:?}"
+            );
+        }
+        assert_eq!(BaseusModel::from_advertising_name("Bass BP1 NC"), None);
     }
 
     #[test]
