@@ -1,4 +1,4 @@
-use crate::device::{CommandSender, DeviceCommand, Side};
+use crate::device::{CommandSender, DeviceCommand, DeviceSnapshot, SharedSnapshot, Side};
 use crate::settings::{self, Settings};
 use baseus_protocol::types::{AncMode, BaseusModel, EqPreset};
 use tauri::{AppHandle, Runtime, State};
@@ -18,6 +18,9 @@ pub fn set_anc_mode(
         "transparency" => AncMode::Transparency,
         other => return Err(format!("unknown mode: {other}")),
     };
+    // The level byte is model-specific: a 0x10–0xFF strength on the BP1 Pro, a
+    // discrete 1–5 step on the BP1 Ultra (clamped by its encoder). The frontend
+    // sends the right scale for the connected model.
     let byte = level.unwrap_or(0x68);
     cmd_tx
         .send(DeviceCommand::SetAncMode(anc_mode, byte))
@@ -49,6 +52,13 @@ pub fn find_earbud(side: String, cmd_tx: State<CommandSender>) -> Result<(), Str
     cmd_tx
         .send(DeviceCommand::FindEarbud(s))
         .map_err(|e| e.to_string())
+}
+
+/// Current connection state and connected model, for a frontend that subscribed to the
+/// `connection-state` / `model-info` events after they were emitted.
+#[tauri::command]
+pub fn get_device_snapshot(snapshot: State<SharedSnapshot>) -> DeviceSnapshot {
+    snapshot.lock().map(|s| s.clone()).unwrap_or_default()
 }
 
 /// Return the ANC modes supported by a given model name.

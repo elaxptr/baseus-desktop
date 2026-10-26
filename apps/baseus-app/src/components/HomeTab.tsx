@@ -17,6 +17,7 @@ interface Props {
   rightHistory: number[];
   elapsed: number; // seconds
   showTimer: boolean;
+  showFind: boolean; // false for models whose find-my-earbuds command is unknown
 }
 
 const CIRC = 2 * Math.PI * 28;
@@ -205,13 +206,15 @@ export default function HomeTab(props: Props) {
       </div>
 
       {/* Find Earbuds */}
-      <div style={{ 'margin-bottom': '14px' }}>
-        <div style={labelStyle}>Find Earbuds <Divider /></div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <FindBtn label="Play Left"  onClick={() => findEarbud('left').catch(() => {})} />
-          <FindBtn label="Play Right" onClick={() => findEarbud('right').catch(() => {})} />
+      {props.showFind && (
+        <div style={{ 'margin-bottom': '14px' }}>
+          <div style={labelStyle}>Find Earbuds <Divider /></div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <FindBtn label="Play Left"  onClick={() => findEarbud('left').catch(() => {})} />
+            <FindBtn label="Play Right" onClick={() => findEarbud('right').catch(() => {})} />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Session timer */}
       {props.showTimer && props.elapsed > 0 && (

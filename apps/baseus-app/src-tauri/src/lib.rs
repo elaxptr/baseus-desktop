@@ -44,6 +44,7 @@ pub fn run() {
         ))
         .plugin(tauri_plugin_notification::init())
         .manage(cmd_tx)
+        .manage(device::SharedSnapshot::default())
         .setup(|app| {
             tray::setup_tray(app.handle())?;
             if let Some(window) = app.get_webview_window("main") {
@@ -74,6 +75,7 @@ pub fn run() {
             commands::get_settings,
             commands::set_settings,
             commands::get_supported_anc_modes,
+            commands::get_device_snapshot,
             commands::check_for_update,
             commands::install_update,
         ])

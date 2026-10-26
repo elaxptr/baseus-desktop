@@ -9,6 +9,8 @@ const PRESETS: { id: EqPreset; name: string; bars: number[] }[] = [
 
 interface Props {
   preset: EqPreset;
+  /** Model-specific preset names, in PRESETS order; null keeps the generic names. */
+  labels: [string, string, string, string] | null;
   onPreset: (p: EqPreset) => void;
 }
 
@@ -17,7 +19,8 @@ export default function EqTab(props: Props) {
     <div>
       <div style={labelStyle}>Sound Presets <Divider /></div>
       <div style={{ display: 'grid', 'grid-template-columns': '1fr 1fr', gap: '8px' }}>
-        {PRESETS.map(({ id, name, bars }) => {
+        {PRESETS.map(({ id, name: genericName, bars }, i) => {
+          const name = props.labels?.[i] ?? genericName;
           const active = () => props.preset === id;
           return (
             <div

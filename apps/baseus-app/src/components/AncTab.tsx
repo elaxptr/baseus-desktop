@@ -3,7 +3,9 @@ import type { AncMode } from '../lib/tauri';
 interface Props {
   mode: AncMode;
   loading: AncMode | null;
-  level: number; // 1–10
+  level: number; // 1–levelMax
+  levelMax: number; // 10 (continuous) or the model's discrete step count
+  strengthModes: AncMode[]; // modes whose strength the slider controls
   supportedModes: AncMode[];
   gameMode: boolean;
   showGameMode: boolean;
@@ -18,9 +20,6 @@ const MODE_META: Record<AncMode, { icon: string; name: string; desc: string }> =
   anc:          { icon: '🎧', name: 'Active Noise Cancellation', desc: 'Blocks ambient sound' },
   transparency: { icon: '🌬️', name: 'Transparency',              desc: 'Lets ambient sound in' },
 };
-
-// Level slider only applies to ANC/Transparency modes.
-const LEVEL_MODES: AncMode[] = ['anc', 'transparency'];
 
 function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -46,7 +45,7 @@ export default function AncTab(props: Props) {
     }
   }
 
-  const showStrength = () => LEVEL_MODES.includes(props.mode);
+  const showStrength = () => props.strengthModes.includes(props.mode);
 
   return (
     <div>
@@ -115,11 +114,11 @@ export default function AncTab(props: Props) {
           <div style={{ display: 'flex', 'justify-content': 'space-between', 'margin-bottom': '12px' }}>
             <span style={{ 'font-size': '12px', color: '#888' }}>Level</span>
             <span class="num-mono" style={{ 'font-size': '12px', 'font-weight': '700', color: '#818cf8' }}>
-              {props.level} / 10
+              {props.level} / {props.levelMax}
             </span>
           </div>
           <input
-            type="range" min="1" max="10" value={props.level}
+            type="range" min="1" max={props.levelMax} value={props.level}
             onInput={sliderInput}
             onChange={sliderCommit}
             style={{
