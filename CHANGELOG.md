@@ -3,6 +3,13 @@
 All notable changes to this project are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions match the git tags.
 
+## [0.4.1] — 2026-10-26
+
+### Fixed
+- Releases now include the signed `latest.json` that the in-app updater reads. No
+  earlier release had it, so the updater never found an update; versions up to 0.4.0
+  have to install this one by hand.
+
 ## [0.4.0] — 2026-10-26
 
 First public release since 0.2.1: 0.3.0 was never published as a release, so its
