@@ -27,6 +27,9 @@ All notable changes to this project are documented here. Format loosely follows
 - Changes made while the earbuds were disconnected were queued and replayed on the next
   connection. They're now refused, and the controls are disabled until the earbuds connect.
 - Batteries no longer show 0 % while disconnected.
+- When the earbuds drop the connection, the next failed change now ends the session and
+  reconnects. Before, every change failed with an error until the link check caught up,
+  which could take a while if you kept clicking.
 - A change the earbuds didn't take now shows an error and reverts the control instead of
   failing silently.
 - Removed the decorative macOS-style window buttons from the title bar.

@@ -510,10 +510,16 @@ async fn notification_loop(
                     }
                     Err(e) => {
                         tracing::warn!("command error: {e}");
+                        let connected = transport.is_connected().await;
+                        let message = if connected { e } else { "the earbuds disconnected".into() };
                         let _ = app.emit(
                             "command-error",
-                            CommandError { command: cmd.kind(), message: e },
+                            CommandError { command: cmd.kind(), message },
                         );
+                        if !connected {
+                            tracing::info!("device disconnected (detected on write)");
+                            return;
+                        }
                     }
                 }
             }
@@ -521,6 +527,10 @@ async fn notification_loop(
                 // The answer arrives as a regular state notification and updates the UI.
                 if let Err(e) = transport.send(&Bp1Ultra::encode_query(opcode)).await {
                     tracing::warn!("state re-check {opcode:#04x} failed: {e}");
+                    if !transport.is_connected().await {
+                        tracing::info!("device disconnected (detected on write)");
+                        return;
+                    }
                 }
             }
             Some(side) = find_stop_rx.recv() => {
@@ -530,6 +540,10 @@ async fn notification_loop(
                 };
                 if let Err(e) = transport.send(stop_bytes).await {
                     tracing::warn!("find auto-stop failed: {e}");
+                    if !transport.is_connected().await {
+                        tracing::info!("device disconnected (detected on write)");
+                        return;
+                    }
                 } else {
                     tracing::debug!("find auto-stop sent");
                 }
