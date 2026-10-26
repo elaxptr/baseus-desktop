@@ -3,7 +3,10 @@
 All notable changes to this project are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions match the git tags.
 
-## [Unreleased]
+## [0.4.0] — 2026-10-26
+
+First public release since 0.2.1: 0.3.0 was never published as a release, so its
+changes (below) also ship with this version.
 
 ### Added
 - **Bass BP1 Ultra support** (firmware 1.0.26): battery (L/R/case), noise control
@@ -43,7 +46,7 @@ All notable changes to this project are documented here. Format loosely follows
 - More BP1 Pro name variants are recognized ("Baseus Bass BP1 Pro", "… ANC"), and name
   matching ignores surrounding whitespace ([#7]).
 
-## [0.3.0] — 2026-07-03
+## 0.3.0 — 2026-07-03 (not released separately)
 
 ### Added
 - **Game / low-latency mode** for the BP1 Pro — a toggle that sends `BA 24 01/00`
@@ -67,7 +70,7 @@ All notable changes to this project are documented here. Format loosely follows
   for future owner-contributed, hardware-verified models — see `BACKLOG.md` for the
   planned in-app Capture Studio and declarative model format.
 
-[0.3.0]: https://github.com/elaxptr/baseus-desktop/releases/tag/v0.3.0
+[0.4.0]: https://github.com/elaxptr/baseus-desktop/releases/tag/v0.4.0
 
 ## [0.2.1] and earlier
 

@@ -43,7 +43,7 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: 'baseus-desktop ${{ github.ref_name }}'
           releaseBody: |
-            Windows desktop companion for Baseus BP1 Pro ANC earbuds.
+            Windows desktop companion for Baseus Bass BP1 Pro ANC and BP1 Ultra earbuds.
 
             **Requires:** Windows 10 1903+ with Bluetooth.
 
