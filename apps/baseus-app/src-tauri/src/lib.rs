@@ -43,12 +43,17 @@ pub fn run() {
             Some(vec!["--minimized"]),
         ))
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_opener::init())
         .manage(cmd_tx)
         .manage(device::SharedSnapshot::default())
         .setup(|app| {
             tray::setup_tray(app.handle())?;
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.hide();
+            // Only launch-at-login (which passes `--minimized`) starts in the tray. A
+            // manual launch that opened nothing read as "the app closes itself" (#1).
+            if std::env::args().any(|arg| arg == "--minimized") {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.hide();
+                }
             }
             let handle = app.handle().clone();
             tauri::async_runtime::spawn(device::run_loop(handle, cmd_rx));
@@ -66,6 +71,16 @@ pub fn run() {
             }
 
             Ok(())
+        })
+        // Closing the window keeps the app in the tray, so low-battery alerts and the
+        // BLE link survive it; the tray menu's Quit exits for real.
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                if window.label() == "main" {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
         })
         .invoke_handler(tauri::generate_handler![
             commands::set_anc_mode,

@@ -53,7 +53,7 @@ export default function SettingsTab(props: Props) {
       <div style={labelStyle}>Preferences <Divider /></div>
       <Toggle
         label="Launch at login"
-        desc="Start automatically with Windows"
+        desc="Start automatically when you log in"
         value={getSettingsStore().launch_at_login}
         onChange={(v) => updateSetting('launch_at_login', v)}
       />
