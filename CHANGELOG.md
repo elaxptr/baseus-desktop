@@ -20,6 +20,8 @@ All notable changes to this project are documented here. Format loosely follows
   [@maiconatz](https://github.com/maiconatz).
 - The `connect` example takes `spatial:on|off`, `wind:on|off`, `bass:off|1|2|3` and
   `fw:?` for testing these from the command line.
+- **Linux release builds:** each release now carries a `.deb` and an AppImage, built on
+  Ubuntu 22.04 for wider glibc compatibility.
 - Tray menu shows the connected model and battery levels and switches noise control
   (Off / Noise cancellation / Transparency); the tray tooltip shows the same summary.
 
@@ -28,8 +30,9 @@ All notable changes to this project are documented here. Format loosely follows
   connection. They're now refused, and the controls are disabled until the earbuds connect.
 - Batteries no longer show 0 % while disconnected.
 - Linux: the app could lock onto the earbuds' classic audio device, which has the same
-  name but no control service, and fail every retry. It now tries each match, the ones
-  advertising the control service first.
+  name but no control service, and fail every retry (or time out paging it when the buds
+  were away). It now tries each match, the ones advertising the control service first,
+  skips any that isn't the control device, and stops touching it for the session.
 - Linux: after restarting the app, the earbuds sent nothing (no battery, model guessed),
   because BlueZ kept the old link open. The app now starts a fresh link in that case.
 - When the earbuds drop the connection, the next failed change now ends the session and

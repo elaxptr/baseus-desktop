@@ -4,8 +4,11 @@ Open-source desktop client for Baseus earbuds, built by reverse-engineering
 the official Baseus Android app.
 
 **Platform:** Windows 10 1903+ and Linux (BlueZ 5.6x). The Bluetooth layer is
-[btleplug](https://github.com/deviceplug/btleplug), so both backends run the same code;
-only the updater is Windows/macOS-only, since Linux installs come from the distro.
+[btleplug](https://github.com/deviceplug/btleplug), so both backends run the same code.
+
+**Install:** grab the latest [release](https://github.com/elaxptr/baseus-desktop/releases/latest):
+the `-setup.exe` on Windows (it updates itself), or the `.deb` / `.AppImage` on Linux
+(no auto-update there; download the new one).
 
 ## Supported hardware
 

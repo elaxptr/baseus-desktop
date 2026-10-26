@@ -7,12 +7,29 @@ on:
 
 jobs:
   release:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            bundles: nsis,msi
+          # The oldest supported runner, so the AppImage and .deb link against an older
+          # glibc and run on more distros.
+          - os: ubuntu-22.04
+            bundles: deb,appimage
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: write
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
+            librsvg2-dev libssl-dev libdbus-1-dev libxdo-dev patchelf
 
       - uses: dtolnay/rust-toolchain@stable
 
@@ -32,6 +49,8 @@ jobs:
         run: pnpm install
         working-directory: apps/baseus-app
 
+      # Both jobs publish to the same release; tauri-action merges each platform into
+      # latest.json. The Linux entry goes unused: Linux builds have no updater plugin.
       - name: Build and publish release
         uses: tauri-apps/tauri-action@v0
         env:
@@ -40,13 +59,17 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: apps/baseus-app
+          args: --bundles ${{ matrix.bundles }}
           tagName: ${{ github.ref_name }}
           releaseName: 'baseus-desktop ${{ github.ref_name }}'
           releaseBody: |
-            Windows desktop companion for Baseus Bass BP1 Pro ANC and BP1 Ultra earbuds.
+            Desktop companion for Baseus Bass BP1 Pro ANC and BP1 Ultra earbuds.
 
-            **Requires:** Windows 10 1903+ with Bluetooth.
+            **Windows** (10 1903 or later): download `baseus-app_*_x64-setup.exe`. Installed
+            copies update themselves.
+            **Linux** (BlueZ): `baseus-app_*_amd64.deb` for Debian/Ubuntu, or the
+            `.AppImage` for anything else. These don't auto-update.
 
-            Download `baseus-desktop_*_x64-setup.exe` below.
+            See CHANGELOG.md for what's new.
           releaseDraft: false
           prerelease: false
