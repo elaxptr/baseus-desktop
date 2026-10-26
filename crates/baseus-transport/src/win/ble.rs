@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use std::sync::Mutex;
 use std::time::Duration;
 
 use btleplug::api::{
@@ -12,6 +13,10 @@ use crate::{DeviceMatch, TransportError};
 
 const SCAN_TIMEOUT: Duration = Duration::from_secs(20);
 const SCAN_POLL: Duration = Duration::from_millis(500);
+
+/// Devices found to lack the control service, kept for the life of the process so later
+/// attempts don't connect them again (each try pages the earbuds' classic audio device).
+static NOT_CONTROL: Mutex<BTreeSet<BDAddr>> = Mutex::new(BTreeSet::new());
 
 pub struct GattTransport {
     peripheral: Peripheral,
@@ -34,8 +39,8 @@ impl GattTransport {
         let adapter = get_adapter().await?;
         // Names of non-matching devices seen along the way, reported on failure.
         let mut nearby = BTreeSet::new();
-        // Matching devices that turned out not to carry the control service.
-        let mut rejected = BTreeSet::new();
+        // Matching devices that turned out not to be the control device.
+        let mut rejected = NOT_CONTROL.lock().map(|s| s.clone()).unwrap_or_default();
 
         // Check cached/bonded peripherals first — the device may already be known to the
         // adapter and not actively advertising, so a fresh scan would time out.
@@ -43,9 +48,11 @@ impl GattTransport {
         let cached = find_matches(&adapter, devices, &mut nearby, &rejected)
             .await
             .unwrap_or_default();
-        for (p, idx) in cached {
+        for (p, idx, by_service) in cached {
             tracing::info!("found {} in adapter cache", devices[idx].name);
-            if let Some(transport) = try_candidate(p, devices[idx], &mut rejected).await? {
+            if let Some(transport) =
+                try_candidate(p, devices[idx], by_service, &mut rejected).await?
+            {
                 return Ok((transport, idx));
             }
         }
@@ -66,9 +73,11 @@ impl GattTransport {
                 let candidates = find_matches(&adapter, devices, &mut nearby, &rejected)
                     .await
                     .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
-                for (p, idx) in candidates {
+                for (p, idx, by_service) in candidates {
                     adapter.stop_scan().await.ok();
-                    if let Some(transport) = try_candidate(p, devices[idx], &mut rejected).await? {
+                    if let Some(transport) =
+                        try_candidate(p, devices[idx], by_service, &mut rejected).await?
+                    {
                         return Ok((transport, idx));
                     }
                     adapter.start_scan(ScanFilter::default()).await.ok();
@@ -216,19 +225,27 @@ async fn connect_with_uuids(
     })
 }
 
-/// Connect to one matching peripheral. `Ok(None)` means it has no control service: a
+/// Connect to one matching peripheral. `Ok(None)` means move on to the next match: a
 /// name match can be the earbuds' classic audio device, which BlueZ lists beside the LE
-/// one. It is remembered in `rejected` and left connected, since it carries the audio.
+/// one under the same name. It has no control service, or can't be paged at all when out
+/// of range, so any failure of a name-only match skips it instead of ending the search.
+/// Skipped devices are remembered in `rejected`, and left as they are: they carry the audio.
 async fn try_candidate(
     peripheral: Peripheral,
     device: DeviceMatch<'_>,
+    by_service: bool,
     rejected: &mut BTreeSet<BDAddr>,
 ) -> Result<Option<GattTransport>, TransportError> {
     let address = peripheral.address();
     match connect_with_uuids(peripheral, device).await {
         Ok(transport) => Ok(Some(transport)),
-        Err(TransportError::ServiceNotFound) => {
-            tracing::info!("{address} has no control service, trying the next match");
+        Err(e) if !by_service || matches!(e, TransportError::ServiceNotFound) => {
+            tracing::info!("{address} is not the control device ({e}), trying the next match");
+            if matches!(e, TransportError::ServiceNotFound) {
+                if let Ok(mut known) = NOT_CONTROL.lock() {
+                    known.insert(address);
+                }
+            }
             rejected.insert(address);
             Ok(None)
         }
@@ -236,15 +253,15 @@ async fn try_candidate(
     }
 }
 
-/// Cached peripherals matching any entry, with the entry's index: those advertising the
-/// control service first, then name-only matches. Names of the peripherals that did not
+/// Cached peripherals matching any entry, with the entry's index and whether the service
+/// UUID matched: those advertising the control service first, then name-only matches. Names of the peripherals that did not
 /// match are added to `nearby`.
 async fn find_matches(
     adapter: &Adapter,
     devices: &[DeviceMatch<'_>],
     nearby: &mut BTreeSet<String>,
     rejected: &BTreeSet<BDAddr>,
-) -> btleplug::Result<Vec<(Peripheral, usize)>> {
+) -> btleplug::Result<Vec<(Peripheral, usize, bool)>> {
     let mut by_service = Vec::new();
     let mut by_name = Vec::new();
     for p in adapter.peripherals().await? {
@@ -261,8 +278,8 @@ async fn find_matches(
             props.services
         );
         match match_index(devices, &props) {
-            Some((idx, true)) => by_service.push((p, idx)),
-            Some((idx, false)) => by_name.push((p, idx)),
+            Some((idx, true)) => by_service.push((p, idx, true)),
+            Some((idx, false)) => by_name.push((p, idx, false)),
             None => {
                 if let Some(name) = props.local_name.map(|n| n.trim().to_string()) {
                     if !name.is_empty() {
