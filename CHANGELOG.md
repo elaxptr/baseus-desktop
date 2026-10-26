@@ -28,6 +28,9 @@ changes (below) also ship with this version.
   [#2](https://github.com/elaxptr/baseus-desktop/issues/2),
   [#5](https://github.com/elaxptr/baseus-desktop/issues/5)). Idea from
   [#7](https://github.com/elaxptr/baseus-desktop/pull/7).
+- [docs/capture-your-model.md](docs/capture-your-model.md): a no-root, no-PC guide for
+  owners of unsupported models to record their earbuds' protocol on an Android phone. The
+  app's "Help add this model" button opens it.
 
 ### Fixed
 - The window stayed on "Connecting…" when the earbuds connected before the webview
@@ -39,9 +42,6 @@ changes (below) also ship with this version.
 - Closing the window hides it to the tray instead of quitting, so the BLE link and
   low-battery alerts keep running; use the tray menu's **Quit** to exit.
 - The title bar no longer claims "Bass BP1 Pro ANC" before any earbuds are connected.
-- [docs/capture-your-model.md](docs/capture-your-model.md): a no-root, no-PC guide for
-  owners of unsupported models to record their earbuds' protocol on an Android phone. The
-  app's "Help add this model" button opens it.
 - Update check and install failures are now shown in Settings, with a retry button.
   Before, a failed check silently reset the panel. The install panel also stays visible
   while installing instead of disappearing as soon as you click Install
