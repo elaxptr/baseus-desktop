@@ -1,3 +1,4 @@
+use std::collections::BTreeSet;
 use std::time::Duration;
 
 use btleplug::api::{
@@ -31,11 +32,13 @@ impl GattTransport {
     /// Returns the transport and the index of the matched entry.
     pub async fn connect_any(devices: &[DeviceMatch<'_>]) -> Result<(Self, usize), TransportError> {
         let adapter = get_adapter().await?;
+        // Names of non-matching devices seen along the way, reported on failure.
+        let mut nearby = BTreeSet::new();
 
         // Check cached/bonded peripherals first — the device may already be known to the
         // adapter and not actively advertising, so a fresh scan would time out.
         tracing::info!("checking cached peripherals for any known Baseus device…");
-        if let Ok(Some((p, idx))) = find_match(&adapter, devices).await {
+        if let Ok(Some((p, idx))) = find_match(&adapter, devices, &mut nearby).await {
             tracing::info!("found {} in adapter cache", devices[idx].name);
             let transport = connect_with_uuids(p, devices[idx]).await?;
             return Ok((transport, idx));
@@ -46,16 +49,21 @@ impl GattTransport {
         // their service UUID in the scan response, so filtering hides them entirely.
         // Identification happens in `match_index` instead, once the device is visible.
         tracing::info!("starting BLE scan for any known Baseus device…");
+        // A scan that cannot start almost always means the radio is off or missing.
         adapter
             .start_scan(ScanFilter::default())
             .await
-            .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
+            .map_err(|e| TransportError::AdapterUnavailable(e.to_string()))?;
 
-        let found = tokio::time::timeout(SCAN_TIMEOUT, poll_for_match(&adapter, devices)).await;
+        let found =
+            tokio::time::timeout(SCAN_TIMEOUT, poll_for_match(&adapter, devices, &mut nearby))
+                .await;
         adapter.stop_scan().await.ok();
 
         let (p, idx) = found
-            .map_err(|_| TransportError::DeviceNotFound("any known Baseus device".to_string()))?
+            .map_err(|_| TransportError::DeviceNotFound {
+                nearby: nearby.into_iter().collect(),
+            })?
             .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
 
         let transport = connect_with_uuids(p, devices[idx]).await?;
@@ -81,15 +89,15 @@ impl GattTransport {
 async fn get_adapter() -> Result<Adapter, TransportError> {
     let manager = Manager::new()
         .await
-        .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
+        .map_err(|e| TransportError::AdapterUnavailable(e.to_string()))?;
     let adapters = manager
         .adapters()
         .await
-        .map_err(|e| TransportError::ConnectionFailed(e.to_string()))?;
+        .map_err(|e| TransportError::AdapterUnavailable(e.to_string()))?;
     adapters
         .into_iter()
         .next()
-        .ok_or_else(|| TransportError::ConnectionFailed("no Bluetooth adapter".into()))
+        .ok_or_else(|| TransportError::AdapterUnavailable("no Bluetooth adapter".into()))
 }
 
 async fn connect_with_uuids(
@@ -172,9 +180,11 @@ async fn connect_with_uuids(
 }
 
 /// Return the first cached peripheral matching any entry, with the entry's index.
+/// Names of the peripherals that did not match are added to `nearby`.
 async fn find_match(
     adapter: &Adapter,
     devices: &[DeviceMatch<'_>],
+    nearby: &mut BTreeSet<String>,
 ) -> btleplug::Result<Option<(Peripheral, usize)>> {
     for p in adapter.peripherals().await? {
         let Ok(Some(props)) = p.properties().await else {
@@ -189,6 +199,11 @@ async fn find_match(
         if let Some(idx) = match_index(devices, &props) {
             return Ok(Some((p, idx)));
         }
+        if let Some(name) = props.local_name.map(|n| n.trim().to_string()) {
+            if !name.is_empty() {
+                nearby.insert(name);
+            }
+        }
     }
     Ok(None)
 }
@@ -196,9 +211,10 @@ async fn find_match(
 async fn poll_for_match(
     adapter: &Adapter,
     devices: &[DeviceMatch<'_>],
+    nearby: &mut BTreeSet<String>,
 ) -> btleplug::Result<(Peripheral, usize)> {
     loop {
-        if let Some(hit) = find_match(adapter, devices).await? {
+        if let Some(hit) = find_match(adapter, devices, nearby).await? {
             return Ok(hit);
         }
         tokio::time::sleep(SCAN_POLL).await;

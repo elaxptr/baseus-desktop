@@ -215,3 +215,61 @@ impl BaseusModel {
             .copied()
     }
 }
+
+/// Product-line words that appear in the advertising names of Baseus audio gear.
+/// "Bass" is matched only as a leading word ("Bass BP1 NC", "Bass EP10 Pro") so
+/// that unrelated speakers with "bass" somewhere in their name don't qualify.
+const BASEUS_NAME_HINTS: &[&str] = &["baseus", "bowie", "inspire", "encok", "airnora"];
+
+/// Whether an advertised BLE name looks like a Baseus device, supported or not.
+///
+/// A heuristic for diagnostics only — it never decides what to connect to. It lets
+/// the app tell an owner of an unsupported model "we see your earbuds, but they
+/// aren't supported yet" instead of searching forever (issues #2, #5, #10).
+pub fn looks_like_baseus(name: &str) -> bool {
+    let lower = name.trim().to_ascii_lowercase();
+    lower.starts_with("bass ") || BASEUS_NAME_HINTS.iter().any(|hint| lower.contains(hint))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn recognises_baseus_product_names() {
+        for name in [
+            "Bass BP1 Pro",
+            "Bass BP1 NC",
+            "BASS EP10 Pro",
+            "Baseus Bowie MA10",
+            "Bowie M2s",
+            "Baseus Inspire XH1",
+            "Encok WM01",
+            "  baseus AirNora 2 ",
+        ] {
+            assert!(looks_like_baseus(name), "{name}");
+        }
+    }
+
+    #[test]
+    fn ignores_unrelated_devices() {
+        for name in [
+            "JBL Flip 6",
+            "UltraBass Speaker",
+            "Bassline",
+            "",
+            "LE-Bose QC",
+        ] {
+            assert!(!looks_like_baseus(name), "{name}");
+        }
+    }
+
+    #[test]
+    fn supported_models_match_the_heuristic() {
+        for model in BaseusModel::all() {
+            for name in model.advertising_names() {
+                assert!(looks_like_baseus(name), "{name}");
+            }
+        }
+    }
+}

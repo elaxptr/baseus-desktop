@@ -5,10 +5,15 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum TransportError {
+    #[error("Bluetooth adapter unavailable: {0}")]
+    AdapterUnavailable(String),
     #[error("connection failed: {0}")]
     ConnectionFailed(String),
-    #[error("device '{0}' not found within scan window")]
-    DeviceNotFound(String),
+    /// No known device turned up within the scan window. `nearby` lists the
+    /// advertised names of every other device seen, so the caller can spot an
+    /// unsupported model instead of retrying silently.
+    #[error("no known device found within scan window ({} other device(s) seen)", nearby.len())]
+    DeviceNotFound { nearby: Vec<String> },
     #[error("Bluetooth service or characteristic not found on device")]
     ServiceNotFound,
     #[error("I/O error: {0}")]

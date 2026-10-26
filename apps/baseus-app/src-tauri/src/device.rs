@@ -6,9 +6,9 @@ use baseus_protocol::{
         bp1_pro_anc::Bp1ProAnc,
         bp1_ultra::{self, Bp1Ultra},
     },
-    types::{AncMode, BaseusModel, DeviceEvent, EqPreset},
+    types::{looks_like_baseus, AncMode, BaseusModel, DeviceEvent, EqPreset},
 };
-use baseus_transport::{win::ble::GattTransport, DeviceMatch};
+use baseus_transport::{win::ble::GattTransport, DeviceMatch, TransportError};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 use tokio::sync::mpsc;
@@ -78,6 +78,48 @@ pub struct DeviceSnapshot {
     pub model: Option<ModelInfo>,
     /// Latest device event of each kind since the connection started.
     pub events: Vec<DeviceEvent>,
+    /// Why the last attempt failed; kept across retries, cleared on connect.
+    pub issue: Option<ConnectionIssue>,
+}
+
+/// Why the last connection attempt failed. Shown while the app keeps retrying, so a
+/// search that never succeeds explains itself instead of sitting on "Connecting…"
+/// (issues #8 and #10).
+#[derive(Debug, Clone, Serialize)]
+pub struct ConnectionIssue {
+    /// `adapter` (Bluetooth off or missing), `not_found` (nothing supported nearby) or
+    /// `connect_failed` (earbuds found, but the control channel could not be opened).
+    pub kind: &'static str,
+    pub detail: String,
+    /// Nearby devices whose names look like Baseus models this app doesn't support.
+    pub unsupported: Vec<String>,
+    pub supported: Vec<&'static str>,
+}
+
+impl ConnectionIssue {
+    fn from_error(e: &TransportError) -> Self {
+        let (kind, unsupported) = match e {
+            TransportError::AdapterUnavailable(_) => ("adapter", Vec::new()),
+            TransportError::DeviceNotFound { nearby } => (
+                "not_found",
+                nearby
+                    .iter()
+                    .filter(|name| looks_like_baseus(name))
+                    .cloned()
+                    .collect(),
+            ),
+            _ => ("connect_failed", Vec::new()),
+        };
+        Self {
+            kind,
+            detail: e.to_string(),
+            unsupported,
+            supported: BaseusModel::all()
+                .iter()
+                .map(|m| m.display_name())
+                .collect(),
+        }
+    }
 }
 
 impl Default for DeviceSnapshot {
@@ -86,6 +128,7 @@ impl Default for DeviceSnapshot {
             state: "connecting",
             model: None,
             events: Vec::new(),
+            issue: None,
         }
     }
 }
@@ -113,6 +156,13 @@ fn emit_event(app: &AppHandle, event: &DeviceEvent) {
         snapshot.events.push(event.clone());
     }
     let _ = app.emit("device-event", event);
+}
+
+fn publish_issue(app: &AppHandle, issue: Option<ConnectionIssue>) {
+    if let Ok(mut snapshot) = app.state::<SharedSnapshot>().lock() {
+        snapshot.issue = issue.clone();
+    }
+    let _ = app.emit("connection-issue", &issue);
 }
 
 fn publish_model(app: &AppHandle, info: ModelInfo) {
@@ -197,6 +247,7 @@ pub async fn run_loop(app: AppHandle, mut cmd_rx: CommandReceiver) {
                 // Model first: the UI must know the model's capabilities before it
                 // starts sending commands to a "connected" device.
                 publish_model(&app, ModelInfo::of(connected_model));
+                publish_issue(&app, None);
                 publish_state(&app, "connected");
 
                 if connected_model == BaseusModel::Bp1Ultra {
@@ -212,6 +263,7 @@ pub async fn run_loop(app: AppHandle, mut cmd_rx: CommandReceiver) {
             }
             Err(e) => {
                 tracing::warn!("connect failed: {e}");
+                publish_issue(&app, Some(ConnectionIssue::from_error(&e)));
                 publish_state(&app, "disconnected");
             }
         }

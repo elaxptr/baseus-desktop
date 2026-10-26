@@ -4,16 +4,19 @@ import HomeTab from './components/HomeTab';
 import AncTab from './components/AncTab';
 import EqTab from './components/EqTab';
 import SettingsTab from './components/SettingsTab';
+import ConnectionHelp from './components/ConnectionHelp';
 import {
   getDeviceSnapshot,
   onDeviceEvent,
   onConnectionState,
+  onConnectionIssue,
   onModelInfo,
   onUpdateAvailable,
   setAncMode,
   setEqPreset,
   setGameMode,
   type AncMode,
+  type ConnectionIssue,
   type DeviceEvent,
   type EqPreset,
   type ModelInfo,
@@ -43,8 +46,9 @@ export default function App() {
   const [wear, setWear] = createSignal<WearState | null>(null);
   const [eqPreset, setEqPresetSignal] = createSignal<EqPreset>('balanced');
   const [updateVersion, setUpdateVersion] = createSignal<string | null>(null);
+  const [issue, setIssue] = createSignal<ConnectionIssue | null>(null);
 
-  const connectedModelName = createMemo(() => modelInfo()?.name ?? 'Bass BP1 Pro ANC');
+  const connectedModelName = createMemo(() => modelInfo()?.name ?? 'Baseus Desktop');
   const supportedAncModes = createMemo<AncMode[]>(() => BP1_ANC_MODES);
   const strengthModes = createMemo<AncMode[]>(() => modelInfo()?.strength_modes ?? DEFAULT_STRENGTH_MODES);
   const levelMax = createMemo(() => modelInfo()?.anc_levels ?? CONTINUOUS_LEVEL_MAX);
@@ -107,6 +111,13 @@ export default function App() {
 
     unlisteners.push(await onConnectionState(applyStatus));
     unlisteners.push(await onModelInfo(applyModel));
+    let issueSeen = false;
+    unlisteners.push(
+      await onConnectionIssue((i) => {
+        issueSeen = true;
+        setIssue(i);
+      }),
+    );
 
     // The backend may have connected before these listeners existed (the webview loads
     // in the background); catch up on what was already published. Model first: event
@@ -115,6 +126,7 @@ export default function App() {
     const snapshot = await getDeviceSnapshot().catch(() => null);
     if (snapshot?.model && modelInfo() === null) applyModel(snapshot.model);
     if (snapshot && status() === 'connecting') applyStatus(snapshot.state);
+    if (snapshot && !issueSeen) setIssue(snapshot.issue);
     snapshot?.events.filter((e) => !seen.has(e.type)).forEach(handleDeviceEvent);
 
     onUpdateAvailable((version) => setUpdateVersion(version))
@@ -215,6 +227,9 @@ export default function App() {
         <div style={{ flex: '1', padding: '16px', 'overflow-y': 'auto' }}>
           <Show when={activeTab() === 'home'}>
             <div class="panel-in">
+              <Show when={status() !== 'connected'}>
+                <ConnectionHelp connecting={status() === 'connecting'} issue={issue()} />
+              </Show>
               <HomeTab
                 leftPct={left()[left().length - 1]?.pct ?? 0}
                 rightPct={right()[right().length - 1]?.pct ?? 0}

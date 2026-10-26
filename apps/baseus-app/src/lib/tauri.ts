@@ -60,11 +60,27 @@ export function onModelInfo(cb: (info: ModelInfo) => void): Promise<UnlistenFn> 
   return listen<ModelInfo>('model-info', (event) => cb(event.payload));
 }
 
+/** Why the last connection attempt failed; null once connected. */
+export interface ConnectionIssue {
+  /** adapter: Bluetooth off/missing · not_found: nothing supported nearby ·
+   *  connect_failed: earbuds found, control channel not opened. */
+  kind: 'adapter' | 'not_found' | 'connect_failed';
+  detail: string;
+  /** Nearby devices that look like Baseus models this app doesn't support. */
+  unsupported: string[];
+  supported: string[];
+}
+
+export function onConnectionIssue(cb: (issue: ConnectionIssue | null) => void): Promise<UnlistenFn> {
+  return listen<ConnectionIssue | null>('connection-issue', (event) => cb(event.payload));
+}
+
 export interface DeviceSnapshot {
   state: ConnectionState;
   model: ModelInfo | null;
   /** Latest device event of each kind since the connection started. */
   events: DeviceEvent[];
+  issue: ConnectionIssue | null;
 }
 
 /** Connection state and model published before this window subscribed to the events. */
