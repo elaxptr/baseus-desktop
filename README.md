@@ -40,6 +40,17 @@ and contribute it back. Protocol capture tooling to make this much easier is on 
 
 ![Baseus Desktop Screenshot](image.png)
 
+## Troubleshooting
+
+- **The app opens and nothing happens.** On a manual launch it opens its window; with
+  *Launch at login* it starts in the tray. Closing the window also leaves it in the tray.
+  Use the tray icon to bring it back, or its menu's **Quit** to exit.
+- **Stuck searching.** While disconnected, the home tab says why the last attempt failed.
+  The earbuds accept one control connection at a time, so close the Baseus app on your
+  phone. In dual-device mode, the other device may be holding that connection.
+- **"Unsupported earbuds found".** Your model is visible but not supported yet. See
+  [docs/re-methodology.md](docs/re-methodology.md) to help add it.
+
 ## Building
 
 ```

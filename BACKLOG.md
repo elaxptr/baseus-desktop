@@ -13,8 +13,6 @@ replacement is tooling that lets real owners capture and contribute *verified* s
 
 ## BP1 Pro ANC remaining work
 
-## BP1 Pro ANC remaining work
-
 - [ ] Touch gesture remapping (opcode `0x92` likely candidate — needs full protocol capture)
 - [ ] Custom EQ (per-band sliders, not just presets)
 - [ ] Confirm EQ preset `0x03` (Clear) — extrapolated, not yet observed in captures
@@ -40,5 +38,5 @@ Not captured yet:
 
 - [ ] Firmware version display
 - [ ] Multi-device support
-- [ ] Linux support (BlueZ transport)
+- [x] Linux support (BlueZ transport)
 - [ ] macOS support (IOBluetooth transport)

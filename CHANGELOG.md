@@ -16,6 +16,26 @@ All notable changes to this project are documented here. Format loosely follows
   identified from the first notification's envelope instead of the scan entry.
 - Per-model capabilities in the `model-info` event: discrete ANC levels, which modes take a
   strength, find-my-earbuds availability, device preset names.
+- **Connection help on the home tab** while no earbuds are connected. It says why the
+  last attempt failed instead of sitting on "Connecting…": Bluetooth off, nothing found,
+  earbuds found but the control channel refused (phone app or dual-device mode holding
+  it, [#8](https://github.com/elaxptr/baseus-desktop/issues/8)), or a nearby Baseus
+  model that isn't supported yet, with links to help add it
+  ([#10](https://github.com/elaxptr/baseus-desktop/issues/10),
+  [#2](https://github.com/elaxptr/baseus-desktop/issues/2),
+  [#5](https://github.com/elaxptr/baseus-desktop/issues/5)). Idea from
+  [#7](https://github.com/elaxptr/baseus-desktop/pull/7).
+
+### Fixed
+- The window stayed on "Connecting…" when the earbuds connected before the webview
+  subscribed to events (a cached peripheral can connect within a second of launch). The
+  backend now keeps a snapshot that the frontend reads after subscribing.
+- A manual launch now opens the window. Only launch-at-login (`--minimized`) starts in
+  the tray; before, every launch went straight to the tray and looked like the app had
+  closed itself ([#1](https://github.com/elaxptr/baseus-desktop/issues/1)).
+- Closing the window hides it to the tray instead of quitting, so the BLE link and
+  low-battery alerts keep running; use the tray menu's **Quit** to exit.
+- The title bar no longer claims "Bass BP1 Pro ANC" before any earbuds are connected.
 
 ## [0.3.0] — 2026-07-03
 
