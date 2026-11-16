@@ -11,12 +11,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # WiX rejects non-numeric pre-release versions (0.5.0-rc.1), so prerelease
+          # tags ship the NSIS installer only.
           - os: windows-latest
             bundles: nsis,msi
+            prerelease_bundles: nsis
           # The oldest supported runner, so the AppImage and .deb link against an older
           # glibc and run on more distros.
           - os: ubuntu-22.04
             bundles: deb,appimage
+            prerelease_bundles: deb,appimage
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
@@ -59,7 +63,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: apps/baseus-app
-          args: --bundles ${{ matrix.bundles }}
+          args: --bundles ${{ contains(github.ref_name, '-') && matrix.prerelease_bundles || matrix.bundles }}
           tagName: ${{ github.ref_name }}
           releaseName: 'baseus-desktop ${{ github.ref_name }}'
           releaseBody: |
@@ -72,4 +76,6 @@ jobs:
 
             See CHANGELOG.md for what's new.
           releaseDraft: false
-          prerelease: false
+          # A tag like v0.5.0-rc.1 publishes a prerelease. The updater reads
+          # releases/latest, which skips prereleases, so installed copies don't take it.
+          prerelease: ${{ contains(github.ref_name, '-') }}
